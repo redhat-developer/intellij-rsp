@@ -1,0 +1,244 @@
+/*******************************************************************************
+ * Copyright (c) 2020 Red Hat, Inc.
+ * Distributed under license by Red Hat, Inc. All rights reserved.
+ * This program is made available under the terms of the
+ * Eclipse Public License v2.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v20.html
+ *
+ * Contributors:
+ * Red Hat, Inc. - initial API and implementation
+ ******************************************************************************/
+package org.jboss.tools.intellij.rsp.util;
+
+import com.intellij.execution.process.ProcessHandler;
+import com.intellij.openapi.application.ApplicationInfo;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.project.Project;
+
+import com.jediterm.terminal.ProcessTtyConnector;
+import com.jediterm.terminal.TtyConnector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.plugins.terminal.AbstractTerminalRunner;
+import org.jetbrains.plugins.terminal.TerminalOptionsProvider;
+import org.jetbrains.plugins.terminal.TerminalView;
+
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * To be deleted once my link-to-terminal is properly in commons
+ */
+public class ExecUtilClone {
+    private static class RedirectedStream extends FilterInputStream {
+        private boolean emitLF = false;
+        private final boolean redirect;
+        private final boolean delay;
+
+        private RedirectedStream(InputStream delegate, boolean redirect, boolean delay) {
+            super(delegate);
+            this.redirect = redirect;
+            this.delay = delay;
+        }
+
+        @Override
+        public synchronized int read() throws IOException {
+            if (emitLF) {
+                emitLF = false;
+                return '\n';
+            } else {
+                int c = super.read();
+                if (redirect && c == '\n') {
+                    emitLF = true;
+                    c = '\r';
+                }
+                return c;
+            }
+        }
+
+        @Override
+        public synchronized int read(@NotNull byte[] b) throws IOException {
+            return read(b, 0, b.length);
+        }
+
+        @Override
+        public synchronized int read(@NotNull byte[] b, int off, int len) throws IOException {
+            if (b == null) {
+                throw new NullPointerException();
+            } else if (off < 0 || len < 0 || len > b.length - off) {
+                throw new IndexOutOfBoundsException();
+            } else if (len == 0) {
+                return 0;
+            }
+
+            int c = read();
+            if (c == -1) {
+                if (delay) {
+                    try {
+                        Thread.sleep(60000L);
+                    } catch (InterruptedException e) {}
+                }
+                return -1;
+            }
+            b[off] = (byte)c;
+
+            int i = 1;
+            try {
+                for (; i < len  && available() > 0; i++) {
+                    c = read();
+                    if (c == -1) {
+                        break;
+                    }
+                    b[off + i] = (byte)c;
+                }
+            } catch (IOException ee) {}
+            return i;
+        }
+    }
+    private static class RedirectedProcess extends Process {
+        private final Process delegate;
+        private final InputStream inputStream;
+
+        private RedirectedProcess(Process delegate, boolean redirect, boolean delay) {
+            this.delegate = delegate;
+            inputStream = new RedirectedStream(delegate.getInputStream(), redirect, delay) {};
+        }
+
+        @Override
+        public OutputStream getOutputStream() {
+            return delegate.getOutputStream();
+        }
+
+        @Override
+        public InputStream getInputStream() {
+            return inputStream;
+        }
+
+        @Override
+        public InputStream getErrorStream() {
+            return delegate.getErrorStream();
+        }
+
+        @Override
+        public int waitFor() throws InterruptedException {
+            return delegate.waitFor();
+        }
+
+        @Override
+        public boolean waitFor(long timeout, TimeUnit unit) throws InterruptedException {
+            return delegate.waitFor(timeout, unit);
+        }
+
+        @Override
+        public int exitValue() {
+            return delegate.exitValue();
+        }
+
+        @Override
+        public void destroy() {
+            delegate.destroy();
+        }
+
+        @Override
+        public Process destroyForcibly() {
+            return delegate.destroyForcibly();
+        }
+
+        @Override
+        public boolean isAlive() {
+            return delegate.isAlive();
+        }
+    }
+
+
+
+    private static AbstractTerminalRunner createTerminalRunner(Project project, Process process, String title) {
+        AbstractTerminalRunner runner = new AbstractTerminalRunner(project) {
+            @Override
+            protected Process createProcess(@Nullable String s) {
+                return process;
+            }
+
+            @Override
+            protected ProcessHandler createProcessHandler(Process process) {
+                return null;
+            }
+
+            @Override
+            protected String getTerminalConnectionName(Process process) {
+                return null;
+            }
+
+            @Override
+            protected TtyConnector createTtyConnector(Process process) {
+                return new ProcessTtyConnector(process, StandardCharsets.UTF_8) {
+                    @Override
+                    protected void resizeImmediately() {
+                    }
+
+                    @Override
+                    public String getName() {
+                        return title;
+                    }
+
+                    @Override
+                    public boolean isConnected() {
+                        return true;
+                    }
+                };
+            }
+
+            @Override
+            public String runningTargetName() {
+                return null;
+            }
+        };
+        return runner;
+    }
+
+
+    public static void linkProcessToTerminal(Process p, Project project, String title, boolean waitForProcessExit) throws IOException {
+        try {
+            boolean isPost2018_3 = ApplicationInfo.getInstance().getBuild().getBaselineVersion() >= 183;
+            final RedirectedProcess process = new RedirectedProcess(p, true, isPost2018_3);
+            AbstractTerminalRunner runner = createTerminalRunner(project, process, title);
+
+            TerminalOptionsProvider terminalOptions = ServiceManager.getService(TerminalOptionsProvider.class);
+            terminalOptions.setCloseSessionOnLogout(false);
+            final TerminalView view = TerminalView.getInstance(project);
+            final Method[] method = new Method[1];
+            final Object[][] parameters = new Object[1][];
+            try {
+                method[0] = TerminalView.class.getMethod("createNewSession", new Class[] {Project.class, AbstractTerminalRunner.class});
+                parameters[0] = new Object[] {project, runner};
+            } catch (NoSuchMethodException e) {
+                try {
+                    method[0] = TerminalView.class.getMethod("createNewSession", new Class[] {AbstractTerminalRunner.class});
+                    parameters[0] = new Object[] { runner};
+                } catch (NoSuchMethodException e1) {
+                    throw new IOException(e1);
+                }
+            }
+            ApplicationManager.getApplication().invokeLater(() -> {
+                try {
+                    method[0].invoke(view, parameters[0]);
+                } catch (IllegalAccessException| InvocationTargetException e) {}
+            });
+            if (waitForProcessExit && p.waitFor() != 0) {
+                throw new IOException("Process returned exit code: " + p.exitValue(), null);
+            }
+        } catch (IOException e) {
+            throw e;
+        }
+        catch (InterruptedException e) {
+            throw new IOException(e);
+        }
+    }
+}

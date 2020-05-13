@@ -1,0 +1,43 @@
+<idea-plugin>
+  <id>org.jboss.tools.intellij.rsp</id>
+  <name>Runtime Server Protocol Connector by Red Hat</name>
+  <version>1.0</version>
+  <vendor email="support@redhat.com" url="http://www.redhat.com">Red-Hat</vendor>
+
+  <description><![CDATA[
+      <img src="https://raw.githubusercontent.com/redhat-developer/intellij-rsp/master/src/main/resources/images/openshift_extension.png" width="32" height="32"/>
+      <h2>Overview</h2>
+      <p>A plugin for interacting with an RSP Server to control various runtimes or application servers.</p>
+    ]]></description>
+
+  <change-notes><![CDATA[
+  <p><b>0.0.1</b></p>
+  <p>Initial release</p>
+    ]]>
+  </change-notes>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <idea-version since-build="182.3684.101"/>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+  <depends>com.intellij.modules.lang</depends>
+  <depends>org.jetbrains.plugins.terminal</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+    <toolWindow id="RSP Servers" anchor="left" factoryClass="org.jboss.tools.intellij.rsp.WindowToolFactory" icon="/META-INF/pluginIcon13x13.svg"/>
+  </extensions>
+
+  <actions>
+    <group id="org.jboss.tools.intellij.rsp.tree" popup="true">
+      <!-- Application Explorer -->
+      <!-- Top level: cluster -->
+      <action class="org.jboss.tools.intellij.rsp.actions.StartRspAction"
+              id="org.jboss.tools.intellij.rsp.actions.StartRspAction" text="Start RSP"/>
+      <separator/>
+   </group>
+    <!-- Add your actions here -->
+  </actions>
+
+</idea-plugin>

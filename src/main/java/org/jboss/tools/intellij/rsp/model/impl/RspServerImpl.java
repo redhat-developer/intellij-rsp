@@ -1,0 +1,74 @@
+/*******************************************************************************
+ * Copyright (c) 2020 Red Hat, Inc.
+ * Distributed under license by Red Hat, Inc. All rights reserved.
+ * This program is made available under the terms of the
+ * Eclipse Public License v2.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v20.html
+ *
+ * Contributors:
+ * Red Hat, Inc. - initial API and implementation
+ ******************************************************************************/
+package org.jboss.tools.intellij.rsp.model.impl;
+
+import org.jboss.tools.intellij.rsp.model.*;
+
+public class RspServerImpl implements IRspServer, IRspStartCallback {
+    private final IRspStateController controller;
+    private final IRspCore model;
+    private IRspServerType type;
+    private String version;
+    private String home;
+    private IRspCore.IJServerState currentState = IRspCore.IJServerState.STOPPED;
+
+    public RspServerImpl(IRspCore model,
+                         IRspServerType type, String version,
+                         String home, IRspStateController controller) {
+        this.model = model;
+        this.type = type;
+        this.version = version;
+        this.controller = controller;
+    }
+
+    @Override
+    public IRspCore getModel() {
+        return model;
+    }
+    @Override
+    public IRspServerType getServerType() {
+        return type;
+    }
+
+    @Override
+    public String getVersion() {
+        return version;
+    }
+
+    @Override
+    public String getServerHome() {  return home; }
+
+    @Override
+    public ServerConnectionInfo start() {
+        return getController().start(this);
+    }
+
+    @Override
+    public void terminate() {
+        getController().terminate(this);
+    }
+
+    @Override
+    public IRspCore.IJServerState getState() {
+        return currentState;
+    }
+
+    protected IRspStateController getController() {
+        return controller;
+    }
+
+
+    @Override
+    public void updateRspState(IRspCore.IJServerState state) {
+        this.currentState = state;
+        model.stateUpdated(this);
+    }
+}
