@@ -17,6 +17,7 @@ public interface IRspServer {
     public String getVersion();
     public String getServerHome();
     public ServerConnectionInfo start();
+    public void stop();
     public void terminate();
     IRspCore.IJServerState getState();
 }

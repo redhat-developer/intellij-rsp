@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.jboss.tools.intellij.rsp.model.impl;
 
+import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
 import org.jboss.tools.intellij.rsp.model.*;
 
 public class RspServerImpl implements IRspServer, IRspStartCallback {
@@ -54,6 +55,17 @@ public class RspServerImpl implements IRspServer, IRspStartCallback {
     @Override
     public void terminate() {
         getController().terminate(this);
+    }
+
+    @Override
+    public void stop() {
+        updateRspState(IRspCore.IJServerState.STOPPING);
+        IntelliJRspClientLauncher client = model.getClient(this);
+        if( client != null ) {
+            client.getServerProxy().shutdown();
+        } else {
+            terminate();
+        }
     }
 
     @Override

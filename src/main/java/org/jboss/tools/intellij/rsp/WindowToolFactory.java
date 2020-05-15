@@ -23,9 +23,12 @@ import com.intellij.ui.tree.StructureTreeModel;
 import com.intellij.ui.treeStructure.Tree;
 import org.jboss.tools.intellij.rsp.model.impl.RspCore;
 import org.jboss.tools.intellij.rsp.ui.tree.RspTreeModel;
+import org.jboss.tools.intellij.rsp.util.common.MutableModelSynchronizer;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.tree.TreePath;
+import java.util.function.Supplier;
 
 
 public class WindowToolFactory implements ToolWindowFactory {
@@ -33,10 +36,12 @@ public class WindowToolFactory implements ToolWindowFactory {
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         RspCore core = RspCore.getDefault();
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        StructureTreeModel stm = new StructureTreeModel(new RspTreeModel(core));
-        Tree tree = new Tree(new AsyncTreeModel(stm));
+        RspTreeModel rspTreeModel = new RspTreeModel(core);
+        StructureTreeModel stm = new StructureTreeModel(rspTreeModel);
+        AsyncTreeModel asyncModel = new AsyncTreeModel(stm);
+        Tree tree = new Tree(asyncModel);
         core.addChangeListener((Object o) -> {
-            invalidatePath(o, tree);
+            refresh(o, stm, rspTreeModel);
         });
 
         tree.setCellRenderer(new NodeRenderer());
@@ -46,7 +51,7 @@ public class WindowToolFactory implements ToolWindowFactory {
         toolWindow.getContentManager().addContent(contentFactory.createContent(panel, "", false));
     }
 
-    private void invalidatePath(Object o, Tree tree) {
-        tree.invalidate();
+    private void refresh(Object o, StructureTreeModel stm, RspTreeModel rspTreeModel) {
+        new MutableModelSynchronizer(stm, rspTreeModel).refresh();
     }
 }

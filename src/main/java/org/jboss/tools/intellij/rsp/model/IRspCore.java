@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.jboss.tools.intellij.rsp.model;
 
+import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
 import org.jboss.tools.intellij.rsp.model.impl.RspServerImpl;
 
 public interface IRspCore {
@@ -37,4 +38,5 @@ public interface IRspCore {
     public void addChangeListener(IRspCoreChangeListener listener);
     public void removeChangeListener(IRspCoreChangeListener listener);
 
+    public IntelliJRspClientLauncher getClient(IRspServer rsp);
 }

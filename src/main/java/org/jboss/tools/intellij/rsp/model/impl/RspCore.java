@@ -93,12 +93,14 @@ public class RspCore implements IRspCore {
         }
     }
 
+    public IntelliJRspClientLauncher getClient(IRspServer rsp) {
+        String id = rsp.getServerType().getId();
+        return rspToClient.get(id);
+    }
+
     @Override
     public void stopServer(IRspServer server) {
-        String id = server.getServerType().getId();
-        IntelliJRspClientLauncher launcher = rspToClient.get(id);
-        if( launcher != null )
-            launcher.getServerProxy().shutdown();
+        server.stop();
     }
 
     @Override

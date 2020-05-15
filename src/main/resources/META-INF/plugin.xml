@@ -17,7 +17,7 @@
   </change-notes>
 
   <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-  <idea-version since-build="182.3684.101"/>
+  <idea-version since-build="183.3975.18"/>
 
   <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
        on how to target different products -->
@@ -35,6 +35,8 @@
       <!-- Top level: cluster -->
       <action class="org.jboss.tools.intellij.rsp.actions.StartRspAction"
               id="org.jboss.tools.intellij.rsp.actions.StartRspAction" text="Start RSP"/>
+      <action class="org.jboss.tools.intellij.rsp.actions.StopRspAction"
+              id="org.jboss.tools.intellij.rsp.actions.StopRspAction" text="Stop RSP"/>
       <separator/>
    </group>
     <!-- Add your actions here -->
