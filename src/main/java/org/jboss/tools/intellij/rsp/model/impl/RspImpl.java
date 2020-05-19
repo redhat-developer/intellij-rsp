@@ -13,17 +13,17 @@ package org.jboss.tools.intellij.rsp.model.impl;
 import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
 import org.jboss.tools.intellij.rsp.model.*;
 
-public class RspServerImpl implements IRspServer, IRspStartCallback {
+public class RspImpl implements IRsp, IRspStartCallback {
     private final IRspStateController controller;
     private final IRspCore model;
-    private IRspServerType type;
+    private IRspType type;
     private String version;
     private String home;
     private IRspCore.IJServerState currentState = IRspCore.IJServerState.STOPPED;
 
-    public RspServerImpl(IRspCore model,
-                         IRspServerType type, String version,
-                         String home, IRspStateController controller) {
+    public RspImpl(IRspCore model,
+                   IRspType type, String version,
+                   String home, IRspStateController controller) {
         this.model = model;
         this.type = type;
         this.version = version;
@@ -35,7 +35,7 @@ public class RspServerImpl implements IRspServer, IRspStartCallback {
         return model;
     }
     @Override
-    public IRspServerType getServerType() {
+    public IRspType getServerType() {
         return type;
     }
 

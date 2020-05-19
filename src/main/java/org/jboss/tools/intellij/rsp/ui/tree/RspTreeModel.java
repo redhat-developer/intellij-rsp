@@ -15,12 +15,18 @@ import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.util.treeView.AbstractTreeStructure;
 import com.intellij.ide.util.treeView.NodeDescriptor;
 import com.intellij.ide.util.treeView.PresentableNodeDescriptor;
-import org.jboss.tools.intellij.rsp.model.IRspServer;
+import org.jboss.tools.intellij.rsp.model.IRsp;
+import org.jboss.tools.intellij.rsp.model.IRspType;
 import org.jboss.tools.intellij.rsp.model.impl.RspCore;
+import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
+import org.jboss.tools.rsp.api.dao.DeployableState;
+import org.jboss.tools.rsp.api.dao.ServerHandle;
+import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.List;
 
 public class RspTreeModel extends AbstractTreeStructure {
     private RspCore core;
@@ -40,10 +46,48 @@ public class RspTreeModel extends AbstractTreeStructure {
     public Object[] getChildElements(@NotNull Object element) {
         if( element == core )
             return core.getRSPs();
-        if(element instanceof IRspServer) {
-            return core.tmpGetChildren((IRspServer)element);
+        if(element instanceof IRsp) {
+            return wrap((IRsp)element, core.getServersInRsp((IRsp)element));
+        }
+        if( element instanceof ServerStateWrapper ) {
+            List<DeployableState> ds = ((ServerStateWrapper)element).ss.getDeployableStates();
+            return wrapDeployableStates((ServerStateWrapper)element, ds);
         }
         return new Object[0];
+    }
+
+    private DeployableStateWrapper[] wrapDeployableStates(ServerStateWrapper element, List<DeployableState> ds) {
+        DeployableStateWrapper[] ret = new DeployableStateWrapper[ds.size()];
+        int i = 0;
+        for( DeployableState ds1 : ds) {
+            ret[i++] = new DeployableStateWrapper(element, ds1);
+        }
+        return ret;
+    }
+
+    private ServerStateWrapper[] wrap(IRsp rsp, ServerState[] state) {
+        ServerStateWrapper[] wrappers = new ServerStateWrapper[state.length];
+        for( int i = 0; i < state.length; i++ ) {
+            wrappers[i] = new ServerStateWrapper(rsp, state[i]);
+        }
+        return wrappers;
+    }
+
+    private static class ServerStateWrapper {
+        private IRsp rsp;
+        private ServerState ss;
+        public ServerStateWrapper(IRsp rsp, ServerState ss) {
+            this.rsp = rsp;
+            this.ss = ss;
+        }
+    }
+    private static class DeployableStateWrapper {
+        private ServerStateWrapper serverState;
+        private DeployableState ds;
+        public DeployableStateWrapper(ServerStateWrapper serverState, DeployableState ds) {
+            this.serverState = serverState;
+            this.ds = ds;
+        }
     }
 
     @Nullable
@@ -51,8 +95,12 @@ public class RspTreeModel extends AbstractTreeStructure {
     public Object getParentElement(@NotNull Object element) {
         if( element == core )
             return null;
-        if( element instanceof IRspServer )
+        if( element instanceof IRsp)
             return core;
+        if( element instanceof ServerStateWrapper)
+            return ((ServerStateWrapper)element).rsp;
+        if( element instanceof DeployableStateWrapper)
+            return ((DeployableStateWrapper)element).serverState;
         return null;
     }
 
@@ -61,8 +109,14 @@ public class RspTreeModel extends AbstractTreeStructure {
     public PresentableNodeDescriptor createDescriptor(@NotNull Object element, @Nullable NodeDescriptor parentDescriptor) {
         if( element instanceof RspCore )
             return new CoreDescriptor((RspCore)element, parentDescriptor);
-        if( element instanceof IRspServer ) {
-            return new RspServerDescriptor((IRspServer)element, parentDescriptor);
+        if( element instanceof IRsp) {
+            return new RspServerDescriptor((IRsp)element, parentDescriptor);
+        }
+        if( element instanceof ServerStateWrapper) {
+            return new ServerStateDescriptor((ServerStateWrapper)element, parentDescriptor);
+        }
+        if( element instanceof DeployableStateWrapper) {
+            return new DeployableStateDescriptor((DeployableStateWrapper)element, parentDescriptor);
         }
         return new StandardDescriptor((Object)element, parentDescriptor);
     }
@@ -77,12 +131,32 @@ public class RspTreeModel extends AbstractTreeStructure {
         }
     }
 
-    private class RspServerDescriptor extends Descriptor<IRspServer> {
-        protected RspServerDescriptor(IRspServer element, @Nullable NodeDescriptor parentDescriptor) {
+    private class RspServerDescriptor extends Descriptor<IRsp> {
+        protected RspServerDescriptor(IRsp element, @Nullable NodeDescriptor parentDescriptor) {
             super(element, parentDescriptor, () -> element.getServerType().getName() + "   [" + element.getState() + "]", element.getServerType().getIcon());
         }
     }
 
+    private class ServerStateDescriptor extends Descriptor<ServerStateWrapper> {
+        protected ServerStateDescriptor(ServerStateWrapper element, @Nullable NodeDescriptor parentDescriptor) {
+            super(element, parentDescriptor, () ->
+                            element.ss.getServer().getType().getVisibleName() + "   [" +
+                                    getRunStateString(element.ss.getState()) + ", " +
+                                    getPublishStateString(element.ss.getPublishState()) + "]",
+                    ((RspServerDescriptor)parentDescriptor).getElement().getServerType().getIcon(element.ss.getServer().getType().getId()));
+        }
+    }
+
+
+    private class DeployableStateDescriptor extends Descriptor<DeployableStateWrapper> {
+        protected DeployableStateDescriptor(DeployableStateWrapper element, @Nullable NodeDescriptor parentDescriptor) {
+            super(element, parentDescriptor, () ->
+                            element.ds.getReference().getLabel() + "   [" +
+                                    getRunStateString(element.ds.getState()) + ", " +
+                                    getPublishStateString(element.ds.getPublishState()) + "]",
+                    AllIcons.General.BalloonInformation);
+        }
+    }
 
     private class StandardDescriptor extends Descriptor<Object> {
         protected StandardDescriptor(Object element, @Nullable NodeDescriptor parentDescriptor) {
@@ -123,5 +197,55 @@ public class RspTreeModel extends AbstractTreeStructure {
     @Override
     public boolean hasSomethingToCommit() {
         return false;
+    }
+
+
+    public static String getRunStateString(int state) {
+        String stateString = "unknown";
+        switch(state) {
+            case ServerManagementAPIConstants.STATE_UNKNOWN:
+                stateString = "unknown";
+                break;
+            case ServerManagementAPIConstants.STATE_STARTED:
+                stateString = "started";
+                break;
+            case ServerManagementAPIConstants.STATE_STARTING:
+                stateString = "starting";
+                break;
+            case ServerManagementAPIConstants.STATE_STOPPED:
+                stateString = "stopped";
+                break;
+            case ServerManagementAPIConstants.STATE_STOPPING:
+                stateString = "stopping";
+                break;
+
+        }
+        return stateString.toUpperCase();
+    }
+
+    public static String getPublishStateString(int state) {
+        String stateString = "unknown";
+        switch(state) {
+            case ServerManagementAPIConstants.PUBLISH_STATE_ADD:
+                stateString = "add";
+                break;
+            case ServerManagementAPIConstants.PUBLISH_STATE_FULL:
+                stateString = "full";
+                break;
+            case ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL:
+                stateString = "incremental";
+                break;
+            case ServerManagementAPIConstants.PUBLISH_STATE_NONE:
+                stateString = "synchronized";
+                break;
+            case ServerManagementAPIConstants.PUBLISH_STATE_REMOVE:
+                stateString = "remove";
+                break;
+            case ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN:
+                stateString = "unknown";
+                break;
+
+        }
+        return stateString.toUpperCase();
     }
 }

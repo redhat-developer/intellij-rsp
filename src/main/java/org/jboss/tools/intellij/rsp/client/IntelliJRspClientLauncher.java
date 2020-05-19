@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.jboss.tools.intellij.rsp.client;
 
-import org.jboss.tools.intellij.rsp.model.IRspServer;
+import org.jboss.tools.intellij.rsp.model.IRsp;
 import org.jboss.tools.rsp.api.RSPServer;
 import org.jboss.tools.rsp.api.SocketLauncher;
 
@@ -26,8 +26,8 @@ public class IntelliJRspClientLauncher {
     private int port;
     private boolean connectionOpen = false;
     private IClientConnectionClosedListener listener;
-    private IRspServer rsp;
-    public IntelliJRspClientLauncher(IRspServer rsp, String host, int port) {
+    private IRsp rsp;
+    public IntelliJRspClientLauncher(IRsp rsp, String host, int port) {
         this.host = host;
         this.port = port;
         this.rsp = rsp;

@@ -11,9 +11,33 @@
 package org.jboss.tools.intellij.rsp.model;
 
 import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
-import org.jboss.tools.intellij.rsp.model.impl.RspServerImpl;
+import org.jboss.tools.intellij.rsp.model.impl.RspImpl;
+import org.jboss.tools.rsp.api.dao.*;
+
+import java.util.concurrent.CompletableFuture;
 
 public interface IRspCore {
+
+    /*
+    Events from clients
+     */
+    void jobAdded(IRsp rsp, JobHandle jobHandle);
+
+    void jobRemoved(IRsp rsp, JobRemoved jobRemoved);
+
+    void jobChanged(IRsp rsp, JobProgress jobProgress);
+
+    CompletableFuture<String> promptString(IRsp rsp, StringPrompt stringPrompt);
+
+    void messageBox(IRsp rsp, MessageBoxNotification messageBoxNotification);
+
+    void serverAdded(IRsp rsp, ServerHandle serverHandle);
+
+    void serverRemoved(IRsp rsp, ServerHandle serverHandle);
+
+    void serverAttributesChanged(IRsp rsp, ServerHandle serverHandle);
+
+    void serverStateChanged(IRsp rsp, ServerState serverState);
 
     public enum IJServerState {
         STOPPING,
@@ -22,11 +46,11 @@ public interface IRspCore {
         STARTED
     }
 
-    public IRspServer[] getRSPs();
-    public IRspServerType findServerType(String id);
-    public void startServer(IRspServer server);
-    public void stopServer(IRspServer server);
-    public void stateUpdated(RspServerImpl rspServer);
+    public IRsp[] getRSPs();
+    public IRspType findServerType(String id);
+    public void startServer(IRsp server);
+    public void stopServer(IRsp server);
+    public void stateUpdated(RspImpl rspServer);
 
     /**
      * Some element in the tree has been updated.
@@ -38,5 +62,5 @@ public interface IRspCore {
     public void addChangeListener(IRspCoreChangeListener listener);
     public void removeChangeListener(IRspCoreChangeListener listener);
 
-    public IntelliJRspClientLauncher getClient(IRspServer rsp);
+    public IntelliJRspClientLauncher getClient(IRsp rsp);
 }

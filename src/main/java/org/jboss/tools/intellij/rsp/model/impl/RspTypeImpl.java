@@ -15,18 +15,19 @@ import org.jboss.tools.intellij.rsp.model.*;
 
 import javax.swing.*;
 
-public class RspServerTypeImpl implements IRspServerType {
-    private final String iconLoc;
+public class RspTypeImpl implements IRspType {
+    private final IServerIconProvider iconProvider;
     private final String name;
     private final String id;
     private final IRspCore model;
     private IRspStateControllerProvider controllerProvider;
 
-    public RspServerTypeImpl(IRspCore model, String id, String name, String iconLoc, IRspStateControllerProvider controllerProvider) {
+    public RspTypeImpl(IRspCore model, String id, String name, IServerIconProvider iconProvider,
+                       IRspStateControllerProvider controllerProvider) {
         this.model = model;
         this.id = id;
         this.name = name;
-        this.iconLoc = iconLoc;
+        this.iconProvider = iconProvider;
         this.controllerProvider = controllerProvider;
     }
     @Override
@@ -41,12 +42,17 @@ public class RspServerTypeImpl implements IRspServerType {
 
     @Override
     public Icon getIcon() {
-        return IconLoader.getIcon(iconLoc);
+        return iconProvider.getIcon();
     }
 
     @Override
-    public IRspServer createServer(IRspCore model, String version, String home) {
-        return new RspServerImpl(model,this, version,home, createController(version, home));
+    public Icon getIcon(String serverTypeId) {
+        return iconProvider.getIcon(serverTypeId);
+    }
+
+    @Override
+    public IRsp createRsp(String version, String home) {
+        return new RspImpl(model,this, version,home, createController(version, home));
     }
 
     private IRspStateController createController(String version, String home) {

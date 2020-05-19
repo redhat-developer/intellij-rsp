@@ -12,14 +12,19 @@ package org.jboss.tools.intellij.rsp.model.impl;
 
 import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
 import org.jboss.tools.intellij.rsp.model.*;
+import org.jboss.tools.intellij.rsp.types.CommunityServerConnector;
+import org.jboss.tools.intellij.rsp.types.RedHatServerConnector;
 import org.jboss.tools.rsp.api.ICapabilityKeys;
-import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
+import org.jboss.tools.rsp.api.dao.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 public class RspCore implements IRspCore {
     private static RspCore instance = new RspCore();
@@ -27,62 +32,43 @@ public class RspCore implements IRspCore {
         return instance;
     }
 
-    private ArrayList<IRspServer> rsps = new ArrayList<>();
-    private ArrayList<IRspServerType> type = new ArrayList<>();
-    private Map<String, IntelliJRspClientLauncher> rspToClient = new HashMap<>();
 
+    private Map<String,SingleRspModel> allRsps = new HashMap<>();
     private ArrayList<IRspCoreChangeListener> listeners = new ArrayList<>();
-
-
     private RspCore() {
         loadRSPs();
     }
 
-    private IRspServerType addServerType(String id, String name, String icon, IRspStateControllerProvider controller) {
-        RspServerTypeImpl ret = (new RspServerTypeImpl(this,id, name, icon, controller));
-        type.add(ret);
-        return ret;
-    }
-
     @Override
-    public IRspServerType findServerType(String id) {
-        for( IRspServerType r : type ) {
-            if( r.getId().equals(id))
-                return r;
-        }
+    public IRspType findServerType(String id) {
+        SingleRspModel srm = allRsps.get(id);
+        if( srm != null )
+            return srm.getType();
         return null;
     }
 
-    private IRspStateControllerProvider createReferenceControllerProvider(final int portMin, final int portMax) {
-        return new IRspStateControllerProvider() {
-            @Override
-            public IRspStateController createController(IRspServerType rspServerType, String version, String home) {
-                return new ReferenceRspControllerImpl(rspServerType, version, home, portMin, portMax);
-            }
-        };
+    private SingleRspModel findModel(String typeId) {
+        return allRsps.get(typeId);
     }
 
     private void loadRSPs() {
-        IRspServerType rht = addServerType("redhat-server-connector", "Red Hat Server Connector", "images/service.png",
-                createReferenceControllerProvider(8500,8999));
-        IRspServerType community = addServerType("redhat-community-server-connector", "Community Server Connector by Red Hat", "images/storage.png",
-                createReferenceControllerProvider(9000,9500));
-
         // TODO load from xml file or something
-        IRspServer rht1 = rht.createServer(this,"0.22.10", "/home/rob/code/work/rsp/rsp-server/distribution/distribution/target/rsp-distribution");
-        IRspServer community1 = community.createServer(this,"0.22.10", "/home/rob/path/to/something");
-        rsps.add(rht1);
-        rsps.add(community1);
-
+        IRsp rht = new RedHatServerConnector().getRsp(this);
+        IRsp community = new CommunityServerConnector().getRsp(this);
+        allRsps.put(rht.getServerType().getId(), new SingleRspModel(rht));
+        allRsps.put(community.getServerType().getId(), new SingleRspModel(community));
     }
 
-    public void startServer(IRspServer server) {
+    public void startServer(IRsp server) {
         ServerConnectionInfo info = server.start();
         if( info != null ) {
             try {
                 IntelliJRspClientLauncher launcher = launch(server, info.getHost(), info.getPort());
                 String typeId = server.getServerType().getId();
-                rspToClient.put(typeId, launcher);
+                SingleRspModel srm = findModel(typeId);
+                if( srm != null ) {
+                    srm.setClient(launcher);
+                }
             } catch(IOException e ) {
 
             } catch(InterruptedException ie) {
@@ -93,27 +79,29 @@ public class RspCore implements IRspCore {
         }
     }
 
-    public IntelliJRspClientLauncher getClient(IRspServer rsp) {
-        String id = rsp.getServerType().getId();
-        return rspToClient.get(id);
+    public IntelliJRspClientLauncher getClient(IRsp rsp) {
+        SingleRspModel srm = findModel(rsp.getServerType().getId());
+        return srm == null ? null : srm.getClient();
     }
 
     @Override
-    public void stopServer(IRspServer server) {
+    public void stopServer(IRsp server) {
         server.stop();
     }
 
     @Override
-    public void stateUpdated(RspServerImpl rspServer) {
+    public void stateUpdated(RspImpl rspServer) {
         if( rspServer.getState() == IJServerState.STOPPED) {
-            // cleanup
-            rspToClient.remove(rspServer.getServerType().getId());
+            SingleRspModel srm = findModel(rspServer.getServerType().getId());
+            if(srm != null ) {
+                srm.setClient(null);
+                srm.clear();
+            }
         }
         modelUpdated(rspServer);
-        // TODO fire to listener model / view
     }
 
-    private IntelliJRspClientLauncher launch(IRspServer rsp, String host, int port) throws IOException, InterruptedException, ExecutionException {
+    private IntelliJRspClientLauncher launch(IRsp rsp, String host, int port) throws IOException, InterruptedException, ExecutionException {
         IntelliJRspClientLauncher launcher = new IntelliJRspClientLauncher(rsp, host, port);
         //launcher.setListener(() -> {
             // TODO or do nothing / delete this block?
@@ -132,12 +120,17 @@ public class RspCore implements IRspCore {
     }
 
 
-    public IRspServer[] getRSPs() {
-        return rsps.toArray(new IRspServer[0]);
+    public IRsp[] getRSPs() {
+        List<IRsp> ret = allRsps.values().stream().filter(p->p.getServer() != null).
+                map(SingleRspModel::getServer).collect(Collectors.toList());
+
+        return ret.toArray(new IRsp[ret.size()]);
     };
 
-    public String[] tmpGetChildren(IRspServer rsp) {
-        return new String[] { "a", "b", "c"};
+    public ServerState[] getServersInRsp(IRsp rsp) {
+        SingleRspModel srm = findModel(rsp.getServerType().getId());
+        List<ServerState> states = srm.getServerState();
+        return states.toArray(new ServerState[states.size()]);
     }
 
 
@@ -157,5 +150,75 @@ public class RspCore implements IRspCore {
     public void removeChangeListener(IRspCoreChangeListener listener) {
         listeners.remove(listener);
     }
+
+
+
+    /*
+    Events from clients
+     */
+    @Override
+    public void jobAdded(IRsp rsp, JobHandle jobHandle) {
+        SingleRspModel model = findModel(rsp.getServerType().getId());
+        if( model != null ) {
+            model.addJob(jobHandle);
+            modelUpdated(rsp);
+        }
+    }
+
+    @Override
+    public void jobRemoved(IRsp rsp, JobRemoved jobRemoved) {
+        SingleRspModel model = findModel(rsp.getServerType().getId());
+        if( model != null ) {
+            model.removeJob(jobRemoved.getHandle());
+            modelUpdated(rsp);
+        }
+    }
+
+    @Override
+    public void jobChanged(IRsp rsp, JobProgress jobProgress) {
+        SingleRspModel model = findModel(rsp.getServerType().getId());
+        if( model != null ) {
+            model.jobChanged(jobProgress);
+            modelUpdated(rsp);
+        }
+    }
+    @Override
+    public void serverAdded(IRsp rsp, ServerHandle serverHandle) {
+        SingleRspModel model = findModel(rsp.getServerType().getId());
+        if( model != null ) {
+            model.addServer(serverHandle);
+            modelUpdated(rsp);
+        }
+    }
+
+    @Override
+    public void serverRemoved(IRsp rsp, ServerHandle serverHandle) {
+        SingleRspModel model = findModel(rsp.getServerType().getId());
+        if( model != null )
+            model.removeServer(serverHandle);
+    }
+
+    @Override
+    public void serverAttributesChanged(IRsp rsp, ServerHandle serverHandle) {
+        // Ignore?
+    }
+
+    @Override
+    public void serverStateChanged(IRsp rsp, ServerState serverState) {
+        SingleRspModel model = findModel(rsp.getServerType().getId());
+        if( model != null ) {
+            model.updateServer(serverState);
+            modelUpdated(rsp);
+        }
+    }
+    @Override
+    public CompletableFuture<String> promptString(IRsp rsp, StringPrompt stringPrompt) {
+        return null; // TODO
+    }
+
+    @Override
+    public void messageBox(IRsp rsp, MessageBoxNotification messageBoxNotification) {
+    }
+
 
 }

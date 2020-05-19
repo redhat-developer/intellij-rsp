@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.jboss.tools.intellij.rsp.client;
 
-import org.jboss.tools.intellij.rsp.model.IRspServer;
+import org.jboss.tools.intellij.rsp.model.IRsp;
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.RSPServer;
 import org.jboss.tools.rsp.api.dao.*;
@@ -18,9 +18,9 @@ import org.jboss.tools.rsp.api.dao.*;
 import java.util.concurrent.CompletableFuture;
 
 public class IntelliJServerManagementClientImpl implements RSPClient {
-    private final IRspServer uiRspServer;
+    private final IRsp uiRspServer;
     private RSPServer server;
-    public IntelliJServerManagementClientImpl(IRspServer rspUi) {
+    public IntelliJServerManagementClientImpl(IRsp rspUi) {
         this.uiRspServer = rspUi;
     }
 
@@ -42,26 +42,26 @@ public class IntelliJServerManagementClientImpl implements RSPClient {
 
     @Override
     public void jobAdded(JobHandle jobHandle) {
-        // TODO no integration with jobs yet
+        uiRspServer.getModel().jobAdded(uiRspServer, jobHandle);
     }
 
     @Override
     public void jobRemoved(JobRemoved jobRemoved) {
-        // TODO no integration with jobs yet
+        uiRspServer.getModel().jobRemoved(uiRspServer, jobRemoved);
     }
 
     @Override
     public void jobChanged(JobProgress jobProgress) {
-        // TODO no integration with jobs yet
+        uiRspServer.getModel().jobChanged(uiRspServer, jobProgress);
     }
     @Override
     public CompletableFuture<String> promptString(StringPrompt stringPrompt) {
-        return null;
+        return uiRspServer.getModel().promptString(uiRspServer, stringPrompt);
     }
 
     @Override
     public void messageBox(MessageBoxNotification messageBoxNotification) {
-
+        uiRspServer.getModel().messageBox(uiRspServer, messageBoxNotification);
     }
 
     @Override
@@ -76,22 +76,22 @@ public class IntelliJServerManagementClientImpl implements RSPClient {
 
     @Override
     public void serverAdded(ServerHandle serverHandle) {
-        refreshView();
+        uiRspServer.getModel().serverAdded(uiRspServer, serverHandle);
     }
 
     @Override
     public void serverRemoved(ServerHandle serverHandle) {
-        refreshView();
+        uiRspServer.getModel().serverRemoved(uiRspServer, serverHandle);
     }
 
     @Override
     public void serverAttributesChanged(ServerHandle serverHandle) {
-        refreshView();
+        uiRspServer.getModel().serverAttributesChanged(uiRspServer, serverHandle);
     }
 
     @Override
     public void serverStateChanged(ServerState serverState) {
-        refreshView();
+        uiRspServer.getModel().serverStateChanged(uiRspServer, serverState);
     }
 
     @Override

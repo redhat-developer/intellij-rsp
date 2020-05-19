@@ -10,14 +10,12 @@
  ******************************************************************************/
 package org.jboss.tools.intellij.rsp.model;
 
-public interface IRspServer {
-    IRspCore getModel();
+import javax.swing.*;
 
-    public IRspServerType getServerType();
-    public String getVersion();
-    public String getServerHome();
-    public ServerConnectionInfo start();
-    public void stop();
-    public void terminate();
-    IRspCore.IJServerState getState();
+public interface IRspType {
+    String getId();
+    String getName();
+    IRsp createRsp(String version, String home);
+    Icon getIcon();
+    Icon getIcon(String serverTypeId);
 }

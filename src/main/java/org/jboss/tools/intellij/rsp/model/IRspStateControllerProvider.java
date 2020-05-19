@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.jboss.tools.intellij.rsp.model;
 
-import org.jboss.tools.intellij.rsp.model.impl.RspServerTypeImpl;
-
 public interface IRspStateControllerProvider {
-        public IRspStateController createController(IRspServerType rspServerType, String version, String home);
+        public IRspStateController createController(IRspType rspServerType, String version, String home);
 }

@@ -11,7 +11,7 @@
 package org.jboss.tools.intellij.rsp.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import org.jboss.tools.intellij.rsp.model.IRspServer;
+import org.jboss.tools.intellij.rsp.model.IRsp;
 import org.jboss.tools.intellij.rsp.model.impl.RspCore;
 
 import javax.swing.tree.TreePath;
@@ -19,8 +19,8 @@ import javax.swing.tree.TreePath;
 public class StopRspAction extends AbstractTreeAction {
     @Override
     protected void actionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
-        if( selected instanceof IRspServer) {
-            IRspServer server = (IRspServer)selected;
+        if( selected instanceof IRsp) {
+            IRsp server = (IRsp)selected;
             new Thread("Start RSP Server: " + server.getServerType().getId()) {
                 public void run() {
                     RspCore.getDefault().stopServer(server);

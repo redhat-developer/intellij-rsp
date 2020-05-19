@@ -25,7 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ReferenceRspControllerImpl implements IRspStateController {
-    private IRspServerType serverType;
+    private IRspType serverType;
     private String version;
     private String rspHome;
     private int portMin;
@@ -33,7 +33,7 @@ public class ReferenceRspControllerImpl implements IRspStateController {
 
     private Process runningProcess;
 
-    public ReferenceRspControllerImpl(IRspServerType rspServerType, String version, String rspHome, int portMin, int portMax) {
+    public ReferenceRspControllerImpl(IRspType rspServerType, String version, String rspHome, int portMin, int portMax) {
         this.serverType = rspServerType;
         this.version = version;
         this.rspHome = rspHome;
@@ -43,6 +43,10 @@ public class ReferenceRspControllerImpl implements IRspStateController {
 
     @Override
     public ServerConnectionInfo start(IRspStartCallback callback) {
+        File rspHomeFile = new File(rspHome);
+        if( !rspHomeFile.exists() || !rspHomeFile.isDirectory())
+            return null;
+
         int port = new PortFinder().nextFreePort(portMin, portMax);
         if( port == -1 )
             return null;
