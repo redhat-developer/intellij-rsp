@@ -12,9 +12,12 @@ package org.jboss.tools.intellij.rsp.model;
 
 import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
 import org.jboss.tools.intellij.rsp.model.impl.RspImpl;
+import org.jboss.tools.intellij.rsp.model.impl.SingleRspModel;
 import org.jboss.tools.rsp.api.dao.*;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public interface IRspCore {
 
@@ -46,8 +49,6 @@ public interface IRspCore {
         STARTED
     }
 
-    public IRsp[] getRSPs();
-    public IRspType findServerType(String id);
     public void startServer(IRsp server);
     public void stopServer(IRsp server);
     public void stateUpdated(RspImpl rspServer);
@@ -62,5 +63,9 @@ public interface IRspCore {
     public void addChangeListener(IRspCoreChangeListener listener);
     public void removeChangeListener(IRspCoreChangeListener listener);
 
+    public IRsp[] getRSPs();
+    public IRspType findServerType(String id);
+    public ServerState[] getServersInRsp(IRsp rsp);
+    public JobProgress[] getJobs(IRsp rsp);
     public IntelliJRspClientLauncher getClient(IRsp rsp);
 }

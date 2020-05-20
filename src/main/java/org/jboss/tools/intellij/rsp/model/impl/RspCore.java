@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.jboss.tools.intellij.rsp.model.impl;
 
+import com.intellij.openapi.progress.ProgressManager;
 import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
 import org.jboss.tools.intellij.rsp.model.*;
 import org.jboss.tools.intellij.rsp.types.CommunityServerConnector;
@@ -34,7 +35,9 @@ public class RspCore implements IRspCore {
 
 
     private Map<String,SingleRspModel> allRsps = new HashMap<>();
-    private ArrayList<IRspCoreChangeListener> listeners = new ArrayList<>();
+    private List<IRspCoreChangeListener> listeners = new ArrayList<>();
+    private Map<String, RspProgressJob> uiJobs = new HashMap<>();
+
     private RspCore() {
         loadRSPs();
     }
@@ -55,8 +58,8 @@ public class RspCore implements IRspCore {
         // TODO load from xml file or something
         IRsp rht = new RedHatServerConnector().getRsp(this);
         IRsp community = new CommunityServerConnector().getRsp(this);
-        allRsps.put(rht.getServerType().getId(), new SingleRspModel(rht));
-        allRsps.put(community.getServerType().getId(), new SingleRspModel(community));
+        allRsps.put(rht.getRspType().getId(), new SingleRspModel(rht));
+        allRsps.put(community.getRspType().getId(), new SingleRspModel(community));
     }
 
     public void startServer(IRsp server) {
@@ -64,7 +67,7 @@ public class RspCore implements IRspCore {
         if( info != null ) {
             try {
                 IntelliJRspClientLauncher launcher = launch(server, info.getHost(), info.getPort());
-                String typeId = server.getServerType().getId();
+                String typeId = server.getRspType().getId();
                 SingleRspModel srm = findModel(typeId);
                 if( srm != null ) {
                     srm.setClient(launcher);
@@ -80,7 +83,7 @@ public class RspCore implements IRspCore {
     }
 
     public IntelliJRspClientLauncher getClient(IRsp rsp) {
-        SingleRspModel srm = findModel(rsp.getServerType().getId());
+        SingleRspModel srm = findModel(rsp.getRspType().getId());
         return srm == null ? null : srm.getClient();
     }
 
@@ -92,7 +95,7 @@ public class RspCore implements IRspCore {
     @Override
     public void stateUpdated(RspImpl rspServer) {
         if( rspServer.getState() == IJServerState.STOPPED) {
-            SingleRspModel srm = findModel(rspServer.getServerType().getId());
+            SingleRspModel srm = findModel(rspServer.getRspType().getId());
             if(srm != null ) {
                 srm.setClient(null);
                 srm.clear();
@@ -120,6 +123,7 @@ public class RspCore implements IRspCore {
     }
 
 
+    @Override
     public IRsp[] getRSPs() {
         List<IRsp> ret = allRsps.values().stream().filter(p->p.getServer() != null).
                 map(SingleRspModel::getServer).collect(Collectors.toList());
@@ -127,8 +131,9 @@ public class RspCore implements IRspCore {
         return ret.toArray(new IRsp[ret.size()]);
     };
 
+    @Override
     public ServerState[] getServersInRsp(IRsp rsp) {
-        SingleRspModel srm = findModel(rsp.getServerType().getId());
+        SingleRspModel srm = findModel(rsp.getRspType().getId());
         List<ServerState> states = srm.getServerState();
         return states.toArray(new ServerState[states.size()]);
     }
@@ -158,33 +163,64 @@ public class RspCore implements IRspCore {
      */
     @Override
     public void jobAdded(IRsp rsp, JobHandle jobHandle) {
-        SingleRspModel model = findModel(rsp.getServerType().getId());
+        SingleRspModel model = findModel(rsp.getRspType().getId());
         if( model != null ) {
             model.addJob(jobHandle);
+            String id = jobHandleToUniqueId(rsp, jobHandle);
+            RspProgressJob progJob = new RspProgressJob(rsp, jobHandle);
+            uiJobs.put(id, progJob);
+            ProgressManager.getInstance().run(progJob);
             modelUpdated(rsp);
         }
     }
 
+    private String jobHandleToUniqueId(IRsp rsp, JobHandle handle) {
+        return rsp.getRspType().getId() + ":" + handle.getId();
+    }
+
     @Override
     public void jobRemoved(IRsp rsp, JobRemoved jobRemoved) {
-        SingleRspModel model = findModel(rsp.getServerType().getId());
+        SingleRspModel model = findModel(rsp.getRspType().getId());
         if( model != null ) {
             model.removeJob(jobRemoved.getHandle());
+            String id = jobHandleToUniqueId(rsp, jobRemoved.getHandle());
+            RspProgressJob uiJob = uiJobs.get(id);
+            if( uiJob != null ) {
+                uiJob.setJobRemoved(jobRemoved);
+                uiJobs.remove(id);
+            }
             modelUpdated(rsp);
         }
     }
 
     @Override
     public void jobChanged(IRsp rsp, JobProgress jobProgress) {
-        SingleRspModel model = findModel(rsp.getServerType().getId());
+
+        SingleRspModel model = findModel(rsp.getRspType().getId());
         if( model != null ) {
             model.jobChanged(jobProgress);
+            String id = jobHandleToUniqueId(rsp, jobProgress.getHandle());
+            RspProgressJob uiJob = uiJobs.get(id);
+            if( uiJob != null ) {
+                uiJob.setJobProgress(jobProgress);
+            }
             modelUpdated(rsp);
         }
     }
+
+    @Override
+    public JobProgress[] getJobs(IRsp rsp) {
+        SingleRspModel model = findModel(rsp.getRspType().getId());
+        if( model != null ) {
+            List<JobProgress> jps = model.getJobs();
+            return jps.toArray(new JobProgress[0]);
+        }
+        return new JobProgress[0];
+    }
+
     @Override
     public void serverAdded(IRsp rsp, ServerHandle serverHandle) {
-        SingleRspModel model = findModel(rsp.getServerType().getId());
+        SingleRspModel model = findModel(rsp.getRspType().getId());
         if( model != null ) {
             model.addServer(serverHandle);
             modelUpdated(rsp);
@@ -193,7 +229,7 @@ public class RspCore implements IRspCore {
 
     @Override
     public void serverRemoved(IRsp rsp, ServerHandle serverHandle) {
-        SingleRspModel model = findModel(rsp.getServerType().getId());
+        SingleRspModel model = findModel(rsp.getRspType().getId());
         if( model != null )
             model.removeServer(serverHandle);
     }
@@ -205,7 +241,7 @@ public class RspCore implements IRspCore {
 
     @Override
     public void serverStateChanged(IRsp rsp, ServerState serverState) {
-        SingleRspModel model = findModel(rsp.getServerType().getId());
+        SingleRspModel model = findModel(rsp.getRspType().getId());
         if( model != null ) {
             model.updateServer(serverState);
             modelUpdated(rsp);

@@ -35,7 +35,7 @@ public class RspImpl implements IRsp, IRspStartCallback {
         return model;
     }
     @Override
-    public IRspType getServerType() {
+    public IRspType getRspType() {
         return type;
     }
 

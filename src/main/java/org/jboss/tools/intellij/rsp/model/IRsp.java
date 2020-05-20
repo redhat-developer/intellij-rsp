@@ -13,7 +13,7 @@ package org.jboss.tools.intellij.rsp.model;
 public interface IRsp {
     IRspCore getModel();
 
-    public IRspType getServerType();
+    public IRspType getRspType();
     public String getVersion();
     public String getServerHome();
     public ServerConnectionInfo start();

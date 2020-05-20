@@ -31,7 +31,7 @@ public class SingleRspModel {
 
     public SingleRspModel(IRsp server) {
         this.server = server;
-        this.type = server.getServerType();
+        this.type = server.getRspType();
         this.jobs = new ArrayList<>();
         this.serverState = new ArrayList<>();
     }

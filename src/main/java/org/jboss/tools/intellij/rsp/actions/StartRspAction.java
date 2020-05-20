@@ -21,7 +21,7 @@ public class StartRspAction extends AbstractTreeAction {
     protected void actionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
         if( selected instanceof IRsp) {
             IRsp server = (IRsp)selected;
-            new Thread("Start RSP Server: " + server.getServerType().getId()) {
+            new Thread("Start RSP Server: " + server.getRspType().getId()) {
                 public void run() {
                     RspCore.getDefault().startServer(server);
                 }

@@ -15,12 +15,11 @@ import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.util.treeView.AbstractTreeStructure;
 import com.intellij.ide.util.treeView.NodeDescriptor;
 import com.intellij.ide.util.treeView.PresentableNodeDescriptor;
+import com.intellij.openapi.progress.ProgressManager;
 import org.jboss.tools.intellij.rsp.model.IRsp;
-import org.jboss.tools.intellij.rsp.model.IRspType;
 import org.jboss.tools.intellij.rsp.model.impl.RspCore;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DeployableState;
-import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -57,6 +56,9 @@ public class RspTreeModel extends AbstractTreeStructure {
     }
 
     private DeployableStateWrapper[] wrapDeployableStates(ServerStateWrapper element, List<DeployableState> ds) {
+        if( ds == null )
+            return new DeployableStateWrapper[0];
+
         DeployableStateWrapper[] ret = new DeployableStateWrapper[ds.size()];
         int i = 0;
         for( DeployableState ds1 : ds) {
@@ -133,17 +135,17 @@ public class RspTreeModel extends AbstractTreeStructure {
 
     private class RspServerDescriptor extends Descriptor<IRsp> {
         protected RspServerDescriptor(IRsp element, @Nullable NodeDescriptor parentDescriptor) {
-            super(element, parentDescriptor, () -> element.getServerType().getName() + "   [" + element.getState() + "]", element.getServerType().getIcon());
+            super(element, parentDescriptor, () -> element.getRspType().getName() + "   [" + element.getState() + "]", element.getRspType().getIcon());
         }
     }
 
     private class ServerStateDescriptor extends Descriptor<ServerStateWrapper> {
         protected ServerStateDescriptor(ServerStateWrapper element, @Nullable NodeDescriptor parentDescriptor) {
             super(element, parentDescriptor, () ->
-                            element.ss.getServer().getType().getVisibleName() + "   [" +
+                            element.ss.getServer().getId() + "   [" +
                                     getRunStateString(element.ss.getState()) + ", " +
                                     getPublishStateString(element.ss.getPublishState()) + "]",
-                    ((RspServerDescriptor)parentDescriptor).getElement().getServerType().getIcon(element.ss.getServer().getType().getId()));
+                    ((RspServerDescriptor)parentDescriptor).getElement().getRspType().getIcon(element.ss.getServer().getType().getId()));
         }
     }
 
