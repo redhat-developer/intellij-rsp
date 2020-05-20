@@ -14,13 +14,16 @@ public abstract class AbstractServerConnector {
     protected int minPort;
     protected int maxPort;
     protected String iconPath;
-    protected AbstractServerConnector(String id, String name, int minPort, int maxPort, String iconPath) {
+    protected AbstractServerConnector(String id, String name,
+                                      int minPort, int maxPort,
+                                      String iconPath) {
         this.id = id;
         this.name = name;
         this.minPort = minPort;
         this.maxPort = maxPort;
         this.iconPath = iconPath;
     }
+
     public abstract IRsp getRsp(IRspCore core);
 
     protected IServerIconProvider createIconProvider() {
@@ -42,7 +45,8 @@ public abstract class AbstractServerConnector {
     }
 
     protected IRspType getType(IRspCore core) {
-        return new RspTypeImpl(core,id, name, createIconProvider(),
+        return new RspTypeImpl(core,id, name,
+                createIconProvider(),
                 createReferenceControllerProvider(minPort, maxPort));
     }
 
@@ -51,8 +55,8 @@ public abstract class AbstractServerConnector {
     protected IRspStateControllerProvider createReferenceControllerProvider(final int portMin, final int portMax) {
         return new IRspStateControllerProvider() {
             @Override
-            public IRspStateController createController(IRspType rspServerType, String version, String home) {
-                return new ReferenceRspControllerImpl(rspServerType, version, home, portMin, portMax);
+            public IRspStateController createController(IRspType rspServerType, String version) {
+                return new ReferenceRspControllerImpl(rspServerType, version, portMin, portMax);
             }
         };
     }

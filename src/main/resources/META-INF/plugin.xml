@@ -33,6 +33,8 @@
     <group id="org.jboss.tools.intellij.rsp.tree" popup="true">
       <!-- Application Explorer -->
       <!-- Top level: cluster -->
+      <action class="org.jboss.tools.intellij.rsp.actions.DownloadRspAction"
+              id="org.jboss.tools.intellij.rsp.actions.DownloadRspAction" text="Download RSP"/>
       <action class="org.jboss.tools.intellij.rsp.actions.StartRspAction"
               id="org.jboss.tools.intellij.rsp.actions.StartRspAction" text="Start RSP"/>
       <action class="org.jboss.tools.intellij.rsp.actions.StopRspAction"

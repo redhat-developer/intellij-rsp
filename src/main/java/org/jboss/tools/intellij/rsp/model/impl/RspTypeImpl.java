@@ -14,15 +14,26 @@ import com.intellij.openapi.util.IconLoader;
 import org.jboss.tools.intellij.rsp.model.*;
 
 import javax.swing.*;
+import java.io.File;
 
 public class RspTypeImpl implements IRspType {
+
+    public static final String SYSPROP_USER_HOME = "user.home";
+    public static final String DATA_LOCATION_DEFAULT = ".rsp";
+    public static final String INSTALLATIONS = ".rspInstalls";
+    public static final String EXPANDED = "expanded";
+    public static final String DOWNLOADS = "downloads";
+
+
     private final IServerIconProvider iconProvider;
     private final String name;
     private final String id;
     private final IRspCore model;
     private IRspStateControllerProvider controllerProvider;
 
-    public RspTypeImpl(IRspCore model, String id, String name, IServerIconProvider iconProvider,
+    public RspTypeImpl(IRspCore model, String id,
+                       String name,
+                       IServerIconProvider iconProvider,
                        IRspStateControllerProvider controllerProvider) {
         this.model = model;
         this.id = id;
@@ -51,11 +62,24 @@ public class RspTypeImpl implements IRspType {
     }
 
     @Override
-    public IRsp createRsp(String version, String home) {
-        return new RspImpl(model,this, version,home, createController(version, home));
+    public String getServerHome() {
+        File home = new File(System.getProperty(SYSPROP_USER_HOME));
+        File root = new File(home, DATA_LOCATION_DEFAULT);
+        File installs = new File(root, INSTALLATIONS);
+        File expanded = new File(installs, EXPANDED);
+        File unzipLoc = new File(expanded, getId());
+        if( unzipLoc.exists() && unzipLoc.listFiles().length == 1 && unzipLoc.listFiles()[0].isDirectory()) {
+            return unzipLoc.listFiles()[0].getAbsolutePath();
+        }
+        return unzipLoc.getAbsolutePath();
     }
 
-    private IRspStateController createController(String version, String home) {
-        return controllerProvider.createController(this, version, home);
+    @Override
+    public IRsp createRsp(String version, String url) {
+        return new RspImpl(model,this, version, url, createController(version));
+    }
+
+    private IRspStateController createController(String version) {
+        return controllerProvider.createController(this, version);
     }
 }

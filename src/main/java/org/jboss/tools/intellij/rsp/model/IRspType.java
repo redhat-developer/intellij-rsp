@@ -15,7 +15,8 @@ import javax.swing.*;
 public interface IRspType {
     String getId();
     String getName();
-    IRsp createRsp(String version, String home);
+    IRsp createRsp(String version, String url);
     Icon getIcon();
     Icon getIcon(String serverTypeId);
+    String getServerHome();
 }

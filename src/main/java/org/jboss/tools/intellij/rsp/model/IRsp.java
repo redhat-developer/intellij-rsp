@@ -15,9 +15,11 @@ public interface IRsp {
 
     public IRspType getRspType();
     public String getVersion();
-    public String getServerHome();
     public ServerConnectionInfo start();
     public void stop();
     public void terminate();
     IRspCore.IJServerState getState();
+
+    boolean exists();
+    void download();
 }

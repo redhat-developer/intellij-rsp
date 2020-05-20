@@ -11,5 +11,5 @@
 package org.jboss.tools.intellij.rsp.model;
 
 public interface IRspStateControllerProvider {
-        public IRspStateController createController(IRspType rspServerType, String version, String home);
+        public IRspStateController createController(IRspType rspServerType, String version);
 }

@@ -13,7 +13,9 @@ public class CommunityServerConnector extends AbstractServerConnector {
                 9000, 9500, "images/storage.png");
     }
     public IRsp getRsp(IRspCore core) {
-        return getType(core).createRsp("0.22.10", "/home/rob/path/to/something");
+        String version = "0.22.10";
+        String url = "https://download.jboss.org/jbosstools/adapters/stable/rsp-server-community/distributions/0.22.10.Final/org.jboss.tools.rsp.server.community.distribution-0.22.10.Final.zip";
+        return getType(core).createRsp(version, url);
     }
 
     @Override

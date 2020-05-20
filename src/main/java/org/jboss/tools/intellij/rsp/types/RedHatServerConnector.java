@@ -13,7 +13,9 @@ public class RedHatServerConnector extends AbstractServerConnector {
                 8500, 8999, "images/storage.png");
     }
     public IRsp getRsp(IRspCore core) {
-        return getType(core).createRsp("0.22.10", "/home/rob/code/work/rsp/rsp-server/distribution/distribution/target/rsp-distribution");
+        String version = "0.22.9";
+        String url = "https://download.jboss.org/jbosstools/adapters/snapshots/rsp-server/org.jboss.tools.rsp.distribution.wildfly-0.22.9.Final.zip";
+        return getType(core).createRsp(version, url);
     }
 
     @Override

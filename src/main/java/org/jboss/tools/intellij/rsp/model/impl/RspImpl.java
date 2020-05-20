@@ -10,23 +10,33 @@
  ******************************************************************************/
 package org.jboss.tools.intellij.rsp.model.impl;
 
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
+import org.jboss.tools.intellij.rsp.download.DownloadUtility;
+import org.jboss.tools.intellij.rsp.download.UnzipUtility;
 import org.jboss.tools.intellij.rsp.model.*;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
+import java.io.IOException;
 
 public class RspImpl implements IRsp, IRspStartCallback {
     private final IRspStateController controller;
     private final IRspCore model;
     private IRspType type;
     private String version;
-    private String home;
+    private String downloadUrl;
     private IRspCore.IJServerState currentState = IRspCore.IJServerState.STOPPED;
 
-    public RspImpl(IRspCore model,
-                   IRspType type, String version,
-                   String home, IRspStateController controller) {
+    public RspImpl(IRspCore model, IRspType type,
+                   String version, String downloadUrl,
+                   IRspStateController controller) {
         this.model = model;
         this.type = type;
         this.version = version;
+        this.downloadUrl = downloadUrl;
         this.controller = controller;
     }
 
@@ -43,9 +53,6 @@ public class RspImpl implements IRsp, IRspStartCallback {
     public String getVersion() {
         return version;
     }
-
-    @Override
-    public String getServerHome() {  return home; }
 
     @Override
     public ServerConnectionInfo start() {
@@ -73,6 +80,43 @@ public class RspImpl implements IRsp, IRspStartCallback {
         return currentState;
     }
 
+    @Override
+    public boolean exists() {
+        return new File(this.type.getServerHome()).exists();
+    }
+
+    @Override
+    public void download() {
+        if( !exists()) {
+            final String serverHome = this.type.getServerHome();
+            ProgressManager.getInstance().run(new Task.Backgroundable(null, "Downloading " + getRspType().getName()) {
+
+                @Override
+                public void run(@NotNull ProgressIndicator indicator) {
+                    File toDl = getRspDownloadLocation();
+                    toDl.getParentFile().mkdirs();
+                    File toExtract = new File(serverHome);
+                    try {
+                        new DownloadUtility().download(downloadUrl, toDl.toPath(), indicator);
+                        if( toDl.exists()) {
+                            new UnzipUtility(toDl).extract(toExtract);
+                        }
+                    } catch(IOException ioe) {
+                    }
+                }
+            });
+        }
+    }
+
+
+    protected File getRspDownloadLocation() {
+        File home = new File(System.getProperty(RspTypeImpl.SYSPROP_USER_HOME));
+        File root = new File(home, RspTypeImpl.DATA_LOCATION_DEFAULT);
+        File installs = new File(root, RspTypeImpl.INSTALLATIONS);
+        File downloads = new File(installs, RspTypeImpl.DOWNLOADS);
+        File dlFile = new File(downloads, getRspType().getId() + "-" + getVersion() + ".zip");
+        return dlFile;
+    }
     protected IRspStateController getController() {
         return controller;
     }

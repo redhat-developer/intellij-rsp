@@ -28,7 +28,7 @@ public class RspProgressJob extends Task.Backgroundable {
     @Override
     public void run(@NotNull ProgressIndicator indicator) {
         latch = newLatch();
-        while( !isDone()) {
+        while( !isDone() && !indicator.isCanceled()) {
             try {
                 latch.await();
             } catch(InterruptedException ie) {
