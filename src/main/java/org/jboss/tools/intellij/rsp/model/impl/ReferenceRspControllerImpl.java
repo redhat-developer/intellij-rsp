@@ -26,15 +26,13 @@ import java.nio.file.Path;
 
 public class ReferenceRspControllerImpl implements IRspStateController {
     private IRspType serverType;
-    private String version;
     private int portMin;
     private int portMax;
 
     private Process runningProcess;
 
-    public ReferenceRspControllerImpl(IRspType rspServerType, String version, int portMin, int portMax) {
+    public ReferenceRspControllerImpl(IRspType rspServerType, int portMin, int portMax) {
         this.serverType = rspServerType;
-        this.version = version;
         this.portMin = portMin;
         this.portMax = portMax;
     }

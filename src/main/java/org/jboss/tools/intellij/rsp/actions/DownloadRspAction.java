@@ -13,17 +13,38 @@ package org.jboss.tools.intellij.rsp.actions;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.jboss.tools.intellij.rsp.model.IRsp;
 import org.jboss.tools.intellij.rsp.model.impl.RspCore;
+import org.jboss.tools.intellij.rsp.model.impl.RspTypeImpl;
+import org.jboss.tools.intellij.rsp.util.VersionComparatorUtil;
 
 import javax.swing.tree.TreePath;
+import java.io.File;
 
 public class DownloadRspAction extends AbstractTreeAction {
     @Override
     protected void actionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
         if( selected instanceof IRsp) {
             IRsp server = (IRsp)selected;
-            if( !server.exists()) {
-                server.download();
+            String installed = server.getInstalledVersion();
+            String latest = server.getLatestVersion();
+            if( !server.exists() || installed == null || VersionComparatorUtil.isGreaterThan(latest, installed.trim())) {
+                String home = server.getRspType().getServerHome();
+                new Thread("Updating RSP " + server.getRspType().getName()) {
+                    public void run() {
+                        deleteDirectory(RspTypeImpl.getServerTypeInstallLocation(server.getRspType()));
+                        server.download();
+                    }
+                }.start();
             }
         }
+    }
+
+    boolean deleteDirectory(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file);
+            }
+        }
+        return directoryToBeDeleted.delete();
     }
 }

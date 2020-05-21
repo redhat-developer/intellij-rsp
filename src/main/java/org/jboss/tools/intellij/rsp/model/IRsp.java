@@ -14,7 +14,8 @@ public interface IRsp {
     IRspCore getModel();
 
     public IRspType getRspType();
-    public String getVersion();
+    public String getLatestVersion();
+    public String getInstalledVersion();
     public ServerConnectionInfo start();
     public void stop();
     public void terminate();

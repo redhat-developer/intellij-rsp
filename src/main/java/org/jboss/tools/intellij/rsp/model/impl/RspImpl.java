@@ -21,21 +21,23 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class RspImpl implements IRsp, IRspStartCallback {
     private final IRspStateController controller;
     private final IRspCore model;
     private IRspType type;
-    private String version;
+    private String latestVersion;
     private String downloadUrl;
     private IRspCore.IJServerState currentState = IRspCore.IJServerState.STOPPED;
 
     public RspImpl(IRspCore model, IRspType type,
-                   String version, String downloadUrl,
+                   String latestVersion, String downloadUrl,
                    IRspStateController controller) {
         this.model = model;
         this.type = type;
-        this.version = version;
+        this.latestVersion = latestVersion;
         this.downloadUrl = downloadUrl;
         this.controller = controller;
     }
@@ -50,8 +52,28 @@ public class RspImpl implements IRsp, IRspStartCallback {
     }
 
     @Override
-    public String getVersion() {
-        return version;
+    public String getLatestVersion() {
+        return latestVersion;
+    }
+
+    @Override
+    public String getInstalledVersion() {
+        String home = getRspType().getServerHome();
+        File dotVersion = new File(home, RspTypeImpl.FILE_DOT_VERSION);
+        if (dotVersion.exists()) {
+            String ret = readFileContent(dotVersion.toPath());
+            return ret == null ? null : ret.trim();
+        }
+        return null;
+    }
+
+    private String readFileContent(Path filePath) {
+        try {
+            return new String ( Files.readAllBytes( filePath ) );
+        } catch (IOException e) {
+            // TODO log error
+            return null;
+        }
     }
 
     @Override
@@ -82,12 +104,15 @@ public class RspImpl implements IRsp, IRspStartCallback {
 
     @Override
     public boolean exists() {
-        return new File(this.type.getServerHome()).exists();
+        File f = new File(this.type.getServerHome());
+        boolean b = f.exists();
+        return b;
     }
 
     @Override
     public void download() {
-        if( !exists()) {
+        boolean b = exists();
+        if( !b) {
             final String serverHome = this.type.getServerHome();
             ProgressManager.getInstance().run(new Task.Backgroundable(null, "Downloading " + getRspType().getName()) {
 
@@ -99,7 +124,14 @@ public class RspImpl implements IRsp, IRspStartCallback {
                     try {
                         new DownloadUtility().download(downloadUrl, toDl.toPath(), indicator);
                         if( toDl.exists()) {
-                            new UnzipUtility(toDl).extract(toExtract);
+                            UnzipUtility util = new UnzipUtility(toDl);
+                            util.extract(toExtract);
+                            String root = util.getRoot();
+                            File extractedRoot = toExtract.toPath().resolve(root).toFile();
+                            File dotVersion = new File(extractedRoot, RspTypeImpl.FILE_DOT_VERSION);
+                            if( !dotVersion.exists()) {
+                                Files.write(dotVersion.toPath(), getLatestVersion().getBytes());
+                            }
                         }
                     } catch(IOException ioe) {
                     }
@@ -114,7 +146,7 @@ public class RspImpl implements IRsp, IRspStartCallback {
         File root = new File(home, RspTypeImpl.DATA_LOCATION_DEFAULT);
         File installs = new File(root, RspTypeImpl.INSTALLATIONS);
         File downloads = new File(installs, RspTypeImpl.DOWNLOADS);
-        File dlFile = new File(downloads, getRspType().getId() + "-" + getVersion() + ".zip");
+        File dlFile = new File(downloads, getRspType().getId() + "-" + getLatestVersion() + ".zip");
         return dlFile;
     }
     protected IRspStateController getController() {

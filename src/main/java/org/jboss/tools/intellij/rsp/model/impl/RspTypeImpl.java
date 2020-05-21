@@ -24,6 +24,8 @@ public class RspTypeImpl implements IRspType {
     public static final String EXPANDED = "expanded";
     public static final String DOWNLOADS = "downloads";
 
+    public static final String FILE_DOT_VERSION = ".distribution.version";
+
 
     private final IServerIconProvider iconProvider;
     private final String name;
@@ -61,13 +63,18 @@ public class RspTypeImpl implements IRspType {
         return iconProvider.getIcon(serverTypeId);
     }
 
-    @Override
-    public String getServerHome() {
+    public static File getServerTypeInstallLocation(IRspType type) {
         File home = new File(System.getProperty(SYSPROP_USER_HOME));
         File root = new File(home, DATA_LOCATION_DEFAULT);
         File installs = new File(root, INSTALLATIONS);
         File expanded = new File(installs, EXPANDED);
-        File unzipLoc = new File(expanded, getId());
+        File unzipLoc = new File(expanded, type.getId());
+        return unzipLoc;
+    }
+
+    @Override
+    public String getServerHome() {
+        File unzipLoc = getServerTypeInstallLocation(this);
         if( unzipLoc.exists() && unzipLoc.listFiles().length == 1 && unzipLoc.listFiles()[0].isDirectory()) {
             return unzipLoc.listFiles()[0].getAbsolutePath();
         }
@@ -76,10 +83,10 @@ public class RspTypeImpl implements IRspType {
 
     @Override
     public IRsp createRsp(String version, String url) {
-        return new RspImpl(model,this, version, url, createController(version));
+        return new RspImpl(model,this, version, url, createController());
     }
 
-    private IRspStateController createController(String version) {
-        return controllerProvider.createController(this, version);
+    protected IRspStateController createController() {
+        return controllerProvider.createController(this);
     }
 }

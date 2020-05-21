@@ -55,8 +55,8 @@ public abstract class AbstractServerConnector {
     protected IRspStateControllerProvider createReferenceControllerProvider(final int portMin, final int portMax) {
         return new IRspStateControllerProvider() {
             @Override
-            public IRspStateController createController(IRspType rspServerType, String version) {
-                return new ReferenceRspControllerImpl(rspServerType, version, portMin, portMax);
+            public IRspStateController createController(IRspType rspServerType) {
+                return new ReferenceRspControllerImpl(rspServerType, portMin, portMax);
             }
         };
     }

@@ -34,7 +34,7 @@
       <!-- Application Explorer -->
       <!-- Top level: cluster -->
       <action class="org.jboss.tools.intellij.rsp.actions.DownloadRspAction"
-              id="org.jboss.tools.intellij.rsp.actions.DownloadRspAction" text="Download RSP"/>
+              id="org.jboss.tools.intellij.rsp.actions.DownloadRspAction" text="Download / Update RSP"/>
       <action class="org.jboss.tools.intellij.rsp.actions.StartRspAction"
               id="org.jboss.tools.intellij.rsp.actions.StartRspAction" text="Start RSP"/>
       <action class="org.jboss.tools.intellij.rsp.actions.StopRspAction"
