@@ -40,6 +40,11 @@
       <action class="org.jboss.tools.intellij.rsp.actions.StopRspAction"
               id="org.jboss.tools.intellij.rsp.actions.StopRspAction" text="Stop RSP"/>
       <separator/>
+      <action class="org.jboss.tools.intellij.rsp.actions.CreateServerAction"
+              id="org.jboss.tools.intellij.rsp.actions.CreateServerAction" text="Create Server"/>
+      <action class="org.jboss.tools.intellij.rsp.actions.DeleteServerAction"
+              id="org.jboss.tools.intellij.rsp.actions.DeleteServerAction" text="Delete Server"/>
+      <separator/>
    </group>
     <!-- Add your actions here -->
   </actions>

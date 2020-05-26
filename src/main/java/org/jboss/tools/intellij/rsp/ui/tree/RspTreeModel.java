@@ -75,20 +75,35 @@ public class RspTreeModel extends AbstractTreeStructure {
         return wrappers;
     }
 
-    private static class ServerStateWrapper {
+    public static class ServerStateWrapper {
         private IRsp rsp;
         private ServerState ss;
         public ServerStateWrapper(IRsp rsp, ServerState ss) {
             this.rsp = rsp;
             this.ss = ss;
         }
+
+        public IRsp getRsp() {
+            return rsp;
+        }
+
+        public ServerState getServerState() {
+            return ss;
+        }
     }
-    private static class DeployableStateWrapper {
+    public static class DeployableStateWrapper {
         private ServerStateWrapper serverState;
         private DeployableState ds;
         public DeployableStateWrapper(ServerStateWrapper serverState, DeployableState ds) {
             this.serverState = serverState;
             this.ds = ds;
+        }
+
+        public ServerStateWrapper getServerState() {
+            return serverState;
+        }
+        public DeployableState getDeployableState() {
+            return ds;
         }
     }
 

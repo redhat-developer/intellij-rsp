@@ -230,8 +230,10 @@ public class RspCore implements IRspCore {
     @Override
     public void serverRemoved(IRsp rsp, ServerHandle serverHandle) {
         SingleRspModel model = findModel(rsp.getRspType().getId());
-        if( model != null )
+        if( model != null ) {
             model.removeServer(serverHandle);
+            modelUpdated(rsp);
+        }
     }
 
     @Override
