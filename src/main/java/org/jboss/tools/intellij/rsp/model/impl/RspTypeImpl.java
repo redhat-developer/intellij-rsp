@@ -60,7 +60,11 @@ public class RspTypeImpl implements IRspType {
 
     @Override
     public Icon getIcon(String serverTypeId) {
-        return iconProvider.getIcon(serverTypeId);
+        Icon rspIcon = iconProvider.getIcon(serverTypeId);
+        if( rspIcon == null ) {
+            return IconLoader.getIcon("images/server-dark.png");
+        }
+        return rspIcon;
     }
 
     public static File getServerTypeInstallLocation(IRspType type) {

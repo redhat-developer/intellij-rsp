@@ -43,7 +43,7 @@ public class RspCore implements IRspCore {
     }
 
     @Override
-    public IRspType findServerType(String id) {
+    public IRspType findRspType(String id) {
         SingleRspModel srm = allRsps.get(id);
         if( srm != null )
             return srm.getType();

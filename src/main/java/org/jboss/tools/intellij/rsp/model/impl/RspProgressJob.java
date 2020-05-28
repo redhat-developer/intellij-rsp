@@ -36,7 +36,10 @@ public class RspProgressJob extends Task.Backgroundable {
             updateIndicator(indicator);
         }
     }
-
+    @Override
+    public void onCancel() {
+        rsp.getModel().getClient(rsp).getServerProxy().cancelJob(jobHandle);
+    }
     private synchronized void updateIndicator(ProgressIndicator indicator) {
         double d = this.progress.getPercent();
         System.out.println("progress: " + d);

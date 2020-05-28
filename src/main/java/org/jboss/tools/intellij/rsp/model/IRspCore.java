@@ -64,7 +64,7 @@ public interface IRspCore {
     public void removeChangeListener(IRspCoreChangeListener listener);
 
     public IRsp[] getRSPs();
-    public IRspType findServerType(String id);
+    public IRspType findRspType(String id);
     public ServerState[] getServersInRsp(IRsp rsp);
     public JobProgress[] getJobs(IRsp rsp);
     public IntelliJRspClientLauncher getClient(IRsp rsp);

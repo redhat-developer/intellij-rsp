@@ -20,6 +20,11 @@ import javax.swing.tree.TreePath;
 import java.io.File;
 
 public class DownloadRspAction extends AbstractTreeAction {
+
+    protected boolean isVisible(Object o) {
+        return o instanceof IRsp;
+    }
+
     @Override
     protected void actionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
         if( selected instanceof IRsp) {

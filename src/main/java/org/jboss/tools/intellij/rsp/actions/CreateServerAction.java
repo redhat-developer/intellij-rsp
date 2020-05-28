@@ -34,35 +34,44 @@ import java.util.concurrent.ExecutionException;
 
 public class CreateServerAction extends AbstractTreeAction {
     @Override
+    protected boolean isEnabled(Object o) {
+        return o instanceof IRsp && ((IRsp)o).getState() == IRspCore.IJServerState.STARTED;
+    }
+
+    @Override
     protected void actionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
         if( selected instanceof IRsp) {
             IRsp server = (IRsp)selected;
             if( server.getState() == IRspCore.IJServerState.STARTED) {
                 Project project = ProjectManager.getInstance().getOpenProjects()[0];
                 final FileChooserDescriptor descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor();
-                final VirtualFile[] result = FileChooser.chooseFiles(descriptor, project, null);
-                VirtualFile vf1 = result == null || result.length == 0 ? null : result[0];
                 IntelliJRspClientLauncher client = RspCore.getDefault().getClient(server);
-                if( vf1 != null && client != null ) {
-                    CompletableFuture<List<ServerBean>> fut = client.getServerProxy().findServerBeans(new DiscoveryPath(vf1.getPath()));
-                    try {
-                        List<ServerBean> beans = fut.get();
-                        if( beans == null || beans.size() == 0 ) {
-                            showErrorMessage("No server found");
-                        } else {
-                            createServerFromBean(beans, client);
-                        }
-                    } catch (InterruptedException interruptedException) {
-                        interruptedException.printStackTrace();
-                    } catch (ExecutionException executionException) {
-                        executionException.printStackTrace();
-                    }
-                }
+                createServerFromBean(client, descriptor, project);
             }
         }
     }
 
-    private void createServerFromBean(List<ServerBean> beans, IntelliJRspClientLauncher client) throws ExecutionException, InterruptedException {
+    private void createServerFromBean(IntelliJRspClientLauncher client, FileChooserDescriptor descriptor, Project project) {
+        final VirtualFile[] result = FileChooser.chooseFiles(descriptor, project, null);
+        VirtualFile vf1 = result == null || result.length == 0 ? null : result[0];
+        if( vf1 != null && client != null ) {
+            CompletableFuture<List<ServerBean>> fut = client.getServerProxy().findServerBeans(new DiscoveryPath(vf1.getPath()));
+            try {
+                List<ServerBean> beans = fut.get();
+                if( beans == null || beans.size() == 0 ) {
+                    showErrorMessage("No server found");
+                } else {
+                    showCreateServerFromBeanDialog(beans, client);
+                }
+            } catch (InterruptedException interruptedException) {
+                interruptedException.printStackTrace();
+            } catch (ExecutionException executionException) {
+                executionException.printStackTrace();
+            }
+        }
+    }
+
+    private void showCreateServerFromBeanDialog(List<ServerBean> beans, IntelliJRspClientLauncher client) throws ExecutionException, InterruptedException {
         ServerBean bean1 = beans.get(0);
         String typeId = bean1.getServerAdapterTypeId();
         ServerType st = new ServerType(typeId, null, null);

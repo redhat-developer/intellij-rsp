@@ -21,6 +21,23 @@ import javax.swing.tree.TreePath;
 import java.util.Optional;
 
 public abstract class AbstractTreeAction extends AnAction {
+
+    @Override
+    public void update(AnActionEvent e) {
+        Object o = getSelectedElementFromEvent(e);
+        e.getPresentation().setVisible(isVisible(o));
+        e.getPresentation().setEnabled(isEnabled(o));
+
+    }
+
+    protected boolean isEnabled(Object o) {
+        return true;
+    }
+
+    protected boolean isVisible(Object o) {
+        return true;
+    }
+
     @Override
     public void actionPerformed(AnActionEvent e) {
         Object userObj = getSelectedElementFromEvent(e);

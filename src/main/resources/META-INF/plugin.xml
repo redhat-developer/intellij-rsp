@@ -42,8 +42,19 @@
       <separator/>
       <action class="org.jboss.tools.intellij.rsp.actions.CreateServerAction"
               id="org.jboss.tools.intellij.rsp.actions.CreateServerAction" text="Create Server"/>
+      <action class="org.jboss.tools.intellij.rsp.actions.DownloadServerAction"
+              id="org.jboss.tools.intellij.rsp.actions.DownloadServerAction" text="Download Server"/>
       <action class="org.jboss.tools.intellij.rsp.actions.DeleteServerAction"
               id="org.jboss.tools.intellij.rsp.actions.DeleteServerAction" text="Delete Server"/>
+      <separator/>
+      <action class="org.jboss.tools.intellij.rsp.actions.StartServerAction"
+              id="org.jboss.tools.intellij.rsp.actions.StartServerAction" text="Start Server (Run)"/>
+      <action class="org.jboss.tools.intellij.rsp.actions.StartServerDebugAction"
+              id="org.jboss.tools.intellij.rsp.actions.StartServerDebugAction" text="Start Server (Debug)"/>
+      <action class="org.jboss.tools.intellij.rsp.actions.StopServerAction"
+              id="org.jboss.tools.intellij.rsp.actions.StopServerAction" text="Stop Server"/>
+      <action class="org.jboss.tools.intellij.rsp.actions.TerminateServerAction"
+              id="org.jboss.tools.intellij.rsp.actions.TerminateServerAction" text="Terminate Server"/>
       <separator/>
    </group>
     <!-- Add your actions here -->

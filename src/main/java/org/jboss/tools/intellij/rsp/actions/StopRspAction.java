@@ -18,6 +18,10 @@ import javax.swing.tree.TreePath;
 
 public class StopRspAction extends AbstractTreeAction {
     @Override
+    protected boolean isVisible(Object o) {
+        return o instanceof IRsp;
+    }
+    @Override
     protected void actionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
         if( selected instanceof IRsp) {
             IRsp server = (IRsp)selected;

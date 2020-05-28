@@ -1,24 +1,19 @@
 package org.jboss.tools.intellij.rsp.actions;
 
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.fileChooser.FileChooser;
-import com.intellij.openapi.fileChooser.FileChooserDescriptor;
-import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.vfs.VirtualFile;
 import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
-import org.jboss.tools.intellij.rsp.model.IRsp;
 import org.jboss.tools.intellij.rsp.model.impl.RspCore;
 import org.jboss.tools.intellij.rsp.ui.tree.RspTreeModel;
-import org.jboss.tools.rsp.api.dao.Status;
-import org.jetbrains.annotations.NotNull;
+import org.jboss.tools.rsp.api.dao.*;
 
 import javax.swing.tree.TreePath;
+import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
-public class DeleteServerAction extends AbstractTreeAction {
+public class StopServerAction extends AbstractTreeAction {
+    @Override
     protected boolean isEnabled(Object o) {
         return o instanceof RspTreeModel.ServerStateWrapper;
     }
@@ -29,8 +24,9 @@ public class DeleteServerAction extends AbstractTreeAction {
             RspTreeModel.ServerStateWrapper sel = (RspTreeModel.ServerStateWrapper)selected;
             Project project = ProjectManager.getInstance().getOpenProjects()[0];
             IntelliJRspClientLauncher client = RspCore.getDefault().getClient(sel.getRsp());
+            StopServerAttributes ssa = new StopServerAttributes(sel.getServerState().getServer().getId(), false);
             try {
-                Status stat = client.getServerProxy().deleteServer(sel.getServerState().getServer()).get();
+                Status stat = client.getServerProxy().stopServerAsync(ssa).get();
                 if( !stat.isOK()) {
                     showError(stat);
                 }
@@ -48,4 +44,5 @@ public class DeleteServerAction extends AbstractTreeAction {
     private void showError(Exception stat) {
         // TODO
     }
+
 }

@@ -35,11 +35,7 @@ public abstract class AbstractServerConnector {
 
             @Override
             public Icon getIcon(String serverType) {
-                Icon icon = findIconForServerType(serverType);
-                if( icon == null ) {
-                    icon = AllIcons.General.WarningDecorator;
-                }
-                return icon;
+                return findIconForServerType(serverType);
             }
         };
     }
