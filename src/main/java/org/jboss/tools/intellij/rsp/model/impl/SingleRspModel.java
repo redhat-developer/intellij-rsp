@@ -13,13 +13,12 @@ package org.jboss.tools.intellij.rsp.model.impl;
 import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
 import org.jboss.tools.intellij.rsp.model.IRsp;
 import org.jboss.tools.intellij.rsp.model.IRspType;
+import org.jboss.tools.intellij.rsp.util.RemoteServerProcess;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
-import org.jboss.tools.rsp.api.dao.JobHandle;
-import org.jboss.tools.rsp.api.dao.JobProgress;
-import org.jboss.tools.rsp.api.dao.ServerHandle;
-import org.jboss.tools.rsp.api.dao.ServerState;
+import org.jboss.tools.rsp.api.dao.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class SingleRspModel {
@@ -29,11 +28,14 @@ public class SingleRspModel {
     private List<JobProgress> jobs;
     private List<ServerState> serverState;
 
+    private HashMap<String, RemoteServerProcess> processes;
+
     public SingleRspModel(IRsp server) {
         this.server = server;
         this.type = server.getRspType();
         this.jobs = new ArrayList<>();
         this.serverState = new ArrayList<>();
+        this.processes = new HashMap<>();
     }
 
     public void setClient(IntelliJRspClientLauncher client) {
@@ -117,5 +119,29 @@ public class SingleRspModel {
     public void clear() {
         this.serverState = new ArrayList<>();
         this.jobs = new ArrayList<>();
+    }
+
+    public Process addServerProcess(ServerProcess serverProcess) {
+        String id = serverProcess.getServer().toString() + ":" + serverProcess.getProcessId();
+        RemoteServerProcess sp = new RemoteServerProcess();
+        processes.put(id, sp);
+        return sp;
+    }
+
+    public void serverProcessTerminated(ServerProcess serverProcess) {
+        String id = serverProcess.getServer().toString() + ":" + serverProcess.getProcessId();
+        RemoteServerProcess sp = processes.get(id);
+        if( sp != null ) {
+            sp.terminate();;
+            processes.remove(id);
+        }
+    }
+
+    public void serverProcessOutputAppended(ServerProcessOutput serverProcessOutput) {
+        String id = serverProcessOutput.getServer().toString() + ":" + serverProcessOutput.getProcessId();
+        RemoteServerProcess sp = processes.get(id);
+        if( sp != null ) {
+            sp.handleEvent(serverProcessOutput);
+        }
     }
 }

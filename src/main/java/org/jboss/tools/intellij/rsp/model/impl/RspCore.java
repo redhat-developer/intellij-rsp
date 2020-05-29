@@ -11,10 +11,13 @@
 package org.jboss.tools.intellij.rsp.model.impl;
 
 import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
 import org.jboss.tools.intellij.rsp.model.*;
 import org.jboss.tools.intellij.rsp.types.CommunityServerConnector;
 import org.jboss.tools.intellij.rsp.types.RedHatServerConnector;
+import org.jboss.tools.intellij.rsp.util.ExecUtilClone;
 import org.jboss.tools.rsp.api.ICapabilityKeys;
 import org.jboss.tools.rsp.api.dao.*;
 
@@ -249,6 +252,38 @@ public class RspCore implements IRspCore {
             modelUpdated(rsp);
         }
     }
+
+    @Override
+    public void serverProcessCreated(IRsp rsp, ServerProcess serverProcess) {
+        SingleRspModel model = findModel(rsp.getRspType().getId());
+        if( model != null ) {
+            Process p = model.addServerProcess(serverProcess);
+            String name = serverProcess.getServer().getId() + ":" + serverProcess.getProcessId();
+            Project project = ProjectManager.getInstance().getOpenProjects()[0];
+            try {
+                ExecUtilClone.linkProcessToTerminal(p, project, name, false);
+            } catch(IOException ioe) {
+                // TODO cleanup
+            }
+        }
+    }
+
+    @Override
+    public void serverProcessTerminated(IRsp rsp, ServerProcess serverProcess) {
+        SingleRspModel model = findModel(rsp.getRspType().getId());
+        if( model != null ) {
+            model.serverProcessTerminated(serverProcess);
+        }
+    }
+
+    @Override
+    public void serverProcessOutputAppended(IRsp rsp, ServerProcessOutput serverProcessOutput) {
+        SingleRspModel model = findModel(rsp.getRspType().getId());
+        if( model != null ) {
+            model.serverProcessOutputAppended(serverProcessOutput);
+        }
+    }
+
     @Override
     public CompletableFuture<String> promptString(IRsp rsp, StringPrompt stringPrompt) {
         return null; // TODO

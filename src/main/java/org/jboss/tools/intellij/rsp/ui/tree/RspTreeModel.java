@@ -16,6 +16,7 @@ import com.intellij.ide.util.treeView.AbstractTreeStructure;
 import com.intellij.ide.util.treeView.NodeDescriptor;
 import com.intellij.ide.util.treeView.PresentableNodeDescriptor;
 import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.util.IconLoader;
 import org.jboss.tools.intellij.rsp.model.IRsp;
 import org.jboss.tools.intellij.rsp.model.impl.RspCore;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
@@ -144,7 +145,7 @@ public class RspTreeModel extends AbstractTreeStructure {
 
     private class CoreDescriptor extends Descriptor<RspCore> {
         protected CoreDescriptor(RspCore element, @Nullable NodeDescriptor parentDescriptor) {
-            super(element, parentDescriptor, () -> "Runtime Server Protocol", AllIcons.General.BalloonError);
+            super(element, parentDescriptor, () -> "Runtime Server Protocol", IconLoader.getIcon("images/community-12x24.png"));
         }
     }
 

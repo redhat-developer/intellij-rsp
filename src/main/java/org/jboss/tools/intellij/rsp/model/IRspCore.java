@@ -42,6 +42,11 @@ public interface IRspCore {
 
     void serverStateChanged(IRsp rsp, ServerState serverState);
 
+    void serverProcessCreated(IRsp rsp, ServerProcess serverProcess);
+    void serverProcessTerminated(IRsp rsp, ServerProcess serverProcess);
+    void serverProcessOutputAppended(IRsp rsp, ServerProcessOutput serverProcessOutput);
+
+
     public enum IJServerState {
         STOPPING,
         STOPPED,

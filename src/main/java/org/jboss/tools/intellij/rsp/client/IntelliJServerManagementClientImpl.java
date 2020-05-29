@@ -36,9 +36,6 @@ public class IntelliJServerManagementClientImpl implements RSPClient {
         uiRspServer.getModel().modelUpdated(uiRspServer);
     }
 
-    private void sendServerOutputToConsole(ServerProcessOutput serverProcessOutput) {
-        // TODO do this
-    }
 
     @Override
     public void jobAdded(JobHandle jobHandle) {
@@ -96,17 +93,16 @@ public class IntelliJServerManagementClientImpl implements RSPClient {
 
     @Override
     public void serverProcessCreated(ServerProcess serverProcess) {
-        // Ignore, not worth showing / displaying
+        uiRspServer.getModel().serverProcessCreated(uiRspServer, serverProcess);
     }
 
     @Override
     public void serverProcessTerminated(ServerProcess serverProcess) {
-        // Ignore, not worth showing / displaying
+        uiRspServer.getModel().serverProcessTerminated(uiRspServer, serverProcess);
     }
 
     @Override
     public void serverProcessOutputAppended(ServerProcessOutput serverProcessOutput) {
-        sendServerOutputToConsole(serverProcessOutput);
+        uiRspServer.getModel().serverProcessOutputAppended(uiRspServer, serverProcessOutput);
     }
-
 }
