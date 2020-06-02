@@ -26,13 +26,11 @@ import org.jetbrains.plugins.terminal.AbstractTerminalRunner;
 import org.jetbrains.plugins.terminal.TerminalOptionsProvider;
 import org.jetbrains.plugins.terminal.TerminalView;
 
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -255,6 +253,16 @@ public class ExecUtilClone {
         }
         catch (InterruptedException e) {
             throw new IOException(e);
+        }
+    }
+
+    public static void executeWithTerminal(Project project, String title, File workingDirectory, boolean waitForProcessToExit, String... command) throws IOException {
+        try {
+            ProcessBuilder builder = new ProcessBuilder(command).directory(workingDirectory).redirectErrorStream(true);
+            Process p = builder.start();
+            linkProcessToTerminal(p, project, title, waitForProcessToExit);
+        } catch (IOException e) {
+            throw e;
         }
     }
 }

@@ -13,10 +13,14 @@ package org.jboss.tools.intellij.rsp.model.impl;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.ui.DialogWrapper;
 import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
 import org.jboss.tools.intellij.rsp.model.*;
 import org.jboss.tools.intellij.rsp.types.CommunityServerConnector;
 import org.jboss.tools.intellij.rsp.types.RedHatServerConnector;
+import org.jboss.tools.intellij.rsp.ui.dialogs.StringPromptDialog;
+import org.jboss.tools.intellij.rsp.ui.dialogs.WorkflowDialog;
+import org.jboss.tools.intellij.rsp.ui.util.UIHelper;
 import org.jboss.tools.intellij.rsp.util.ExecUtilClone;
 import org.jboss.tools.rsp.api.ICapabilityKeys;
 import org.jboss.tools.rsp.api.dao.*;
@@ -286,7 +290,17 @@ public class RspCore implements IRspCore {
 
     @Override
     public CompletableFuture<String> promptString(IRsp rsp, StringPrompt stringPrompt) {
-        return null; // TODO
+        final String[] ret = new String[1];
+        UIHelper.executeInUI(() -> {
+            StringPromptDialog spd = new StringPromptDialog(rsp, stringPrompt);
+            spd.show();
+            if( spd.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
+                ret[0] = spd.getText();
+            } else {
+                ret[0] = null;
+            }
+        });
+        return CompletableFuture.completedFuture(ret[0]);
     }
 
     @Override
