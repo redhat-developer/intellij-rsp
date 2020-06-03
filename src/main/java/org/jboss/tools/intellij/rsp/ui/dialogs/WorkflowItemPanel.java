@@ -13,6 +13,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.util.Map;
 
 public class WorkflowItemPanel extends JPanel implements DocumentListener, ActionListener {
@@ -78,13 +79,31 @@ public class WorkflowItemPanel extends JPanel implements DocumentListener, Actio
                 box.addActionListener(this);
                 add(box);
             }  else if( details.getResponseType().equals(ServerManagementAPIConstants.ATTR_TYPE_INT)) {
-                field = item.getPrompt().isResponseSecret() ? new JBPasswordField() : new JTextField();
-                field.getDocument().addDocumentListener(this);
-                add(field);
+                List<String> valid = item.getPrompt().getValidResponses();
+                if( valid == null || valid.size() == 0 ) {
+                    field = item.getPrompt().isResponseSecret() ? new JBPasswordField() : new JTextField();
+                    field.getDocument().addDocumentListener(this);
+                    add(field);
+                } else {
+                    String[] vals = valid.toArray(new String[0]);
+                    box = new ComboBox(vals);
+                    box.setSelectedIndex(-1);
+                    box.addActionListener(this);
+                    add(box);
+                }
             }  else if( details.getResponseType().equals(ServerManagementAPIConstants.ATTR_TYPE_STRING)) {
-                field = item.getPrompt().isResponseSecret() ? new JBPasswordField() : new JTextField();
-                field.getDocument().addDocumentListener(this);
-                add(field);
+                List<String> valid = item.getPrompt().getValidResponses();
+                if( valid == null || valid.size() == 0 ) {
+                    field = item.getPrompt().isResponseSecret() ? new JBPasswordField() : new JTextField();
+                    field.getDocument().addDocumentListener(this);
+                    add(field);
+                } else {
+                    String[] vals = valid.toArray(new String[0]);
+                    box = new ComboBox(vals);
+                    box.setSelectedIndex(-1);
+                    box.addActionListener(this);
+                    add(box);
+                }
             }
         }
     }

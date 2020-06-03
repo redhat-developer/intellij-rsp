@@ -2,47 +2,45 @@ package org.jboss.tools.intellij.rsp.ui.dialogs;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import org.jboss.tools.intellij.rsp.model.IRsp;
-import org.jboss.tools.intellij.rsp.model.IRspType;
-import org.jboss.tools.intellij.rsp.model.impl.RspCore;
+import org.jboss.tools.intellij.rsp.ui.tree.RspTreeModel;
 import org.jboss.tools.intellij.rsp.util.AlphanumComparator;
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
 import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
+import org.jboss.tools.rsp.api.dao.ListServerActionResponse;
+import org.jboss.tools.rsp.api.dao.ServerActionWorkflow;
 import org.jetbrains.annotations.Nullable;
 import sun.swing.DefaultLookup;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-public class SelectDownloadRuntimeDialog extends DialogWrapper implements ListSelectionListener {
-    private final ListDownloadRuntimeResponse runtimeResponse;
-    private final IRsp rsp;
-    private HashMap<String, DownloadRuntimeDescription> dataMap;
+public class SelectServerActionDialog extends DialogWrapper implements ListSelectionListener {
+    private final ListServerActionResponse actionResponse;
+    private final RspTreeModel.ServerStateWrapper state;
+    private HashMap<String, ServerActionWorkflow> dataMap;
+
     private JPanel contentPane;
     private JBList list;
-    private DownloadRuntimeDescription selected = null;
-    public SelectDownloadRuntimeDialog(IRsp rsp, ListDownloadRuntimeResponse runtimeResponse) {
+    private ServerActionWorkflow selected = null;
+    public SelectServerActionDialog(RspTreeModel.ServerStateWrapper state, ListServerActionResponse actionResponse) {
         super((Project)null, true, IdeModalityType.IDE);
-        this.rsp = rsp;
-        this.runtimeResponse = runtimeResponse;
+        this.state = state;
+        this.actionResponse = actionResponse;
         dataMap = new HashMap<>();
-        for( DownloadRuntimeDescription descriptor : runtimeResponse.getRuntimes() ) {
-            dataMap.put(descriptor.getId(), descriptor);
+        for( ServerActionWorkflow descriptor : actionResponse.getWorkflows() ) {
+            dataMap.put(descriptor.getActionId(), descriptor);
         }
-        setTitle("Download Server Runtime...");
+        setTitle("Select a Server Action");
         init();
     }
 
@@ -56,45 +54,41 @@ public class SelectDownloadRuntimeDialog extends DialogWrapper implements ListSe
     @Override
     public void valueChanged(ListSelectionEvent e) {
         Object o = list.getSelectedValue();
-        if( o instanceof DownloadRuntimeDescription) {
-            selected = (DownloadRuntimeDescription)o;
+        if( o instanceof ServerActionWorkflow) {
+            selected = (ServerActionWorkflow)o;
         }
     }
 
-    public DownloadRuntimeDescription getSelected() {
+    public ServerActionWorkflow getSelected() {
         return selected;
     }
 
-    private class DownloadRuntimeCellRenderer extends AbstractRspCellRenderer {
-        public DownloadRuntimeCellRenderer() {
+    private class ServerActionCellRenderer extends AbstractRspCellRenderer {
+        public ServerActionCellRenderer() {
             super();
         }
 
         @Override
         protected String getTextForValue(Object value) {
-            if( value instanceof DownloadRuntimeDescription) {
-                return ((DownloadRuntimeDescription)value).getName();
+            if( value instanceof ServerActionWorkflow) {
+                return (((ServerActionWorkflow) value).getActionLabel());
             }
             return null;
         }
 
         @Override
         protected Icon getIconForValue(Object value) {
-            if( value instanceof DownloadRuntimeDescription) {
-                String serverType = ((DownloadRuntimeDescription) value).getProperties().get("wtp-runtime-type");
-                return serverType == null ? null : rsp.getRspType().getIcon(serverType);
-            }
-            return null;
+                return null;
         }
     }
 
     private void createLayout() {
-        java.util.List<DownloadRuntimeDescription> dlrts = new ArrayList<>(dataMap.values());
-        Collections.sort(dlrts, (o1,o2) -> {
-            return AlphanumComparator.staticCompare(o1.getName(), o2.getName());
+        java.util.List<ServerActionWorkflow> actions = new ArrayList<>(dataMap.values());
+        Collections.sort(actions, (o1,o2) -> {
+            return AlphanumComparator.staticCompare(o1.getActionLabel(), o2.getActionLabel());
         });
-        list = new JBList(dlrts);
-        DownloadRuntimeCellRenderer renderer = new DownloadRuntimeCellRenderer();
+        list = new JBList(actions);
+        ServerActionCellRenderer renderer = new ServerActionCellRenderer();
         list.setCellRenderer(renderer);
         list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         list.setLayoutOrientation(JList.VERTICAL);
@@ -104,7 +98,7 @@ public class SelectDownloadRuntimeDialog extends DialogWrapper implements ListSe
         listScroller.setPreferredSize(new Dimension(250, 250));
         contentPane = new JPanel();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
-        JLabel instructions = new JLabel("Please select a runtime to download...");
+        JLabel instructions = new JLabel("Please select a server action to execute...");
         contentPane.add(instructions);
         contentPane.add(listScroller);
     }

@@ -56,6 +56,8 @@
       <action class="org.jboss.tools.intellij.rsp.actions.TerminateServerAction"
               id="org.jboss.tools.intellij.rsp.actions.TerminateServerAction" text="Terminate Server"/>
       <separator/>
+      <action class="org.jboss.tools.intellij.rsp.actions.ServerActionAction"
+              id="org.jboss.tools.intellij.rsp.actions.ServerActionAction" text="Run Server Action..."/>
    </group>
     <!-- Add your actions here -->
   </actions>
