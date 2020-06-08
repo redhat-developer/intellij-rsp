@@ -56,6 +56,10 @@
       <action class="org.jboss.tools.intellij.rsp.actions.TerminateServerAction"
               id="org.jboss.tools.intellij.rsp.actions.TerminateServerAction" text="Terminate Server"/>
       <separator/>
+      <action class="org.jboss.tools.intellij.rsp.actions.AddDeploymentAction"
+              id="org.jboss.tools.intellij.rsp.actions.AddDeploymentAction" text="Add Deployment"/>
+      <action class="org.jboss.tools.intellij.rsp.actions.RemoveDeploymentAction"
+              id="org.jboss.tools.intellij.rsp.actions.RemoveDeploymentAction" text="Remove Deployment"/>
       <action class="org.jboss.tools.intellij.rsp.actions.IncrementalPublishServerAction"
               id="org.jboss.tools.intellij.rsp.actions.IncrementalPublishServerAction" text="Publish Server (Incremental)"/>
       <action class="org.jboss.tools.intellij.rsp.actions.FullPublishServerAction"
