@@ -56,8 +56,10 @@ public class NewServerDialog extends DialogWrapper implements DocumentListener {
         contentPane.add(name);
         nameField = new JTextField();
         contentPane.add(nameField);
-        contentPane.add(requiredPanel);
-        contentPane.add(optionalPanel);
+        if( required != null && required.getAttributes().size() > 0 )
+            contentPane.add(requiredPanel);
+        if( optional != null && optional.getAttributes().size() > 0 )
+            contentPane.add(optionalPanel);
         nameField.getDocument().addDocumentListener(this);
 
     }

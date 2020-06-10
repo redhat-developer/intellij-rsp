@@ -24,16 +24,16 @@ import java.util.Optional;
 
 public abstract class AbstractTreeAction extends AnAction {
     private static final String INVALID_RESPONSE = "Invalid Response from RSP";
+
+    protected void showError(String msg, String title) {
+        Messages.showErrorDialog(msg, title);
+    }
     protected void apiError(Exception exception, String title) {
-        Messages.showErrorDialog(exception.getMessage(), title);
+        showError(exception == null ? "Unknown Error" : exception.getMessage(), title);
     }
 
     protected void statusError(Status stat, String title) {
-        if( stat == null ) {
-            Messages.showErrorDialog(INVALID_RESPONSE,title);
-        } else {
-            Messages.showErrorDialog(stat.getMessage(), title);
-        }
+        showError(stat == null ? INVALID_RESPONSE : stat.getMessage(), title);
     }
 
     @Override

@@ -16,6 +16,7 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
 import org.jboss.tools.intellij.rsp.model.IRsp;
@@ -100,14 +101,20 @@ public class CreateServerAction extends AbstractTreeAction {
         NewServerDialog td = new NewServerDialog(required2, optional2, values);
         UIHelper.executeInUI(() -> {
             td.show();
-            ServerAttributes csa = new ServerAttributes(typeId, td.getName(), values);
-            try {
-                CreateServerResponse result = client.getServerProxy().createServer(csa).get();
-                if( !result.getStatus().isOK()) {
-                    statusError(result.getStatus(), ERROR_CREATING_SERVER);
+            if( td.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
+                if( td.getName() == null || td.getName().trim().isEmpty()) {
+                    showError("Name must not be empty or missing", "Invalid Name");
+                } else {
+                    ServerAttributes csa = new ServerAttributes(typeId, td.getName(), values);
+                    try {
+                        CreateServerResponse result = client.getServerProxy().createServer(csa).get();
+                        if (!result.getStatus().isOK()) {
+                            statusError(result.getStatus(), ERROR_CREATING_SERVER);
+                        }
+                    } catch (InterruptedException | ExecutionException e) {
+                        apiError(e, ERROR_CREATING_SERVER);
+                    }
                 }
-            } catch (InterruptedException | ExecutionException e) {
-                apiError(e, ERROR_CREATING_SERVER);
             }
         });
     }

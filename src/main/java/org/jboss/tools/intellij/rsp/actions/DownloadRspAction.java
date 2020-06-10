@@ -12,6 +12,7 @@ package org.jboss.tools.intellij.rsp.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.jboss.tools.intellij.rsp.model.IRsp;
+import org.jboss.tools.intellij.rsp.model.IRspCore;
 import org.jboss.tools.intellij.rsp.model.impl.RspTypeImpl;
 import org.jboss.tools.intellij.rsp.util.VersionComparatorUtil;
 
@@ -20,6 +21,21 @@ import java.io.File;
 
 public class DownloadRspAction extends AbstractTreeAction {
 
+    @Override
+    protected boolean isEnabled(Object o) {
+        boolean canDownload = o instanceof IRsp && ((IRsp)o).getState() == IRspCore.IJServerState.STOPPED;
+        if( !canDownload )
+            return false;
+        IRsp server = (IRsp)o;
+        String installed = server.getInstalledVersion();
+        String latest = server.getLatestVersion();
+        if( !server.exists() || installed == null ||
+                VersionComparatorUtil.isGreaterThan(latest, installed.trim())) {
+            return true;
+        }
+
+        return false;
+    }
     protected boolean isVisible(Object o) {
         return o instanceof IRsp;
     }

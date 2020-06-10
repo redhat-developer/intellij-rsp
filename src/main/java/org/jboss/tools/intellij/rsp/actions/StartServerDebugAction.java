@@ -29,6 +29,7 @@ import org.jboss.tools.intellij.rsp.ui.tree.RspTreeModel;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
+import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
 
 import javax.swing.tree.TreePath;
@@ -64,23 +65,24 @@ public class StartServerDebugAction extends AbstractTreeAction {
     }
     protected void actionPerformedInternal(RspTreeModel.ServerStateWrapper sel, Project project, IntelliJRspClientLauncher client) {
         String mode = "debug";
-        ServerAttributes sa = new ServerAttributes(sel.getServerState().getServer().getType().getId(),
+        ServerHandle handle = sel.getServerState().getServer();
+        ServerAttributes sa = new ServerAttributes(handle.getType().getId(),
                 sel.getServerState().getServer().getId(), new HashMap<String,Object>());
         LaunchParameters params = new LaunchParameters(sa, mode);
-        StartServerResponse stat = null;
+        StartServerResponse response = null;
         try {
-            stat = client.getServerProxy().startServerAsync(params).get();
+            response = client.getServerProxy().startServerAsync(params).get();
         } catch (InterruptedException | ExecutionException ex) {
             apiError(ex, ERROR_STARTING_SERVER);
             return;
         }
-        if( stat == null || !stat.getStatus().isOK()) {
-            statusError(stat.getStatus(), ERROR_STARTING_SERVER);
+        if( response == null || !response.getStatus().isOK()) {
+            statusError(response.getStatus(), ERROR_STARTING_SERVER);
         } else {
-            connectDebugger(stat);
+            connectDebugger(response, handle);
         }
     }
-    private void connectDebugger(StartServerResponse stat) {
+    private void connectDebugger(StartServerResponse stat, ServerHandle handle) {
         String host = stat.getDetails().getProperties().get(DEBUG_DETAILS_HOST);
         String port = stat.getDetails().getProperties().get(DEBUG_DETAILS_PORT);
         String type = stat.getDetails().getProperties().get(DEBUG_DETAILS_TYPE);
@@ -88,7 +90,7 @@ public class StartServerDebugAction extends AbstractTreeAction {
             return;
 
         if(DEBUG_DETAILS_TYPE_JAVA.equals(type)) {
-            String configurationName = stat.getDetails().getCmdLine() + " Remote Debug";
+            String configurationName = handle.getId() + " Remote Debug";
             RunnerAndConfigurationSettings runSettings = getSettings(host, port, configurationName);
 
             // Connect java debugger

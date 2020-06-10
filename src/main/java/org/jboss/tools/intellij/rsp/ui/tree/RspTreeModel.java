@@ -178,13 +178,13 @@ public class RspTreeModel extends AbstractTreeStructure {
                             element.ds.getReference().getLabel() + "   [" +
                                     getRunStateString(element.ds.getState()) + ", " +
                                     getPublishStateString(element.ds.getPublishState()) + "]",
-                    AllIcons.General.BalloonInformation);
+                    IconLoader.getIcon("images/jar_obj.gif"));
         }
     }
 
     private class StandardDescriptor extends Descriptor<Object> {
         protected StandardDescriptor(Object element, @Nullable NodeDescriptor parentDescriptor) {
-            super(element, parentDescriptor, () -> element.toString(), AllIcons.General.BalloonError);
+            super(element, parentDescriptor, () -> element.toString(), AllIcons.General.Information);
         }
     }
 
