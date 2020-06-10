@@ -12,6 +12,14 @@ package org.jboss.tools.intellij.rsp.util;
 
 import java.util.Comparator;
 
+/**
+ * Compare two strings for the purposes of sorting servers strings
+ * that have letters and numeric (ie version) strings mixed in the middle.
+ *
+ * This is required to ensure that wildfly-7.0.0-Final is marked as earlier than
+ * Wildfly-10.0.0-Final. A normal string comparison would mark wildfly10 as lower
+ * because of the presence of the 1.
+ */
 public class AlphanumComparator implements Comparator<String> {
     public AlphanumComparator() {
     }

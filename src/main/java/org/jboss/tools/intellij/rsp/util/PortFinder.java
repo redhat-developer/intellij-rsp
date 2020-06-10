@@ -14,6 +14,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Find a free port in some range
+ */
 public class PortFinder {
     public static int nextFreePort(int from, int to) {
         for( int port = from; port < to; port ++ ) {

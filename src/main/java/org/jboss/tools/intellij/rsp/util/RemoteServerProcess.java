@@ -15,6 +15,10 @@ import org.jboss.tools.rsp.api.dao.ServerProcessOutput;
 
 import java.io.*;
 
+/**
+ * Used to wrap output from a remote server process into something
+ * usable by the terminal view.
+ */
 public class RemoteServerProcess extends Process {
     private boolean terminated = false;
     private OutputStream serverSysIn;

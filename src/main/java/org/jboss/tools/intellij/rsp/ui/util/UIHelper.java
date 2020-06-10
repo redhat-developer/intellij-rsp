@@ -14,6 +14,9 @@ import com.intellij.openapi.application.ApplicationManager;
 
 import java.util.function.Supplier;
 
+/**
+ * Simple util to run stuff in UI thread
+ */
 public class UIHelper {
     public static void executeInUI(Runnable runnable) {
         if (ApplicationManager.getApplication().isDispatchThread()) {

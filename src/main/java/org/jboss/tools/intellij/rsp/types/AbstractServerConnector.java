@@ -17,6 +17,11 @@ import org.jboss.tools.intellij.rsp.model.impl.RspTypeImpl;
 
 import javax.swing.*;
 
+/**
+ * An abstract server connector for reference-implementation type RSPs
+ * of the same type and structure as the redhat-server-connector or
+ * community-server-connector
+ */
 public abstract class AbstractServerConnector {
     protected String name;
     protected String id;

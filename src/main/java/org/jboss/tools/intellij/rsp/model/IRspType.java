@@ -12,6 +12,9 @@ package org.jboss.tools.intellij.rsp.model;
 
 import javax.swing.*;
 
+/**
+ * Provides basic information for each RSP type and allows an instance of the RSP to be created
+ */
 public interface IRspType {
     String getId();
     String getName();

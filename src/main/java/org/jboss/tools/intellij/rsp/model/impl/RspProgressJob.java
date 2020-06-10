@@ -21,6 +21,10 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
+/**
+ * A wrapper representing a job executing on an RSP that this extension
+ * receives status updates for.
+ */
 public class RspProgressJob extends Task.Backgroundable {
     private IRsp rsp;
     private JobHandle jobHandle;

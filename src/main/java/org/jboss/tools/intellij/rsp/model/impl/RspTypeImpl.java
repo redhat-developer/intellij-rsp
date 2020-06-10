@@ -16,6 +16,9 @@ import org.jboss.tools.intellij.rsp.model.*;
 import javax.swing.*;
 import java.io.File;
 
+/**
+ * An implementation of an RSP type
+ */
 public class RspTypeImpl implements IRspType {
 
     public static final String SYSPROP_USER_HOME = "user.home";

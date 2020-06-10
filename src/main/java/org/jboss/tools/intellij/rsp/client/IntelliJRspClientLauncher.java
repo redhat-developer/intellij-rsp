@@ -18,6 +18,10 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+/**
+ * Launch a connection to a remote rsp instance and control
+ * access to the remote API via the client
+ */
 public class IntelliJRspClientLauncher {
     private IntelliJServerManagementClientImpl myClient;
     private SocketLauncher<RSPServer> launcher;

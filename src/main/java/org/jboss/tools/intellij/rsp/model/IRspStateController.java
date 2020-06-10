@@ -10,10 +10,20 @@
  ******************************************************************************/
 package org.jboss.tools.intellij.rsp.model;
 
-import org.jboss.tools.intellij.rsp.model.IRspStartCallback;
-import org.jboss.tools.intellij.rsp.model.ServerConnectionInfo;
-
+/**
+ * Controls the state for an RSP
+ */
 public interface IRspStateController {
+    /**
+     * Start the RSP and alert the callback to changes in the state
+     * @param callback
+     * @return
+     */
     public ServerConnectionInfo start(IRspStartCallback callback);
+
+    /**
+     * Terminate the rsp and alert the callback to changes in the state
+     * @param callback
+     */
     public void terminate(IRspStartCallback callback);
 }

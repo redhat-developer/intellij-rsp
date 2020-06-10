@@ -19,6 +19,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+/**
+ * Represents the primary model for the UI tooling
+ */
 public interface IRspCore {
 
     /*
@@ -65,12 +68,48 @@ public interface IRspCore {
      */
     public void modelUpdated(Object o);
 
+    /**
+     * Add a listener to respond to model changes
+     * @param listener
+     */
     public void addChangeListener(IRspCoreChangeListener listener);
+    /**
+     * Remove a listener to respond to model changes
+     * @param listener
+     */
     public void removeChangeListener(IRspCoreChangeListener listener);
 
+    /**
+     * Get a list of all declared RSPs
+     * @return
+     */
     public IRsp[] getRSPs();
+
+    /**
+     * Find an RSP type by the given id
+     * @param id
+     * @return
+     */
     public IRspType findRspType(String id);
+
+    /**
+     * Get a list of servers defined inside a given rsp
+     * @param rsp
+     * @return
+     */
     public ServerState[] getServersInRsp(IRsp rsp);
+
+    /**
+     * Get all currently-running jobs for the given RSP
+     * @param rsp
+     * @return
+     */
     public JobProgress[] getJobs(IRsp rsp);
+
+    /**
+     * Get a client for the remote RSP which can make requests
+     * @param rsp
+     * @return
+     */
     public IntelliJRspClientLauncher getClient(IRsp rsp);
 }

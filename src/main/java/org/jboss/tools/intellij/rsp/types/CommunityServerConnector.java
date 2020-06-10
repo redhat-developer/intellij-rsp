@@ -16,6 +16,10 @@ import org.jboss.tools.intellij.rsp.model.IRspCore;
 
 import javax.swing.*;
 
+/**
+ * Provides the id, name, ports, icons, and download information for
+ * the latest version of the Community Server Connector.
+ */
 public class CommunityServerConnector extends AbstractServerConnector {
     public CommunityServerConnector() {
         super("redhat-community-server-connector", "Community Server Connector by Red Hat",

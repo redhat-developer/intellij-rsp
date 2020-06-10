@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.jboss.tools.intellij.rsp.model;
 
+/**
+ * Allow an IRspStateController to update its caller with state changes for the given rsp
+ */
 public interface IRspStartCallback {
     public void updateRspState(IRspCore.IJServerState state);
 }

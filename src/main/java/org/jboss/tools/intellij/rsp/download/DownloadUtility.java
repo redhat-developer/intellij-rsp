@@ -21,6 +21,9 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * Download a remote file
+ */
 public class DownloadUtility {
 
     public void download(String url, Path dlFilePath, ProgressIndicator progressIndicator) throws IOException {

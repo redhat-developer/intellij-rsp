@@ -17,6 +17,9 @@ import org.jboss.tools.rsp.api.dao.*;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Make requests to, and receive events from, the remote rsp
+ */
 public class IntelliJServerManagementClientImpl implements RSPClient {
     private final IRsp uiRspServer;
     private RSPServer server;

@@ -21,6 +21,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * The model for a single RSP, including its type, client, jobs currently executing,
+ * and state for each of the servers declared on the RSP (including deployment state)
+ */
 public class SingleRspModel {
     private IRspType type;
     private IRsp server;

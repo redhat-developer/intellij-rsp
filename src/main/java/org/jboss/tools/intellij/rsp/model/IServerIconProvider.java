@@ -12,6 +12,9 @@ package org.jboss.tools.intellij.rsp.model;
 
 import javax.swing.*;
 
+/**
+ * Provide icons for a given RSP or the server types declared within
+ */
 public interface IServerIconProvider {
     public Icon getIcon();
     public Icon getIcon(String serverType);

@@ -14,6 +14,7 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.Messages;
 import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
 import org.jboss.tools.intellij.rsp.model.*;
 import org.jboss.tools.intellij.rsp.types.CommunityServerConnector;
@@ -34,6 +35,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+/**
+ * The primary model for the framework. It mostly just links events from rsp and client
+ * to listeners and stores some basic information about each model object
+ */
 public class RspCore implements IRspCore {
     private static RspCore instance = new RspCore();
     public static RspCore getDefault() {
@@ -305,6 +310,16 @@ public class RspCore implements IRspCore {
 
     @Override
     public void messageBox(IRsp rsp, MessageBoxNotification messageBoxNotification) {
+        int sev = messageBoxNotification.getSeverity();
+        if( sev == Status.ERROR) {
+            Messages.showErrorDialog(messageBoxNotification.getMessage(), "Error");
+        } else if( sev == Status.INFO) {
+            Messages.showInfoMessage(messageBoxNotification.getMessage(), "Info");
+        } else if( sev == Status.WARNING) {
+            Messages.showWarningDialog(messageBoxNotification.getMessage(), "Warning");
+        } else if( sev == Status.OK) {
+            Messages.showInfoMessage(messageBoxNotification.getMessage(), "Info");
+        }
     }
 
 

@@ -16,6 +16,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.ComponentUI;
 import java.awt.*;
 
+/**
+ * Code copied from intelli-j internal classes for use in rendering cells in lists.
+ */
 public abstract class AbstractRspCellRenderer extends DefaultListCellRenderer {
     private final Border SAFE_NO_FOCUS_BORDER = new EmptyBorder(1, 1, 1, 1);
     private final Border DEFAULT_NO_FOCUS_BORDER = new EmptyBorder(1, 1, 1, 1);

@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.jboss.tools.intellij.rsp.client;
 
+/**
+ * Listen to client close events
+ */
 public interface IClientConnectionClosedListener {
     public void connectionClosed();
 }

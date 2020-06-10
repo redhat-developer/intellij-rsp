@@ -13,6 +13,10 @@ package org.jboss.tools.intellij.rsp.util;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+/**
+ * Convert a long command string into array items suitable to be passed into
+ * Runtime.exec(etc) in order to spawn a process.
+ */
 public class CommandLineUtils {
     public static String[] translateCommandline( String toProcess )  throws CommandLineException {
         if ( ( toProcess == null ) || ( toProcess.length() == 0 ) ) {

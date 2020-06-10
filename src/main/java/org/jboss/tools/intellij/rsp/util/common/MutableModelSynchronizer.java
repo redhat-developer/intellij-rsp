@@ -19,6 +19,9 @@ import javax.swing.tree.TreePath;
 import java.util.Enumeration;
 import java.util.function.Supplier;
 
+/**
+ * Tool copied from redhat-developer/intellij-common to update the view
+ */
 public class MutableModelSynchronizer {
     private final StructureTreeModel treeModel;
     private final AbstractTreeStructure structure;

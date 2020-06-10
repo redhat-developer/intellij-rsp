@@ -28,6 +28,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Workflow Utility
+ * Some RSP calls (like download runtimes or server actions) use a workflow
+ * which requires multiple rounds of back-and-forth for a multi-step process to
+ * complete.
+ *
+ * This utility will display all prompts in dialogs or perform other workflow steps
+ * like open editors or terminals as requested.
+ */
 public class WorkflowUiUtility {
 
     public static Map<String, Object> displayPromptsSeekWorkflowInput(WorkflowResponse resp) {

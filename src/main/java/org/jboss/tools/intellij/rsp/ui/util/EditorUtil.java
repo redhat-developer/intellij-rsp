@@ -21,6 +21,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
+/**
+ * Utilities related to opening editors
+ */
 public class EditorUtil {
     public static void openFileInEditor(Project project, File f) {
         VirtualFile vf =  LocalFileSystem.getInstance().refreshAndFindFileByIoFile(f);

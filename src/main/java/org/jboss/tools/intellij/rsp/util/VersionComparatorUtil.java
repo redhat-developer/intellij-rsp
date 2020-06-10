@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.jboss.tools.intellij.rsp.util;
 
+/**
+ * Compare version strings.
+ */
 public class VersionComparatorUtil {
 
     public static boolean isGreaterThanOrEqualTo(String actual, String test) {

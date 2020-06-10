@@ -24,6 +24,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * Provides the logic to start and stop a reference-implementation-based RSP
+ * including launching the felix command with flags for logging, port,
+ * data directory, and data locking.
+ */
 public class ReferenceRspControllerImpl implements IRspStateController {
     private IRspType serverType;
     private int portMin;

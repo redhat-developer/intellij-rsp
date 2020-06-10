@@ -21,6 +21,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
+/**
+ * Utility to unzip a downloaded archive
+ */
 public class UnzipUtility {
     private static final String EXTRACTING = "Extracting ..."; //$NON-NLS-1$
     private static final String SEPARATOR = "/"; //$NON-NLS-1$

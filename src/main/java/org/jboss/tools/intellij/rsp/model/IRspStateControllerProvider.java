@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.jboss.tools.intellij.rsp.model;
 
+/**
+ * Creates IRspStateController for a given IRspType
+ */
 public interface IRspStateControllerProvider {
         public IRspStateController createController(IRspType rspServerType);
 }

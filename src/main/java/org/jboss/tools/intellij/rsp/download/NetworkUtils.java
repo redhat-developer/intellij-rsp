@@ -36,6 +36,9 @@ import java.util.Set;
 import static com.intellij.openapi.util.text.StringUtil.isNotEmpty;
 import static okhttp3.Credentials.basic;
 
+/**
+ * For use by the download utility, assists in setting up the connection
+ */
 public class NetworkUtils {
 
     public static OkHttpClient getClient() {

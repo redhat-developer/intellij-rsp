@@ -16,6 +16,11 @@ import org.jboss.tools.intellij.rsp.model.IRspCore;
 
 import javax.swing.*;
 
+/**
+ * Provides the id, name, ports, icons, and download information for
+ * the latest version of the Red Hat Server Connector.
+ */
+
 public class RedHatServerConnector extends AbstractServerConnector {
     public RedHatServerConnector() {
         super("redhat-server-connector", "Red Hat Server Connector",

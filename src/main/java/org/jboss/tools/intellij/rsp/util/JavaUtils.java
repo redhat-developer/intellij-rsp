@@ -13,6 +13,9 @@ package org.jboss.tools.intellij.rsp.util;
 import java.io.File;
 import java.util.Locale;
 
+/**
+ * Find the java executable on the user's hard drive at expected locations
+ */
 public class JavaUtils {
     private static final String JRE = "jre"; //$NON-NLS-1$
     private static final String JAVA_HOME = "java.home";

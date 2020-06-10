@@ -28,7 +28,9 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
-
+/**
+ * The primary view
+ */
 public class WindowToolFactory implements ToolWindowFactory {
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {

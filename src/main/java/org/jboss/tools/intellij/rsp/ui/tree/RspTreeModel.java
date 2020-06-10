@@ -28,6 +28,12 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.util.List;
 
+/**
+ * The primary model of the tree / view used by users.
+ * This primarily wraps the objects of the underlying Core model
+ * to ensure a heirarchy that can be traced up and down, as well as
+ * provides labels and icons.
+ */
 public class RspTreeModel extends AbstractTreeStructure {
     private RspCore core;
     public RspTreeModel(RspCore core) {

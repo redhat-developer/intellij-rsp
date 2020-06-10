@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.jboss.tools.intellij.rsp.model;
 
+/**
+ * Simple host/port pair
+ */
 public class ServerConnectionInfo {
     private final String host;
     private final int port;

@@ -24,6 +24,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * The implementation for an RSP.
+ * Most of this implementation should be fairly standard, with the
+ * custom bits in the IRspStateController
+ */
 public class RspImpl implements IRsp, IRspStartCallback {
     private final IRspStateController controller;
     private final IRspCore model;
