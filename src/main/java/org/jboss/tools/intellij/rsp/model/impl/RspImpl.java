@@ -96,10 +96,12 @@ public class RspImpl implements IRsp, IRspStartCallback {
         updateRspState(IRspCore.IJServerState.STOPPING);
         IntelliJRspClientLauncher client = model.getClient(this);
         if( client != null ) {
-            client.getServerProxy().shutdown();
-        } else {
-            terminate();
+            if( client.getServerProxy() != null ) {
+                client.getServerProxy().shutdown();
+                return;
+            }
         }
+        terminate();
     }
 
     @Override
