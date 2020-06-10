@@ -12,27 +12,18 @@ package org.jboss.tools.intellij.rsp.ui.dialogs;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import org.jboss.tools.intellij.rsp.model.IRsp;
-import org.jboss.tools.intellij.rsp.model.IRspType;
-import org.jboss.tools.intellij.rsp.model.impl.RspCore;
 import org.jboss.tools.intellij.rsp.util.AlphanumComparator;
 import org.jboss.tools.rsp.api.dao.DownloadRuntimeDescription;
 import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
 import org.jetbrains.annotations.Nullable;
-import sun.swing.DefaultLookup;
 
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
