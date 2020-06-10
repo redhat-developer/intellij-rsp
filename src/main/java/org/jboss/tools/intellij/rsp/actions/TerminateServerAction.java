@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2020 Red Hat, Inc.
+ * Distributed under license by Red Hat, Inc. All rights reserved.
+ * This program is made available under the terms of the
+ * Eclipse Public License v2.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v20.html
+ *
+ * Contributors:
+ * Red Hat, Inc. - initial API and implementation
+ ******************************************************************************/
 package org.jboss.tools.intellij.rsp.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -14,6 +24,7 @@ import javax.swing.tree.TreePath;
 import java.util.concurrent.ExecutionException;
 
 public class TerminateServerAction extends AbstractTreeAction {
+    private static final String ERROR_TERMINATE_SERVER = "Error terminating server";
     @Override
     protected boolean isEnabled(Object o) {
         if( o instanceof RspTreeModel.ServerStateWrapper) {
@@ -33,21 +44,11 @@ public class TerminateServerAction extends AbstractTreeAction {
             try {
                 Status stat = client.getServerProxy().stopServerAsync(ssa).get();
                 if( !stat.isOK()) {
-                    showError(stat);
+                    statusError(stat, ERROR_TERMINATE_SERVER);
                 }
-            } catch (InterruptedException ex) {
-                showError(ex);
-            } catch (ExecutionException ex) {
-                showError(ex);
+            } catch (InterruptedException | ExecutionException ex) {
+                apiError(ex, ERROR_TERMINATE_SERVER);
             }
         }
     }
-
-    private void showError(Status stat) {
-        // TODO
-    }
-    private void showError(Exception stat) {
-        // TODO
-    }
-
 }

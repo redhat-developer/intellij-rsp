@@ -13,7 +13,6 @@ package org.jboss.tools.intellij.rsp.actions;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.jboss.tools.intellij.rsp.model.IRsp;
 import org.jboss.tools.intellij.rsp.model.impl.RspCore;
-import org.jboss.tools.intellij.rsp.ui.tree.RspTreeModel;
 
 import javax.swing.tree.TreePath;
 

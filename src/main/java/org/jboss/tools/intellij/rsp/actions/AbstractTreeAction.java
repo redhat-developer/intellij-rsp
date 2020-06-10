@@ -13,14 +13,28 @@ package org.jboss.tools.intellij.rsp.actions;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.Tree;
 import org.jboss.tools.intellij.rsp.ui.tree.RspTreeModel;
+import org.jboss.tools.rsp.api.dao.Status;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.util.Optional;
 
 public abstract class AbstractTreeAction extends AnAction {
+    private static final String INVALID_RESPONSE = "Invalid Response from RSP";
+    protected void apiError(Exception exception, String title) {
+        Messages.showErrorDialog(exception.getMessage(), title);
+    }
+
+    protected void statusError(Status stat, String title) {
+        if( stat == null ) {
+            Messages.showErrorDialog(INVALID_RESPONSE,title);
+        } else {
+            Messages.showErrorDialog(stat.getMessage(), title);
+        }
+    }
 
     @Override
     public void update(AnActionEvent e) {

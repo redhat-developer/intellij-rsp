@@ -27,8 +27,6 @@ import org.jboss.tools.intellij.rsp.util.common.MutableModelSynchronizer;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import javax.swing.tree.TreePath;
-import java.util.function.Supplier;
 
 
 public class WindowToolFactory implements ToolWindowFactory {

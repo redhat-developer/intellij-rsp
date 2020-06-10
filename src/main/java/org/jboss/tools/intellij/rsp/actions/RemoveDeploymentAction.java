@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2020 Red Hat, Inc.
+ * Distributed under license by Red Hat, Inc. All rights reserved.
+ * This program is made available under the terms of the
+ * Eclipse Public License v2.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v20.html
+ *
+ * Contributors:
+ * Red Hat, Inc. - initial API and implementation
+ ******************************************************************************/
 package org.jboss.tools.intellij.rsp.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -14,6 +24,7 @@ import javax.swing.tree.TreePath;
 import java.util.concurrent.ExecutionException;
 
 public class RemoveDeploymentAction extends AbstractTreeAction {
+    private static final String ERROR_REMOVING_DEPLOYMENT = "Error removing deployment";
     protected boolean isEnabled(Object o) {
         return o instanceof RspTreeModel.DeployableStateWrapper;
     }
@@ -34,17 +45,13 @@ public class RemoveDeploymentAction extends AbstractTreeAction {
     }
 
     protected void actionPerformedThread(RSPServer rspServer, ServerDeployableReference sdr) {
-        Status stat = null;
-        Exception ex = null;
         try {
-            stat = rspServer.removeDeployable(sdr).get();
-        } catch (InterruptedException interruptedException) {
-            ex = interruptedException;
-        } catch (ExecutionException executionException) {
-            ex = executionException;
-        }
-        if( stat == null || !stat.isOK()) {
-            // TODO error
+            Status stat = rspServer.removeDeployable(sdr).get();
+            if( stat == null || !stat.isOK()) {
+                statusError(stat, ERROR_REMOVING_DEPLOYMENT);
+            }
+        } catch (InterruptedException | ExecutionException ex) {
+            apiError(ex, ERROR_REMOVING_DEPLOYMENT);
         }
     }
 
@@ -54,4 +61,6 @@ public class RemoveDeploymentAction extends AbstractTreeAction {
         ServerDeployableReference sdr = new ServerDeployableReference(sh, ds.getReference());
         return sdr;
     }
+
+
 }

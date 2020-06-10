@@ -1,37 +1,43 @@
+/*******************************************************************************
+ * Copyright (c) 2020 Red Hat, Inc.
+ * Distributed under license by Red Hat, Inc. All rights reserved.
+ * This program is made available under the terms of the
+ * Eclipse Public License v2.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v20.html
+ *
+ * Contributors:
+ * Red Hat, Inc. - initial API and implementation
+ ******************************************************************************/
 package org.jboss.tools.intellij.rsp.actions;
 
 import com.intellij.execution.ProgramRunnerUtil;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.ConfigurationType;
-import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.executors.DefaultDebugExecutor;
 import com.intellij.execution.remote.RemoteConfiguration;
 import com.intellij.execution.remote.RemoteConfigurationType;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.ExecutionEnvironmentBuilder;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
-import org.jboss.tools.intellij.rsp.model.IRsp;
 import org.jboss.tools.intellij.rsp.model.impl.RspCore;
 import org.jboss.tools.intellij.rsp.ui.tree.RspTreeModel;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
-import org.jboss.tools.rsp.api.dao.Status;
 
 import javax.swing.tree.TreePath;
-import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 public class StartServerDebugAction extends AbstractTreeAction {
+    private static final String ERROR_STARTING_SERVER = "Error starting server";
     @Override
     protected boolean isEnabled(Object o) {
         if( o instanceof RspTreeModel.ServerStateWrapper) {
@@ -61,18 +67,17 @@ public class StartServerDebugAction extends AbstractTreeAction {
         ServerAttributes sa = new ServerAttributes(sel.getServerState().getServer().getType().getId(),
                 sel.getServerState().getServer().getId(), new HashMap<String,Object>());
         LaunchParameters params = new LaunchParameters(sa, mode);
-
+        StartServerResponse stat = null;
         try {
-            StartServerResponse stat = client.getServerProxy().startServerAsync(params).get();
-            if( !stat.getStatus().isOK()) {
-                showError(stat.getStatus());
-            } else {
-                connectDebugger(stat);
-            }
-        } catch (InterruptedException ex) {
-            showError(ex);
-        } catch (ExecutionException ex) {
-            showError(ex);
+            stat = client.getServerProxy().startServerAsync(params).get();
+        } catch (InterruptedException | ExecutionException ex) {
+            apiError(ex, ERROR_STARTING_SERVER);
+            return;
+        }
+        if( stat == null || !stat.getStatus().isOK()) {
+            statusError(stat.getStatus(), ERROR_STARTING_SERVER);
+        } else {
+            connectDebugger(stat);
         }
     }
     private void connectDebugger(StartServerResponse stat) {
@@ -137,19 +142,4 @@ public class StartServerDebugAction extends AbstractTreeAction {
         }
         return runSettings;
     }
-
-    protected int getPortFromConfiguration(RunConfiguration configuration) {
-        if (configuration instanceof RemoteConfiguration) {
-            return Integer.parseInt(((RemoteConfiguration) configuration).PORT);
-        }
-        return -1;
-    }
-
-    private void showError(Status stat) {
-        // TODO
-    }
-    private void showError(Exception stat) {
-        // TODO
-    }
-
 }

@@ -33,6 +33,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 public class CreateServerAction extends AbstractTreeAction {
+    private static final String ERROR_DISCOVERY = "Error discovering server in selected folder";
+    private static final String ERROR_LOADING_ATTRIBUTES = "Error requesting attributes for server type";
+    private static final String ERROR_CREATING_SERVER = "Error creating server";
+
     @Override
     protected boolean isEnabled(Object o) {
         return o instanceof IRsp && ((IRsp)o).getState() == IRspCore.IJServerState.STARTED;
@@ -56,29 +60,35 @@ public class CreateServerAction extends AbstractTreeAction {
         VirtualFile vf1 = result == null || result.length == 0 ? null : result[0];
         if( vf1 != null && client != null ) {
             CompletableFuture<List<ServerBean>> fut = client.getServerProxy().findServerBeans(new DiscoveryPath(vf1.getPath()));
+            List<ServerBean> beans = null;
             try {
-                List<ServerBean> beans = fut.get();
-                if( beans == null || beans.size() == 0 ) {
-                    showErrorMessage("No server found");
-                } else {
-                    showCreateServerFromBeanDialog(beans, client);
-                }
-            } catch (InterruptedException interruptedException) {
-                interruptedException.printStackTrace();
-            } catch (ExecutionException executionException) {
-                executionException.printStackTrace();
+                beans = fut.get();
+            } catch (InterruptedException | ExecutionException e) {
+                apiError(e, ERROR_DISCOVERY);
+            }
+            if( beans == null || beans.size() == 0 ) {
+                apiError(new Exception("No server found at " + vf1.getPath()), ERROR_DISCOVERY);
+            } else {
+                showCreateServerFromBeanDialog(beans, client);
             }
         }
     }
 
-    private void showCreateServerFromBeanDialog(List<ServerBean> beans, IntelliJRspClientLauncher client) throws ExecutionException, InterruptedException {
+    private void showCreateServerFromBeanDialog(List<ServerBean> beans, IntelliJRspClientLauncher client) {
         ServerBean bean1 = beans.get(0);
         String typeId = bean1.getServerAdapterTypeId();
         ServerType st = new ServerType(typeId, null, null);
-        Attributes required2 = client.getServerProxy()
-                .getRequiredAttributes(st).get();
-        Attributes optional2 = client.getServerProxy()
-                .getOptionalAttributes(st).get();
+        Attributes required2 = null;
+        Attributes optional2 = null;
+        try {
+            required2 = client.getServerProxy()
+                    .getRequiredAttributes(st).get();
+            optional2 = client.getServerProxy()
+                    .getOptionalAttributes(st).get();
+        } catch(InterruptedException | ExecutionException e ) {
+            apiError(new Exception("Error loading attributes for server type " + typeId), ERROR_LOADING_ATTRIBUTES);
+            return;
+        }
 
         final HashMap<String,Object> values = new HashMap<>();
         if( required2.getAttributes().containsKey(DefaultServerAttributes.SERVER_HOME_DIR)) {
@@ -91,18 +101,14 @@ public class CreateServerAction extends AbstractTreeAction {
         UIHelper.executeInUI(() -> {
             td.show();
             ServerAttributes csa = new ServerAttributes(typeId, td.getName(), values);
-
             try {
                 CreateServerResponse result = client.getServerProxy().createServer(csa).get();
-            } catch (InterruptedException e) {
-                showErrorMessage(e.getMessage());
-            } catch (ExecutionException e) {
-                showErrorMessage(e.getMessage());
+                if( !result.getStatus().isOK()) {
+                    statusError(result.getStatus(), ERROR_CREATING_SERVER);
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                apiError(e, ERROR_CREATING_SERVER);
             }
         });
-    }
-
-    private void showErrorMessage(String msg) {
-        // TODO how to show error message
     }
 }

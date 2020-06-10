@@ -1,8 +1,19 @@
+/*******************************************************************************
+ * Copyright (c) 2020 Red Hat, Inc.
+ * Distributed under license by Red Hat, Inc. All rights reserved.
+ * This program is made available under the terms of the
+ * Eclipse Public License v2.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v20.html
+ *
+ * Contributors:
+ * Red Hat, Inc. - initial API and implementation
+ ******************************************************************************/
 package org.jboss.tools.intellij.rsp.ui.util;
 
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.ui.Messages;
 import org.jboss.tools.intellij.rsp.ui.dialogs.WorkflowDialog;
 import org.jboss.tools.intellij.rsp.util.CommandLineUtils;
 import org.jboss.tools.intellij.rsp.util.ExecUtilClone;
@@ -31,7 +42,7 @@ public class WorkflowUiUtility {
             if( type.equals("workflow.browser.open")) {
                 String urlString = i.getContent();
                 UIHelper.executeInUI(() -> {
-                    BrowserUtil.open(urlString); // TODO check if proper thread?
+                    BrowserUtil.open(urlString);
                 });
             } else if( type.equals("workflow.editor.open")) {
                 UIHelper.executeInUI(() -> {
@@ -49,7 +60,7 @@ public class WorkflowUiUtility {
                         File wd = new File(System.getProperty("user.home"));
                         ExecUtilClone.executeWithTerminal(project, "title", wd, false, asArr);
                     } catch (IOException | CommandLineUtils.CommandLineException e) {
-                        // TODO
+                        Messages.showErrorDialog(e.getMessage(), "Error running command in terminal");
                     }
                 });
             } else if( type.equals("workflow.prompt.small") || type.equals("workflow.prompt.large")) {
