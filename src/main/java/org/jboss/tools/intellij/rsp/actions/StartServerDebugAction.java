@@ -26,6 +26,7 @@ import com.intellij.openapi.project.ProjectManager;
 import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
 import org.jboss.tools.intellij.rsp.model.impl.RspCore;
 import org.jboss.tools.intellij.rsp.ui.tree.RspTreeModel;
+import org.jboss.tools.intellij.rsp.ui.util.UIHelper;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
@@ -69,15 +70,16 @@ public class StartServerDebugAction extends AbstractTreeAction {
         ServerAttributes sa = new ServerAttributes(handle.getType().getId(),
                 sel.getServerState().getServer().getId(), new HashMap<String,Object>());
         LaunchParameters params = new LaunchParameters(sa, mode);
-        StartServerResponse response = null;
+        final StartServerResponse response;
         try {
             response = client.getServerProxy().startServerAsync(params).get();
         } catch (InterruptedException | ExecutionException ex) {
-            apiError(ex, ERROR_STARTING_SERVER);
+            UIHelper.executeInUI(() -> apiError(ex, ERROR_STARTING_SERVER));
             return;
         }
+
         if( response == null || !response.getStatus().isOK()) {
-            statusError(response.getStatus(), ERROR_STARTING_SERVER);
+            UIHelper.executeInUI(() -> statusError(response.getStatus(), ERROR_STARTING_SERVER));
         } else {
             connectDebugger(response, handle);
         }
