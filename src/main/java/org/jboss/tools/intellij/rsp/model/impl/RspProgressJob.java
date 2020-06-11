@@ -55,10 +55,11 @@ public class RspProgressJob extends Task.Backgroundable {
         rsp.getModel().getClient(rsp).getServerProxy().cancelJob(jobHandle);
     }
     private synchronized void updateIndicator(ProgressIndicator indicator) {
-        double d = this.progress.getPercent();
-        System.out.println("progress: " + d);
-        indicator.setFraction(d/100);
-        newLatch();
+        if( this.progress != null ) {
+            double d = this.progress.getPercent();
+            indicator.setFraction(d / 100);
+            newLatch();
+        }
     }
 
     private synchronized CountDownLatch getLatch() {
@@ -73,7 +74,7 @@ public class RspProgressJob extends Task.Backgroundable {
     }
 
     private synchronized boolean isDone() {
-        return jobRemoved != null; // TODO or is canceled
+        return jobRemoved != null;
     }
     public synchronized void setJobProgress(JobProgress jp) {
         this.progress = jp;
