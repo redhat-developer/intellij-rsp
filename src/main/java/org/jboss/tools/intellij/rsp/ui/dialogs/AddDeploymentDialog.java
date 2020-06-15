@@ -82,7 +82,7 @@ public class AddDeploymentDialog extends DialogWrapper {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     Project project = ProjectManager.getInstance().getOpenProjects()[0];
-                    final FileChooserDescriptor descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor();
+                    final FileChooserDescriptor descriptor = FileChooserDescriptorFactory.createSingleLocalFileDescriptor();
                     final VirtualFile[] result = FileChooser.chooseFiles(descriptor, project, null);
                     VirtualFile vf1 = result == null || result.length == 0 ? null : result[0];
                     if( vf1 != null ) {

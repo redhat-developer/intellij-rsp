@@ -12,6 +12,7 @@ package org.jboss.tools.intellij.rsp.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.jboss.tools.intellij.rsp.model.IRsp;
+import org.jboss.tools.intellij.rsp.model.IRspCore;
 import org.jboss.tools.intellij.rsp.model.impl.RspCore;
 
 import javax.swing.tree.TreePath;
@@ -20,6 +21,11 @@ public class StartRspAction extends AbstractTreeAction {
     @Override
     protected boolean isVisible(Object o) {
         return o instanceof IRsp;
+    }
+
+    @Override
+    protected boolean isEnabled(Object o) {
+        return o instanceof IRsp && ((IRsp)o).getState() == IRspCore.IJServerState.STOPPED;
     }
 
     @Override
