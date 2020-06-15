@@ -13,10 +13,13 @@ package org.jboss.tools.intellij.rsp.model.impl;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.ui.Messages;
+import com.sun.tools.javadoc.Start;
 import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
 import org.jboss.tools.intellij.rsp.download.DownloadUtility;
 import org.jboss.tools.intellij.rsp.download.UnzipUtility;
 import org.jboss.tools.intellij.rsp.model.*;
+import org.jboss.tools.intellij.rsp.ui.util.UIHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -83,7 +86,14 @@ public class RspImpl implements IRsp, IRspStartCallback {
 
     @Override
     public ServerConnectionInfo start() {
-        return getController().start(this);
+        try {
+            return getController().start(this);
+        } catch(StartupFailedException sfe) {
+            UIHelper.executeInUI(() -> {
+                Messages.showErrorDialog(sfe.getMessage(), "Unable to start RSP");
+            });
+            return null;
+        }
     }
 
     @Override

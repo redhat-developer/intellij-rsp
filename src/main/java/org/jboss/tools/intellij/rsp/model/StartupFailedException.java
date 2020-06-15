@@ -10,21 +10,8 @@
  ******************************************************************************/
 package org.jboss.tools.intellij.rsp.model;
 
-/**
- * Controls the state for an RSP
- */
-public interface IRspStateController {
-    /**
-     * Start the RSP and alert the callback to changes in the state
-     * @param callback
-     * @return
-     */
-    public ServerConnectionInfo start(IRspStartCallback callback) throws StartupFailedException;
-
-    /**
-     * Terminate the rsp and alert the callback to changes in the state
-     * @param callback
-     */
-    public void terminate(IRspStartCallback callback);
-
+public class StartupFailedException extends Exception {
+    public StartupFailedException(String s) {
+        super(s);
+    }
 }

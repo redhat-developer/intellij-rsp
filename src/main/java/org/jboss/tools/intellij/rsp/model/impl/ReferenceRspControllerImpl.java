@@ -43,19 +43,23 @@ public class ReferenceRspControllerImpl implements IRspStateController {
     }
 
     @Override
-    public ServerConnectionInfo start(IRspStartCallback callback) {
+    public ServerConnectionInfo start(IRspStartCallback callback) throws StartupFailedException {
         String rspHome = serverType.getServerHome();
         File rspHomeFile = new File(rspHome);
         if( !rspHomeFile.exists() || !rspHomeFile.isDirectory())
-            return null;
+            throw new StartupFailedException("RSP does not appear to be installed.");
+
+        File felixFile = new File(new File(rspHomeFile, "bin"), "felix.jar");
+        if( !felixFile.exists() || !felixFile.isDirectory())
+            throw new StartupFailedException("RSP does not appear to be installed or is broken. Please use the Download / Update RSP action.");
 
         int port = new PortFinder().nextFreePort(portMin, portMax);
         if( port == -1 )
-            return null;
+            throw new StartupFailedException("No free port within the defined range found.");
 
         File java = JavaUtils.findJavaExecutable();
         if( java == null || !java.exists())
-            return null;
+            throw new StartupFailedException("A java executable could not be located on this system.");
 
         String portInUse = getLockedWorkspacePort();
         if( portInUse != null) {
@@ -81,6 +85,7 @@ public class ReferenceRspControllerImpl implements IRspStateController {
                 return new ServerConnectionInfo("localhost", port);
             } else {
                 terminate(callback);
+                throw new StartupFailedException("Unable to connect to RSP after startup.");
             }
         }
         return null;
