@@ -25,7 +25,11 @@ public class StartRspAction extends AbstractTreeAction {
 
     @Override
     protected boolean isEnabled(Object o) {
-        return o instanceof IRsp && ((IRsp)o).getState() == IRspCore.IJServerState.STOPPED;
+        if( o instanceof IRsp ) {
+            IRsp rsp = (IRsp)o;
+            return rsp.getState() == IRspCore.IJServerState.STOPPED && rsp.exists();
+        }
+        return false;
     }
 
     @Override
