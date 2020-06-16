@@ -50,7 +50,7 @@ public class ReferenceRspControllerImpl implements IRspStateController {
             throw new StartupFailedException("RSP does not appear to be installed.");
 
         File felixFile = new File(new File(rspHomeFile, "bin"), "felix.jar");
-        if( !felixFile.exists() || !felixFile.isDirectory())
+        if( !felixFile.exists() || !felixFile.isFile())
             throw new StartupFailedException("RSP does not appear to be installed or is broken. Please use the Download / Update RSP action.");
 
         int port = new PortFinder().nextFreePort(portMin, portMax);
