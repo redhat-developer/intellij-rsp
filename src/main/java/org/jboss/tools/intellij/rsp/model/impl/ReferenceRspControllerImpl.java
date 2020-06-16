@@ -63,6 +63,7 @@ public class ReferenceRspControllerImpl implements IRspStateController {
 
         String portInUse = getLockedWorkspacePort();
         if( portInUse != null) {
+            callback.updateRspState(IRspCore.IJServerState.STARTED);
             return new ServerConnectionInfo("localhost", Integer.parseInt(portInUse));
         }
         Process p = startRSP(rspHome, port, java, callback);

@@ -10,7 +10,11 @@
  ******************************************************************************/
 package org.jboss.tools.intellij.rsp.util;
 
+import com.intellij.execution.TaskExecutor;
+import com.intellij.execution.process.ProcessAdapter;
+import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessHandler;
+import com.intellij.execution.process.ProcessWaitFor;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
@@ -18,11 +22,14 @@ import com.intellij.openapi.project.Project;
 
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.util.concurrency.AppExecutorUtil;
 import com.jediterm.terminal.ProcessTtyConnector;
 import com.jediterm.terminal.TtyConnector;
+import com.pty4j.PtyProcess;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.terminal.AbstractTerminalRunner;
+import org.jetbrains.plugins.terminal.LocalTerminalDirectRunner;
 import org.jetbrains.plugins.terminal.TerminalOptionsProvider;
 import org.jetbrains.plugins.terminal.TerminalView;
 
@@ -31,6 +38,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -157,50 +165,116 @@ public class ExecUtilClone {
         }
     }
 
+    private static class RspProcessHandler extends ProcessHandler implements TaskExecutor {
 
+        private final Process myProcess;
+        private final ProcessWaitFor myWaitFor;
 
-    private static AbstractTerminalRunner createTerminalRunner(Project project, Process process, String title) {
-        AbstractTerminalRunner runner = new AbstractTerminalRunner(project) {
-            @Override
-            protected Process createProcess(@Nullable String s) {
-                return process;
-            }
+        RspProcessHandler(Process process, @NotNull String presentableName) {
+            myProcess = process;
+            myWaitFor = new ProcessWaitFor(process, this, presentableName);
+        }
 
-            @Override
-            protected ProcessHandler createProcessHandler(Process process) {
-                return null;
-            }
-
-            @Override
-            protected String getTerminalConnectionName(Process process) {
-                return null;
-            }
-
-            @Override
-            protected TtyConnector createTtyConnector(Process process) {
-                return new ProcessTtyConnector(process, StandardCharsets.UTF_8) {
-                    @Override
-                    protected void resizeImmediately() {
+        @Override
+        public void startNotify() {
+            addProcessListener(new ProcessAdapter() {
+                @Override
+                public void startNotified(@NotNull ProcessEvent event) {
+                    try {
+                        myWaitFor.setTerminationCallback(integer -> notifyProcessTerminated(integer));
                     }
-
-                    @Override
-                    public String getName() {
-                        return title;
+                    finally {
+                        removeProcessListener(this);
                     }
+                }
+            });
 
-                    @Override
-                    public boolean isConnected() {
-                        return true;
-                    }
-                };
-            }
+            super.startNotify();
+        }
 
-            @Override
-            public String runningTargetName() {
-                return null;
-            }
-        };
-        return runner;
+        @Override
+        protected void destroyProcessImpl() {
+            myProcess.destroy();
+        }
+
+        @Override
+        protected void detachProcessImpl() {
+            destroyProcessImpl();
+        }
+
+        @Override
+        public boolean detachIsDefault() {
+            return false;
+        }
+
+        @Override
+        public boolean isSilentlyDestroyOnClose() {
+            return true;
+        }
+
+        @Nullable
+        @Override
+        public OutputStream getProcessInput() {
+            return myProcess.getOutputStream();
+        }
+
+        @NotNull
+        @Override
+        public Future<?> executeTask(@NotNull Runnable task) {
+            return AppExecutorUtil.getAppExecutorService().submit(task);
+        }
+    }
+
+    private static class RspTerminalRunner extends AbstractTerminalRunner {
+        private final String title;
+        private final Process process;
+
+        public RspTerminalRunner(Project project, String title, Process process) {
+            super(project);
+            this.process = process;
+            this.title = title;
+        }
+        @Override
+        protected Process createProcess(@Nullable String s) {
+            return process;
+        }
+
+        @Override
+        public ProcessHandler createProcessHandler(Process process) {
+            return new RspProcessHandler(process, title);
+        }
+
+        @Override
+        protected String getTerminalConnectionName(Process process) {
+            return null;
+        }
+
+        @Override
+        protected TtyConnector createTtyConnector(Process process) {
+            return new ProcessTtyConnector(process, StandardCharsets.UTF_8) {
+                @Override
+                protected void resizeImmediately() {
+                }
+
+                @Override
+                public String getName() {
+                    return title;
+                }
+
+                @Override
+                public boolean isConnected() {
+                    return process.isAlive();
+                }
+            };
+        }
+
+        @Override
+        public String runningTargetName() {
+            return null;
+        }
+    }
+    private static RspTerminalRunner createTerminalRunner(Project project, Process process, String title) {
+        return new RspTerminalRunner(project, title, process);
     }
 
     /**
@@ -222,10 +296,10 @@ public class ExecUtilClone {
             ensureTerminalWindowsIsOpened(project);
             boolean isPost2018_3 = ApplicationInfo.getInstance().getBuild().getBaselineVersion() >= 183;
             final RedirectedProcess process = new RedirectedProcess(p, true, isPost2018_3);
-            AbstractTerminalRunner runner = createTerminalRunner(project, process, title);
+            RspTerminalRunner runner = createTerminalRunner(project, process, title);
 
             TerminalOptionsProvider terminalOptions = ServiceManager.getService(TerminalOptionsProvider.class);
-            terminalOptions.setCloseSessionOnLogout(false);
+            terminalOptions.setCloseSessionOnLogout(true);
             final TerminalView view = TerminalView.getInstance(project);
             final Method[] method = new Method[1];
             final Object[][] parameters = new Object[1][];
@@ -240,6 +314,7 @@ public class ExecUtilClone {
                     throw new IOException(e1);
                 }
             }
+            runner.createProcessHandler(p).startNotify();
             ApplicationManager.getApplication().invokeLater(() -> {
                 try {
                     method[0].invoke(view, parameters[0]);
