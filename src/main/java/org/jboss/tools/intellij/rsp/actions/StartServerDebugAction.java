@@ -81,6 +81,10 @@ public class StartServerDebugAction extends AbstractTreeAction {
         if( response == null || !response.getStatus().isOK()) {
             UIHelper.executeInUI(() -> statusError(response.getStatus(), ERROR_STARTING_SERVER));
         } else {
+            try {
+                Thread.sleep(1500);
+            } catch(InterruptedException ie) {
+            }
             connectDebugger(response, handle);
         }
     }
@@ -136,14 +140,16 @@ public class StartServerDebugAction extends AbstractTreeAction {
         if( runSettings == null ) {
             runSettings = runManager.createConfiguration(
                     configurationName, type.getConfigurationFactories()[0]);
-            if (runSettings.getConfiguration() instanceof RemoteConfiguration) {
-                RemoteConfiguration remoteConfiguration = (RemoteConfiguration) runSettings.getConfiguration();
-                remoteConfiguration.HOST = (host == null ? "localhost" : host);
-                remoteConfiguration.PORT = port;
-            }
-            runSettings.getConfiguration().setAllowRunningInParallel(true);
-            runManager.addConfiguration(runSettings);
+        } else {
+            runManager.removeConfiguration(runSettings);
         }
+        if (runSettings.getConfiguration() instanceof RemoteConfiguration) {
+            RemoteConfiguration remoteConfiguration = (RemoteConfiguration) runSettings.getConfiguration();
+            remoteConfiguration.HOST = (host == null ? "localhost" : host);
+            remoteConfiguration.PORT = port;
+        }
+        runSettings.getConfiguration().setAllowRunningInParallel(true);
+        runManager.addConfiguration(runSettings);
         return runSettings;
     }
 }

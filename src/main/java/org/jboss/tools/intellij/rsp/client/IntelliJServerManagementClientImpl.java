@@ -35,33 +35,37 @@ public class IntelliJServerManagementClientImpl implements RSPClient {
         return server;
     }
 
-    private void refreshView() {
-        uiRspServer.getModel().modelUpdated(uiRspServer);
+    private static interface MyRunnable {
+        public void run();
     }
 
-
-    @Override
-    public void jobAdded(JobHandle jobHandle) {
-        uiRspServer.getModel().jobAdded(uiRspServer, jobHandle);
-    }
-
-    @Override
-    public void jobRemoved(JobRemoved jobRemoved) {
-        uiRspServer.getModel().jobRemoved(uiRspServer, jobRemoved);
-    }
-
-    @Override
-    public void jobChanged(JobProgress jobProgress) {
-        uiRspServer.getModel().jobChanged(uiRspServer, jobProgress);
-    }
     @Override
     public CompletableFuture<String> promptString(StringPrompt stringPrompt) {
         return uiRspServer.getModel().promptString(uiRspServer, stringPrompt);
     }
 
+    private void async(MyRunnable run) {
+        new Thread(() -> run.run()).start();
+    }
+
+    @Override
+    public void jobAdded(JobHandle jobHandle) {
+        async(()->uiRspServer.getModel().jobAdded(uiRspServer, jobHandle));
+    }
+
+    @Override
+    public void jobRemoved(JobRemoved jobRemoved) {
+        async(()->uiRspServer.getModel().jobRemoved(uiRspServer, jobRemoved));
+    }
+
+    @Override
+    public void jobChanged(JobProgress jobProgress) {
+        async(()->uiRspServer.getModel().jobChanged(uiRspServer, jobProgress));
+    }
+
     @Override
     public void messageBox(MessageBoxNotification messageBoxNotification) {
-        uiRspServer.getModel().messageBox(uiRspServer, messageBoxNotification);
+        async(()->uiRspServer.getModel().messageBox(uiRspServer, messageBoxNotification));
     }
 
     @Override
@@ -76,27 +80,27 @@ public class IntelliJServerManagementClientImpl implements RSPClient {
 
     @Override
     public void serverAdded(ServerHandle serverHandle) {
-        uiRspServer.getModel().serverAdded(uiRspServer, serverHandle);
+        async(()->uiRspServer.getModel().serverAdded(uiRspServer, serverHandle));
     }
 
     @Override
     public void serverRemoved(ServerHandle serverHandle) {
-        uiRspServer.getModel().serverRemoved(uiRspServer, serverHandle);
+        async(()->uiRspServer.getModel().serverRemoved(uiRspServer, serverHandle));
     }
 
     @Override
     public void serverAttributesChanged(ServerHandle serverHandle) {
-        uiRspServer.getModel().serverAttributesChanged(uiRspServer, serverHandle);
+        async(()->uiRspServer.getModel().serverAttributesChanged(uiRspServer, serverHandle));
     }
 
     @Override
     public void serverStateChanged(ServerState serverState) {
-        uiRspServer.getModel().serverStateChanged(uiRspServer, serverState);
+        async(()->uiRspServer.getModel().serverStateChanged(uiRspServer, serverState));
     }
 
     @Override
     public void serverProcessCreated(ServerProcess serverProcess) {
-        uiRspServer.getModel().serverProcessCreated(uiRspServer, serverProcess);
+        async(()->uiRspServer.getModel().serverProcessCreated(uiRspServer, serverProcess));
     }
 
     @Override
@@ -106,6 +110,6 @@ public class IntelliJServerManagementClientImpl implements RSPClient {
 
     @Override
     public void serverProcessOutputAppended(ServerProcessOutput serverProcessOutput) {
-        uiRspServer.getModel().serverProcessOutputAppended(uiRspServer, serverProcessOutput);
+        async(()->uiRspServer.getModel().serverProcessOutputAppended(uiRspServer, serverProcessOutput));
     }
 }
