@@ -16,6 +16,7 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.Tree;
 import org.jboss.tools.intellij.rsp.ui.tree.RspTreeModel;
+import org.jboss.tools.intellij.rsp.ui.util.UIHelper;
 import org.jboss.tools.rsp.api.dao.Status;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -26,8 +27,9 @@ public abstract class AbstractTreeAction extends AnAction {
     private static final String INVALID_RESPONSE = "Invalid Response from RSP";
 
     protected void showError(String msg, String title) {
-        Messages.showErrorDialog(msg, title);
+        UIHelper.executeInUI(() -> Messages.showErrorDialog(msg, title));
     }
+
     protected void apiError(Exception exception, String title) {
         showError(exception == null ? "Unknown Error" : exception.getMessage(), title);
     }
