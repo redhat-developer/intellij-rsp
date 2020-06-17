@@ -269,6 +269,7 @@ public class RspCore implements IRspCore {
             Process p = model.addServerProcess(serverProcess);
             String name = serverProcess.getServer().getId() + ":" + serverProcess.getProcessId();
             Project project = ProjectManager.getInstance().getOpenProjects()[0];
+
             try {
                 ExecUtilClone.linkProcessToTerminal(p, project, name, false);
             } catch(IOException ioe) {
