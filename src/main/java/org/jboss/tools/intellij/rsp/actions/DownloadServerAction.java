@@ -35,6 +35,11 @@ public class DownloadServerAction extends AbstractTreeAction {
     private static final String ERROR_DOWNLOADING_RUNTIME = "Error downloading runtime";
 
     @Override
+    protected boolean isVisible(Object o) {
+        return o instanceof IRsp;
+    }
+
+    @Override
     protected boolean isEnabled(Object o) {
         return o instanceof IRsp && ((IRsp) o).getState() == IRspCore.IJServerState.STARTED;
     }

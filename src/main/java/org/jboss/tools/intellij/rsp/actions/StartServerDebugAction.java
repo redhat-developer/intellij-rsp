@@ -41,6 +41,12 @@ import java.util.concurrent.ExecutionException;
 
 public class StartServerDebugAction extends AbstractTreeAction {
     private static final String ERROR_STARTING_SERVER = "Error starting server";
+
+    @Override
+    protected boolean isVisible(Object o) {
+        return o instanceof RspTreeModel.ServerStateWrapper;
+    }
+
     @Override
     protected boolean isEnabled(Object o) {
         if( o instanceof RspTreeModel.ServerStateWrapper) {

@@ -65,6 +65,8 @@
       <action class="org.jboss.tools.intellij.rsp.actions.FullPublishServerAction"
               id="org.jboss.tools.intellij.rsp.actions.FullPublishServerAction" text="Publish Server (Full)"/>
       <separator/>
+      <action class="org.jboss.tools.intellij.rsp.actions.EditServerAction"
+              id="org.jboss.tools.intellij.rsp.actions.EditServerAction" text="Edit Server..."/>
       <action class="org.jboss.tools.intellij.rsp.actions.ServerActionAction"
               id="org.jboss.tools.intellij.rsp.actions.ServerActionAction" text="Run Server Action..."/>
    </group>

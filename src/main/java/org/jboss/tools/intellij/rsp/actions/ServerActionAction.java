@@ -35,6 +35,11 @@ public class ServerActionAction extends AbstractTreeAction {
     private static final String ERROR_EXECUTE_ACTIONS = "Error executing server action";
 
     @Override
+    protected boolean isVisible(Object o) {
+        return o instanceof RspTreeModel.ServerStateWrapper;
+    }
+
+    @Override
     protected boolean isEnabled(Object o) {
         return o instanceof RspTreeModel.ServerStateWrapper;
     }

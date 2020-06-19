@@ -25,6 +25,12 @@ import java.util.concurrent.ExecutionException;
 
 public class IncrementalPublishServerAction extends AbstractTreeAction {
     private static final String ERROR_PUBLISHING = "Error publishing to server";
+
+    @Override
+    protected boolean isVisible(Object o) {
+        return o instanceof RspTreeModel.ServerStateWrapper;
+    }
+
     @Override
     protected boolean isEnabled(Object o) {
         return o instanceof RspTreeModel.ServerStateWrapper;

@@ -25,6 +25,13 @@ import java.util.concurrent.ExecutionException;
 
 public class RemoveDeploymentAction extends AbstractTreeAction {
     private static final String ERROR_REMOVING_DEPLOYMENT = "Error removing deployment";
+
+    @Override
+    protected boolean isVisible(Object o) {
+        return o instanceof RspTreeModel.DeployableStateWrapper;
+    }
+
+    @Override
     protected boolean isEnabled(Object o) {
         return o instanceof RspTreeModel.DeployableStateWrapper;
     }

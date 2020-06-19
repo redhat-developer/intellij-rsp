@@ -14,6 +14,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
+import org.jboss.tools.intellij.rsp.model.IRsp;
 import org.jboss.tools.intellij.rsp.model.impl.RspCore;
 import org.jboss.tools.intellij.rsp.ui.tree.RspTreeModel;
 import org.jboss.tools.rsp.api.dao.Status;
@@ -23,6 +24,13 @@ import java.util.concurrent.ExecutionException;
 
 public class DeleteServerAction extends AbstractTreeAction {
     private static final String ERROR_DELETING_SERVER = "Error deleting server";
+
+    @Override
+    protected boolean isVisible(Object o) {
+        return o instanceof RspTreeModel.ServerStateWrapper;
+    }
+
+    @Override
     protected boolean isEnabled(Object o) {
         return o instanceof RspTreeModel.ServerStateWrapper;
     }

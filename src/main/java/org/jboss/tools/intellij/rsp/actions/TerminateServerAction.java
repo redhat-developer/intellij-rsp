@@ -25,6 +25,12 @@ import java.util.concurrent.ExecutionException;
 
 public class TerminateServerAction extends AbstractTreeAction {
     private static final String ERROR_TERMINATE_SERVER = "Error terminating server";
+
+    @Override
+    protected boolean isVisible(Object o) {
+        return o instanceof RspTreeModel.ServerStateWrapper;
+    }
+
     @Override
     protected boolean isEnabled(Object o) {
         if( o instanceof RspTreeModel.ServerStateWrapper) {

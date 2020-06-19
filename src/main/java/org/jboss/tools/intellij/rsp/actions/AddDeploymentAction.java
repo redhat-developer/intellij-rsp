@@ -29,6 +29,12 @@ public class AddDeploymentAction extends AbstractTreeAction {
     private static final String ERROR_LISTING = "Error listing deployment options";
     private static final String ERROR_ADDING = "Error adding deployment";
 
+    @Override
+    protected boolean isVisible(Object o) {
+        return o instanceof RspTreeModel.ServerStateWrapper;
+    }
+
+    @Override
     protected boolean isEnabled(Object o) {
         return o instanceof RspTreeModel.ServerStateWrapper;
     }
