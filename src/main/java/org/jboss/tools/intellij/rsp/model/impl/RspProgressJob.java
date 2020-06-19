@@ -70,7 +70,8 @@ public class RspProgressJob extends Task.Backgroundable {
         return latch;
     }
     private synchronized void countdown() {
-        latch.countDown();
+        if( latch != null )
+            latch.countDown();
     }
 
     private synchronized boolean isDone() {
