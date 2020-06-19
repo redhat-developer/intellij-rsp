@@ -12,6 +12,7 @@ package org.jboss.tools.intellij.rsp.util;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -33,6 +34,22 @@ public class PortFinder {
             return true;
         } catch (IOException e) {
             return false;
+        }
+    }
+
+    public static void waitForServer(String host, int port, int timeout) {
+        long endTime = System.currentTimeMillis() + timeout;
+        while( System.currentTimeMillis() < endTime) {
+            try {
+                Socket socket = new Socket(host, port);
+                try {
+                    socket.close();
+                } catch (IOException ioe) {
+                    // ignore
+                }
+            } catch (IOException e) {
+                // ignore
+            }
         }
     }
 }

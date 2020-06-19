@@ -27,6 +27,7 @@ import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
 import org.jboss.tools.intellij.rsp.model.impl.RspCore;
 import org.jboss.tools.intellij.rsp.ui.tree.RspTreeModel;
 import org.jboss.tools.intellij.rsp.ui.util.UIHelper;
+import org.jboss.tools.intellij.rsp.util.PortFinder;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
@@ -81,10 +82,6 @@ public class StartServerDebugAction extends AbstractTreeAction {
         if( response == null || !response.getStatus().isOK()) {
             UIHelper.executeInUI(() -> statusError(response.getStatus(), ERROR_STARTING_SERVER));
         } else {
-            try {
-                Thread.sleep(1500);
-            } catch(InterruptedException ie) {
-            }
             connectDebugger(response, handle);
         }
     }
@@ -94,6 +91,8 @@ public class StartServerDebugAction extends AbstractTreeAction {
         String type = stat.getDetails().getProperties().get(DEBUG_DETAILS_TYPE);
         if( port == null || port.isEmpty() )
             return;
+
+        PortFinder.waitForServer(host, Integer.parseInt(port), 5000);
 
         if(DEBUG_DETAILS_TYPE_JAVA.equals(type)) {
             String configurationName = handle.getId() + " Remote Debug";
