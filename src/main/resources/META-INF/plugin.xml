@@ -27,6 +27,7 @@
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
     <toolWindow id="RSP Servers" anchor="left" factoryClass="org.jboss.tools.intellij.rsp.WindowToolFactory" icon="/META-INF/pluginIcon13x13.svg"/>
+    <fileDocumentSynchronizationVetoer implementation="org.jboss.tools.intellij.rsp.editor.EditServerListener" order="first" />
   </extensions>
 
   <actions>
