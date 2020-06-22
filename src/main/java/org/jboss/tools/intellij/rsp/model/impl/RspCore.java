@@ -62,6 +62,14 @@ public class RspCore implements IRspCore {
         return null;
     }
 
+    @Override
+    public IRsp findRsp(String id) {
+        SingleRspModel srm = allRsps.get(id);
+        if( srm != null )
+            return srm.getServer();
+        return null;
+    }
+
     private SingleRspModel findModel(String typeId) {
         return allRsps.get(typeId);
     }
@@ -148,6 +156,18 @@ public class RspCore implements IRspCore {
         SingleRspModel srm = findModel(rsp.getRspType().getId());
         List<ServerState> states = srm.getServerState();
         return states.toArray(new ServerState[states.size()]);
+    }
+
+    @Override
+    public ServerState findServerInRsp(IRsp rsp, String serverId) {
+        ServerState[] all = getServersInRsp(rsp);
+        if( all == null )
+            return null;
+        for( int i = 0; i < all.length; i++ ) {
+            if( all[i].getServer().getId().equals(serverId))
+                return all[i];
+        }
+        return null;
     }
 
 

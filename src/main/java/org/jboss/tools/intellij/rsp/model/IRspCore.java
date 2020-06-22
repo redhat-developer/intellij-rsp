@@ -86,6 +86,12 @@ public interface IRspCore {
     public IRsp[] getRSPs();
 
     /**
+     * Find the rsp with a specific id
+     * @param id
+     * @return
+     */
+    public IRsp findRsp(String id);
+    /**
      * Find an RSP type by the given id
      * @param id
      * @return
@@ -99,6 +105,13 @@ public interface IRspCore {
      */
     public ServerState[] getServersInRsp(IRsp rsp);
 
+    /**
+     * Find a specific server in the given rsp or null
+     * @param rsp
+     * @param serverId
+     * @return
+     */
+    public ServerState findServerInRsp(IRsp rsp, String serverId);
     /**
      * Get all currently-running jobs for the given RSP
      * @param rsp
