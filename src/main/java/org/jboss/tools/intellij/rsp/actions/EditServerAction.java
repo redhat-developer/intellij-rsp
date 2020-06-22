@@ -1,8 +1,10 @@
 package org.jboss.tools.intellij.rsp.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Key;
@@ -41,24 +43,25 @@ public class EditServerAction extends AbstractTreeAction {
                     showError(response.getStatus().getMessage(), "Error loading server descriptor content.");
                 } else {
                     // OK assumed
-                    VirtualFile vf = new LightVirtualFile(server.getServerState().getServer().getId(), response.getServerJson());
+                    String fName = server.getServerState().getServer().getId() + ".json";
+                    VirtualFile vf = new LightVirtualFile(fName, response.getServerJson());
                     Key<String> KEY_RSP_ID = EditServerListener.KEY_RSP_ID;
                     Key<String> KEY_SERVER_ID = EditServerListener.KEY_SERVER_ID;
 
                     vf.putUserData(KEY_RSP_ID, server.getRsp().getRspType().getId());
                     vf.putUserData(KEY_SERVER_ID, server.getServerState().getServer().getId());
-
                     try {
                         vf.setWritable(true);
-                        FileEditor[] editors = FileEditorManager.getInstance(project).openFile(vf, true);
+                        OpenFileDescriptor desc = new OpenFileDescriptor(project, vf, 0);
+                        Editor editors = FileEditorManager.getInstance(project).openTextEditor(desc, true);
                     } catch (IOException ioException) {
-                        showError(ioException.getMessage(), "Error displaying server descriptor conetnt.");
+                        showError(ioException.getMessage(), "Error displaying server descriptor content.");
                     }
                 }
             } catch (InterruptedException interruptedException) {
-                interruptedException.printStackTrace();
+                showError("Error displaying server descriptor content.", "Error");
             } catch (ExecutionException executionException) {
-                executionException.printStackTrace();
+                showError("Error displaying server descriptor content.", "Error");
             }
         }
     }
