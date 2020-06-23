@@ -2,14 +2,15 @@ package org.jboss.tools.intellij.rsp.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.LightVirtualFile;
+import org.apache.commons.io.FileUtils;
 import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
 import org.jboss.tools.intellij.rsp.editor.EditServerListener;
 import org.jboss.tools.intellij.rsp.model.impl.RspCore;
@@ -17,7 +18,9 @@ import org.jboss.tools.intellij.rsp.ui.tree.RspTreeModel;
 import org.jboss.tools.rsp.api.dao.GetServerJsonResponse;
 
 import javax.swing.tree.TreePath;
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
 
 public class EditServerAction extends AbstractTreeAction {
@@ -44,7 +47,8 @@ public class EditServerAction extends AbstractTreeAction {
                 } else {
                     // OK assumed
                     String fName = server.getServerState().getServer().getId() + ".json";
-                    VirtualFile vf = new LightVirtualFile(fName, response.getServerJson());
+                    //VirtualFile vf = new LightVirtualFile(fName, response.getServerJson());
+                    VirtualFile vf = createTempFile(fName, response.getServerJson());
                     Key<String> KEY_RSP_ID = EditServerListener.KEY_RSP_ID;
                     Key<String> KEY_SERVER_ID = EditServerListener.KEY_SERVER_ID;
 
@@ -59,10 +63,19 @@ public class EditServerAction extends AbstractTreeAction {
                     }
                 }
             } catch (InterruptedException interruptedException) {
-                showError("Error displaying server descriptor content.", "Error");
+                showError("Error displaying server descriptor content: " + interruptedException.getMessage(), "Error");
             } catch (ExecutionException executionException) {
-                showError("Error displaying server descriptor content.", "Error");
+                showError("Error displaying server descriptor content: " + executionException.getMessage(), "Error");
+            } catch (IOException ioe) {
+                showError("Error displaying server descriptor content: " + ioe.getMessage(), "Error");
             }
         }
+    }
+
+    private static VirtualFile createTempFile(String name, String content) throws IOException {
+        File file = new File(System.getProperty("java.io.tmpdir"), name);
+        FileUtils.write(file, content, StandardCharsets.UTF_8);
+        file.deleteOnExit();
+        return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file);
     }
 }
