@@ -19,10 +19,7 @@ import org.jboss.tools.intellij.rsp.model.IRsp;
 import org.jboss.tools.intellij.rsp.model.IRspType;
 import org.jboss.tools.intellij.rsp.model.impl.RspCore;
 import org.jboss.tools.intellij.rsp.ui.util.UIHelper;
-import org.jboss.tools.rsp.api.dao.ServerState;
-import org.jboss.tools.rsp.api.dao.Status;
-import org.jboss.tools.rsp.api.dao.UpdateServerRequest;
-import org.jboss.tools.rsp.api.dao.UpdateServerResponse;
+import org.jboss.tools.rsp.api.dao.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ExecutionException;
@@ -61,18 +58,8 @@ public class EditServerListener extends FileDocumentSynchronizationVetoer {
             Notification notification = new Notification(NOTIFICATION_ID, "Error",
                     "An error occurred: " + error, NotificationType.ERROR);
             Notifications.Bus.notify(notification);
-            return false;
+            return true;
         }
-
-        int resultDialog = UIHelper.executeInUI(() ->
-                Messages.showYesNoDialog(
-                        "Do you want to push the changes to the RSP?",
-                        "Save to RSP",
-                        null
-                ));
-
-        if (resultDialog != Messages.OK) return false;
-
 
         IntelliJRspClientLauncher client = rspObj.getModel().getClient(rspObj);
         UpdateServerResponse saveResult = null;
@@ -80,19 +67,19 @@ public class EditServerListener extends FileDocumentSynchronizationVetoer {
             UpdateServerRequest request = new UpdateServerRequest();
             request.setHandle(ss.getServer());
             request.setServerJson(document.getText());
-            saveResult = client.getServerProxy().updateServer(null).get();
+            saveResult = client.getServerProxy().updateServer(request).get();
         } catch (InterruptedException | ExecutionException e) {
             Notification notification = new Notification(NOTIFICATION_ID, "Error",
                     "An error occurred while saving text to RSP: " + e.getMessage(), NotificationType.ERROR);
             Notifications.Bus.notify(notification);
-            return false;
+            return true;
         }
 
         if( saveResult == null ) {
             Notification notification = new Notification(NOTIFICATION_ID, "Error",
                     "An error occurred while saving text to RSP: Null response from server", NotificationType.ERROR);
             Notifications.Bus.notify(notification);
-            return false;
+            return true;
         }
 
         if( !saveResult.getValidation().getStatus().isOK()) {
@@ -101,15 +88,16 @@ public class EditServerListener extends FileDocumentSynchronizationVetoer {
             Notification notification = new Notification(NOTIFICATION_ID, "Error",
                     "An error occurred while saving text to RSP: " + stat.getMessage(), NotificationType.ERROR);
             Notifications.Bus.notify(notification);
-            return false;
+            return true;
         }
-
-        document.setText(saveResult.getServerJson().getServerJson());
+        GetServerJsonResponse gsjr = saveResult.getServerJson();
+        String newServerString = gsjr == null ? null : saveResult.getServerJson().getServerJson();
+        // TODO document.setText(newServerString);
         // notify user if saving was completed successfully
         Notification notification = new Notification(NOTIFICATION_ID, "Save Successful",
                 "Server " + ss.getServer().getId() + " saved successfully.", NotificationType.INFORMATION);
         Notifications.Bus.notify(notification);
-        return false;
+        return true;
     }
 
     private boolean isFileToPush(Document document, VirtualFile vf) {
