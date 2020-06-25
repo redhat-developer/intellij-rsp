@@ -21,6 +21,7 @@ import javax.swing.tree.TreePath;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 
 public class EditServerAction extends AbstractTreeAction {
@@ -72,8 +73,13 @@ public class EditServerAction extends AbstractTreeAction {
         }
     }
 
+
     private static VirtualFile createTempFile(String name, String content) throws IOException {
         File file = new File(System.getProperty("java.io.tmpdir"), name);
+        if (file.exists()){
+            file.delete();
+            LocalFileSystem.getInstance().refreshIoFiles(Arrays.asList(file));
+        }
         FileUtils.write(file, content, StandardCharsets.UTF_8);
         file.deleteOnExit();
         return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file);
