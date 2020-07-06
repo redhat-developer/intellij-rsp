@@ -112,7 +112,7 @@ public class SingleRspModel {
     }
 
     private ServerState findServerState(ServerHandle serverHandle) {
-        for( ServerState ss : serverState) {
+        for( ServerState ss : new ArrayList<>(serverState)) {
             ServerHandle ssh = ss.getServer();
             if( ssh.getId().equals(serverHandle.getId()) && ssh.getType().getId().equals(serverHandle.getType().getId()))
                 return ss;
