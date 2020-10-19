@@ -26,8 +26,8 @@ public class CommunityServerConnector extends AbstractServerConnector {
                 9000, 9500, "images/community-12x24.png");
     }
     public IRsp getRsp(IRspCore core) {
-        String version = "0.22.10";
-        String url = "https://download.jboss.org/jbosstools/adapters/stable/rsp-server-community/distributions/0.22.10.Final/org.jboss.tools.rsp.server.community.distribution-0.22.10.Final.zip";
+        String version = "0.23.5";
+        String url = "https://download.jboss.org/jbosstools/adapters/stable/rsp-server-community/distributions/0.23.5.Final/org.jboss.tools.rsp.server.community.distribution-0.23.5.Final.zip";
         return getType(core).createRsp(version, url);
     }
 

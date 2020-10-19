@@ -126,9 +126,9 @@ public class RspCore implements IRspCore {
 
     private IntelliJRspClientLauncher launch(IRsp rsp, String host, int port) throws IOException, InterruptedException, ExecutionException {
         IntelliJRspClientLauncher launcher = new IntelliJRspClientLauncher(rsp, host, port);
-        //launcher.setListener(() -> {
-            // TODO or do nothing / delete this block?
-        //});
+        launcher.setListener(() -> {
+            rsp.terminate();
+        });
         launcher.launch();
         ClientCapabilitiesRequest clientCapRequest = createClientCapabilitiesRequest();
         launcher.getServerProxy().registerClientCapabilities(clientCapRequest).get();
