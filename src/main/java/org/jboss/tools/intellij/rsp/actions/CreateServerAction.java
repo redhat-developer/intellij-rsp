@@ -83,6 +83,12 @@ public class CreateServerAction extends AbstractTreeAction {
     private void showCreateServerFromBeanDialog(List<ServerBean> beans, IntelliJRspClientLauncher client) {
         ServerBean bean1 = beans.get(0);
         String typeId = bean1.getServerAdapterTypeId();
+        if( typeId == null || typeId.isEmpty() ) {
+            UIHelper.executeInUI(() -> {
+                showError("No server found in the given folder", "Invalid Selection");
+            });
+            return;
+        }
         ServerType st = new ServerType(typeId, null, null);
         Attributes required2 = null;
         Attributes optional2 = null;

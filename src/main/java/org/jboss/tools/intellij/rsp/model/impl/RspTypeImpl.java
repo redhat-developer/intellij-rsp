@@ -93,6 +93,11 @@ public class RspTypeImpl implements IRspType {
         return new RspImpl(model,this, version, url, createController());
     }
 
+    @Override
+    public IRsp createRsp() {
+        return new RspImpl(model,this, null, null, createController());
+    }
+
     protected IRspStateController createController() {
         return controllerProvider.createController(this);
     }

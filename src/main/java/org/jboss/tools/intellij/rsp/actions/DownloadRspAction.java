@@ -29,6 +29,9 @@ public class DownloadRspAction extends AbstractTreeAction {
         IRsp server = (IRsp)o;
         String installed = server.getInstalledVersion();
         String latest = server.getLatestVersion();
+        if( server.getLatestVersion() == null)
+            return false;
+
         if( !server.exists() || installed == null ||
                 VersionComparatorUtil.isGreaterThan(latest, installed.trim())) {
             return true;

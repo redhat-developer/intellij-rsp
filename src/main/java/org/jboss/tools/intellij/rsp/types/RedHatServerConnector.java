@@ -24,13 +24,17 @@ import javax.swing.*;
 public class RedHatServerConnector extends AbstractServerConnector {
     public RedHatServerConnector() {
         super("redhat-server-connector", "Red Hat Server Connector",
-                8500, 8999, "images/jboss.eap-24x24.png");
+                8500, 8999, "images/jboss.eap-24x24.png",
+                "https://download.jboss.org/jbosstools/adapters/stable/rsp-server/LATEST",
+                "org.jboss.tools.rsp.distribution.latest.version", "org.jboss.tools.rsp.distribution.latest.url");
     }
-    public IRsp getRsp(IRspCore core) {
-        String version = "0.23.7";
-        String url = "https://download.jboss.org/jbosstools/adapters/snapshots/rsp-server/org.jboss.tools.rsp.distribution.wildfly-0.23.7.Final.zip";
-        return getType(core).createRsp(version, url);
-    }
+
+    @Override
+    protected IRsp createFallbackRsp(IRspCore core) {
+        return getType(core).createRsp("0.23.8.Final",
+                "https://download.jboss.org/jbosstools/adapters/stable/rsp-server/org.jboss.tools.rsp.distribution-0.23.8.Final.zip");
+    };
+
 
     @Override
     protected Icon findIconForServerType(String serverType) {

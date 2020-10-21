@@ -129,7 +129,7 @@ public class RspImpl implements IRsp, IRspStartCallback {
     @Override
     public void download() {
         boolean b = exists();
-        if( !b) {
+        if( !b && latestVersion != null && downloadUrl != null ) {
             final String serverHome = this.type.getServerHome();
             ProgressManager.getInstance().run(new Task.Backgroundable(null, "Downloading " + getRspType().getName()) {
 
