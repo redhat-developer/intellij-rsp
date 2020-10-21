@@ -9,7 +9,7 @@ There are only a few guidelines that we need contributors to follow.
 1. Install prerequisites:
    * [Java Development Kit](https://adoptopenjdk.net/)
 2. Fork and clone the repository
-3. `cd intellij-openshift-connector`
+3. `cd intellij-rsp`
 4. Import the folder as a project in JetBrains IntelliJ
 
 ## Run the extension locally
@@ -20,6 +20,6 @@ There are only a few guidelines that we need contributors to follow.
     ```
 
 
-2. Once the plugin is installed and reloaded, there will be an OpenShift Icon in the Tool Windows list (bottom left).
+2. Once the plugin is installed and reloaded, there will be an Server Icon in the Tool Windows list (bottom left).
 
 > If you have any questions or run into any problems, please post an issue - we'll be very happy to help.
