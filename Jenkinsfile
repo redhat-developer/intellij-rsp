@@ -3,7 +3,7 @@
 node('rhel7'){
 	stage('Checkout repo') {
 		deleteDir()
-		git url: 'https://github.com/redhat-developer/intellij-openshift-connector',
+		git url: 'https://github.com/redhat-developer/intellij-rsp',
 			branch: "${sha1}"
 	}
 
@@ -22,7 +22,7 @@ node('rhel7'){
 	if(params.UPLOAD_LOCATION) {
 		stage('Upload') {
 			def filesToPush = findFiles(glob: '**/*.zip')
-			sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${filesToPush[0].path} ${UPLOAD_LOCATION}/snapshots/intellij-openshift-connector/"
+			sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${filesToPush[0].path} ${UPLOAD_LOCATION}/snapshots/intellij-rsp/"
             stash name:'zip', includes:filesToPush[0].path
 		}
     }
@@ -44,7 +44,7 @@ node('rhel7'){
             if (!isSnapshot) {
                 stage("Promote the build to stable") {
                     def zip = findFiles(glob: '**/*.zip')
-                    sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${zip[0].path} ${UPLOAD_LOCATION}/stable/intellij-openshift-connector/"
+                    sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${zip[0].path} ${UPLOAD_LOCATION}/stable/intellij-rsp/"
                 }
             }
         }
