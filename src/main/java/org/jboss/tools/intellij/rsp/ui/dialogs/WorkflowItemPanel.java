@@ -21,6 +21,7 @@ import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -69,7 +70,7 @@ public class WorkflowItemPanel extends JPanel implements DocumentListener, Actio
     }
 
     private JBScrollPane createTextArea(String msg) {
-        JTextArea jta = new JTextArea(40,70);
+        JTextArea jta = new JTextArea(40,80);
         jta.setEditable(false);
         if( msg != null )
             jta.setText(msg);
@@ -78,6 +79,7 @@ public class WorkflowItemPanel extends JPanel implements DocumentListener, Actio
         JBScrollPane scroll = new JBScrollPane(jta);
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scroll.getVerticalScrollBar().setValue(0);
         return scroll;
     }
 
