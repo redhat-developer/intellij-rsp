@@ -31,13 +31,15 @@ public class WorkflowItemPanel extends JPanel implements DocumentListener, Actio
     private static final String COMBO_FALSE = "No (false)";
 
     private final WorkflowResponseItem item;
+    private IWorkflowItemListener listener;
     private Map<String, Object> values;
     private ComboBox box;
     private JTextField field;
 
-    public WorkflowItemPanel(WorkflowResponseItem item, Map<String, Object> values) {
+    public WorkflowItemPanel(WorkflowResponseItem item, Map<String, Object> values, IWorkflowItemListener listener) {
         this.item = item;
         this.values = values;
+        this.listener = listener;
         String type = item.getItemType();
         String content = item.getContent();
         String msg = item.getLabel() + (content == null || content.isEmpty() ? "" : "\n" + content);
@@ -155,21 +157,25 @@ public class WorkflowItemPanel extends JPanel implements DocumentListener, Actio
     @Override
     public void insertUpdate(DocumentEvent e) {
         values.put(item.getId(), asObject(getWidgetString()));
+        listener.panelChanged();
     }
 
     @Override
     public void removeUpdate(DocumentEvent e) {
         values.put(item.getId(), asObject(getWidgetString()));
+        listener.panelChanged();
     }
 
     @Override
     public void changedUpdate(DocumentEvent e) {
         values.put(item.getId(), asObject(getWidgetString()));
+        listener.panelChanged();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         values.put(item.getId(), asObject(getWidgetString()));
+        listener.panelChanged();
     }
 
     private String getWidgetString() {

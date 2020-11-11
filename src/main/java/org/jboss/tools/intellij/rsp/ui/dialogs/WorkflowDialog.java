@@ -12,6 +12,7 @@ package org.jboss.tools.intellij.rsp.ui.dialogs;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +23,7 @@ import javax.swing.event.DocumentListener;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WorkflowDialog extends DialogWrapper  {
+public class WorkflowDialog extends DialogWrapper  implements IWorkflowItemListener {
     private Map<String, Object> attributeValues;
     private JPanel contentPane;
     private WorkflowResponseItem[] items;
@@ -44,13 +45,30 @@ public class WorkflowDialog extends DialogWrapper  {
     }
 
     private void createLayout() {
-        WorkflowItemsPanel itemsPanel = new WorkflowItemsPanel(items, null, attributeValues);
+        WorkflowItemsPanel itemsPanel = new WorkflowItemsPanel(items, null, attributeValues, this);
         contentPane = new JPanel();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
         contentPane.add(itemsPanel);
+        getOKAction().setEnabled(isComplete());
     }
 
     public Map<String, Object> getAttributes() {
         return attributeValues;
+    }
+
+    public void panelChanged() {
+        getOKAction().setEnabled(isComplete());
+    }
+
+    private boolean isComplete() {
+        boolean isComplete = true;
+        for( int i = 0; i < items.length; i++ ) {
+            if( items[i].getPrompt() != null && !items[i].getPrompt().getResponseType().equals(ServerManagementAPIConstants.ATTR_TYPE_NONE)) {
+                String id = items[i].getId();
+                if( attributeValues.get(id) == null )
+                    return false;
+            }
+        }
+        return true;
     }
 }
