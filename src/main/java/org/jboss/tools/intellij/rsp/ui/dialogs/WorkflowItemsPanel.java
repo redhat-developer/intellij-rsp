@@ -19,7 +19,8 @@ public class WorkflowItemsPanel extends JPanel {
     private WorkflowResponseItem[] items;
     private String title;
     private Map<String, Object> values;
-    public WorkflowItemsPanel(WorkflowResponseItem[] items, String title, Map<String, Object> values) {
+    public WorkflowItemsPanel(WorkflowResponseItem[] items, String title,
+                              Map<String, Object> values, IWorkflowItemListener listener) {
         this.items = items;
         this.title = title;
         this.values = values;
@@ -30,7 +31,7 @@ public class WorkflowItemsPanel extends JPanel {
         }
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         for( int i = 0; i < items.length; i++ ) {
-            add(new WorkflowItemPanel(items[i], values));
+            add(new WorkflowItemPanel(items[i], values, listener));
         }
     }
 }
