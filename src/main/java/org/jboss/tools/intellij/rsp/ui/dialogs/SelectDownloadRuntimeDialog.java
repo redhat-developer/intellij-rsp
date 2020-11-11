@@ -95,9 +95,9 @@ public class SelectDownloadRuntimeDialog extends DialogWrapper implements ListSe
             return AlphanumComparator.staticCompare(o1.getName(), o2.getName());
         });
         list = new JBList(dlrts);
+        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         DownloadRuntimeCellRenderer renderer = new DownloadRuntimeCellRenderer();
         list.setCellRenderer(renderer);
-        list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         list.setLayoutOrientation(JList.VERTICAL);
         list.setVisibleRowCount(15);
         list.addListSelectionListener(this);
