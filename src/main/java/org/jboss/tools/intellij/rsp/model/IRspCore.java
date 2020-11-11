@@ -51,6 +51,7 @@ public interface IRspCore {
 
 
     public enum IJServerState {
+        MISSING,
         STOPPING,
         STOPPED,
         STARTING,
