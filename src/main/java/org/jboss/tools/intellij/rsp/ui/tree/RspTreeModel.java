@@ -157,20 +157,28 @@ public class RspTreeModel extends AbstractTreeStructure {
 
     private class RspServerDescriptor extends Descriptor<IRsp> {
         protected RspServerDescriptor(IRsp element, @Nullable NodeDescriptor parentDescriptor) {
-            super(element, parentDescriptor, () -> element.getRspType().getName() + "   [" + element.getState() + "]", element.getRspType().getIcon());
+            super(element, parentDescriptor,
+                    () -> getRspString(element),
+                    element.getRspType().getIcon());
         }
     }
 
+    private static String getRspString(IRsp element) {
+        return element.getRspType().getName() + "   [" + getRspState(element) + "]";
+    }
     private class ServerStateDescriptor extends Descriptor<ServerStateWrapper> {
         protected ServerStateDescriptor(ServerStateWrapper element, @Nullable NodeDescriptor parentDescriptor) {
-            super(element, parentDescriptor, () ->
-                            element.ss.getServer().getId() + "   [" +
-                                    getRunStateString(element.ss.getState()) + ", " +
-                                    getPublishStateString(element.ss.getPublishState()) + "]",
+            super(element, parentDescriptor,
+                    () -> getServerStateString(element),
                     ((RspServerDescriptor)parentDescriptor).getElement().getRspType().getIcon(element.ss.getServer().getType().getId()));
         }
     }
 
+    private static String getServerStateString(ServerStateWrapper element) {
+        return element.ss.getServer().getId() + "   [" +
+                getRunStateString(element.ss.getState()) + ", " +
+                getPublishStateString(element.ss.getPublishState()) + "]";
+    }
 
     private class DeployableStateDescriptor extends Descriptor<DeployableStateWrapper> {
         protected DeployableStateDescriptor(DeployableStateWrapper element, @Nullable NodeDescriptor parentDescriptor) {
@@ -223,6 +231,9 @@ public class RspTreeModel extends AbstractTreeStructure {
         return false;
     }
 
+    public static String getRspState(IRsp rsp) {
+        return rsp.getState().toString().toUpperCase();
+    }
 
     public static String getRunStateString(int state) {
         String stateString = "unknown";

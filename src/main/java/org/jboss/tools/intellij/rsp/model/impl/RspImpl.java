@@ -38,7 +38,7 @@ public class RspImpl implements IRsp, IRspStartCallback {
     private IRspType type;
     private String latestVersion;
     private String downloadUrl;
-    private IRspCore.IJServerState currentState = IRspCore.IJServerState.STOPPED;
+    private IRspCore.IJServerState currentState;
 
     public RspImpl(IRspCore model, IRspType type,
                    String latestVersion, String downloadUrl,
@@ -48,6 +48,7 @@ public class RspImpl implements IRsp, IRspStartCallback {
         this.latestVersion = latestVersion;
         this.downloadUrl = downloadUrl;
         this.controller = controller;
+        this.currentState = exists() ?  IRspCore.IJServerState.STOPPED : IRspCore.IJServerState.MISSING;
     }
 
     @Override
@@ -152,6 +153,12 @@ public class RspImpl implements IRsp, IRspStartCallback {
                         }
                     } catch(IOException ioe) {
                     }
+                    if( exists() ) {
+                        updateRspState(IRspCore.IJServerState.STOPPED);
+                    } else {
+                        updateRspState(IRspCore.IJServerState.MISSING);
+                    }
+
                 }
             });
         }
