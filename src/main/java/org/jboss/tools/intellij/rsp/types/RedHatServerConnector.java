@@ -64,9 +64,9 @@ public class RedHatServerConnector extends AbstractServerConnector {
         } else if (serverType.startsWith("org.jboss.tools.openshift.cdk.server.type")) {
             return "openshift_extension-24x24.png";
         } else if (serverType.startsWith("org.jboss.ide.eclipse.as.runtime.")) {
-            return "jboss.png";
+            return "jboss-24x24.png";
         } else if (serverType.startsWith("org.jboss.ide.eclipse.as.")) {
-            return "jboss.png";
+            return "jboss-24x24.png";
         } else {
             return "jboss.eap-24x24.png";
         }
