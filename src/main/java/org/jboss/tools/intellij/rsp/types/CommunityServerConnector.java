@@ -23,7 +23,7 @@ import javax.swing.*;
 public class CommunityServerConnector extends AbstractServerConnector {
     public CommunityServerConnector() {
         super("redhat-community-server-connector", "Community Server Connector by Red Hat",
-                9000, 9500, "images/community-12x24.png",
+                9000, 9500, "images/community-24x24.png",
                 "https://download.jboss.org/jbosstools/adapters/snapshots/rsp-server-community/distributions/LATEST",
                 "org.jboss.tools.rsp.community.distribution.latest.version",
                 "org.jboss.tools.rsp.community.distribution.latest.url");
