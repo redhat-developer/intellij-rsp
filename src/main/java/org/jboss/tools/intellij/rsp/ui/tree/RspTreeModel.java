@@ -265,10 +265,10 @@ public class RspTreeModel extends AbstractTreeStructure {
                 stateString = "add";
                 break;
             case ServerManagementAPIConstants.PUBLISH_STATE_FULL:
-                stateString = "full";
+                stateString = "publish required (full)";
                 break;
             case ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL:
-                stateString = "incremental";
+                stateString = "publish required (incremental)";
                 break;
             case ServerManagementAPIConstants.PUBLISH_STATE_NONE:
                 stateString = "synchronized";
