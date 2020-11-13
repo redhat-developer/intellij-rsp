@@ -14,6 +14,8 @@ import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.ServerProcessOutput;
 
 import java.io.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Used to wrap output from a remote server process into something
@@ -26,7 +28,7 @@ public class RemoteServerProcess extends Process {
     private PipedOutputStream serverSysErrInternal;
     private PipedInputStream serverSysOut;
     private PipedInputStream serverSysErr;
-
+    private RSPThread writer;
     public RemoteServerProcess() {
         serverSysIn = new OutputStream() { @Override public void write(int b) { } };
         serverSysOut =new PipedInputStream();
@@ -41,7 +43,36 @@ public class RemoteServerProcess extends Process {
         }
     }
 
+    private class RSPThread extends Thread {
+        private BlockingQueue<ServerProcessOutput> queue;
+        public RSPThread() {
+            super("Server Process Output Processor");
+            queue = new LinkedBlockingQueue<ServerProcessOutput>();
+        }
+        public void run() {
+            try {
+                while (true) {
+                    handleEventInternal(queue.take());
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        public void addElement(ServerProcessOutput out) {
+            if( out != null )
+                queue.add(out);
+        }
+    }
+
     public void handleEvent(ServerProcessOutput output) {
+        if( writer == null ) {
+            writer = new RSPThread();
+            writer.start();
+        }
+        writer.addElement(output);
+    }
+
+    private void handleEventInternal(ServerProcessOutput output) {
         try {
             if (output.getStreamType() == ServerManagementAPIConstants.STREAM_TYPE_SYSOUT) {
                 serverSysOutInternal.write(output.getText().getBytes());
@@ -116,6 +147,7 @@ public class RemoteServerProcess extends Process {
             serverSysErrInternal.close();
         } catch(IOException ioe) {
         }
+        writer.interrupt();
     }
     private synchronized boolean isTerminated() {
         return terminated;
