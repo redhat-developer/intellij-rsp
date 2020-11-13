@@ -80,6 +80,7 @@ public class WorkflowItemPanel extends JPanel implements DocumentListener, Actio
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scroll.getVerticalScrollBar().setValue(0);
+        jta.setCaretPosition(0);
         return scroll;
     }
 
