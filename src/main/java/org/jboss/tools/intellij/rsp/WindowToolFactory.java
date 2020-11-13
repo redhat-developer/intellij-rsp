@@ -29,6 +29,7 @@ import org.jboss.tools.intellij.rsp.util.common.MutableModelSynchronizer;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.JScrollPane;
+import javax.swing.tree.TreeSelectionModel;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -45,6 +46,8 @@ public class WindowToolFactory implements ToolWindowFactory {
             StructureTreeModel stm = buildModel(rspTreeModel, project);
             AsyncTreeModel asyncModel = new AsyncTreeModel(stm);
             Tree tree = new Tree(asyncModel);
+            tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+            tree.setRootVisible(false);
             core.addChangeListener((Object o) -> {
                 refresh(o, stm, rspTreeModel);
             });
