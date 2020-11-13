@@ -91,18 +91,21 @@ public class WorkflowItemPanel extends JPanel implements DocumentListener, Actio
                 box = new ComboBox(vals);
                 box.setSelectedIndex(-1);
                 box.addActionListener(this);
+                box.setMaximumSize(new Dimension(Integer.MAX_VALUE, box.getMinimumSize().height));
                 add(box);
             }  else if( details.getResponseType().equals(ServerManagementAPIConstants.ATTR_TYPE_INT)) {
                 List<String> valid = item.getPrompt().getValidResponses();
                 if( valid == null || valid.size() == 0 ) {
                     field = item.getPrompt().isResponseSecret() ? new JBPasswordField() : new JTextField();
                     field.getDocument().addDocumentListener(this);
+                    field.setMaximumSize(new Dimension(Integer.MAX_VALUE, field.getMinimumSize().height));
                     add(field);
                 } else {
                     String[] vals = valid.toArray(new String[0]);
                     box = new ComboBox(vals);
                     box.setSelectedIndex(-1);
                     box.addActionListener(this);
+                    box.setMaximumSize(new Dimension(Integer.MAX_VALUE, box.getMinimumSize().height));
                     add(box);
                 }
             }  else if( details.getResponseType().equals(ServerManagementAPIConstants.ATTR_TYPE_STRING)) {
@@ -110,12 +113,14 @@ public class WorkflowItemPanel extends JPanel implements DocumentListener, Actio
                 if( valid == null || valid.size() == 0 ) {
                     field = item.getPrompt().isResponseSecret() ? new JBPasswordField() : new JTextField();
                     field.getDocument().addDocumentListener(this);
+                    field.setMaximumSize(new Dimension(Integer.MAX_VALUE, field.getMinimumSize().height));
                     add(field);
                 } else {
                     String[] vals = valid.toArray(new String[0]);
                     box = new ComboBox(vals);
                     box.setSelectedIndex(-1);
                     box.addActionListener(this);
+                    box.setMaximumSize(new Dimension(Integer.MAX_VALUE, box.getMinimumSize().height));
                     add(box);
                 }
             }
