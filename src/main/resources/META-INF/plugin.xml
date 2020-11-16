@@ -52,6 +52,10 @@
               id="org.jboss.tools.intellij.rsp.actions.StartServerAction" text="Start Server (Run)"/>
       <action class="org.jboss.tools.intellij.rsp.actions.StartServerDebugAction"
               id="org.jboss.tools.intellij.rsp.actions.StartServerDebugAction" text="Start Server (Debug)"/>
+      <action class="org.jboss.tools.intellij.rsp.actions.RestartServerAction"
+              id="org.jboss.tools.intellij.rsp.actions.RestartServerAction" text="Restart Server (Run)"/>
+      <action class="org.jboss.tools.intellij.rsp.actions.RestartServerDebugAction"
+              id="org.jboss.tools.intellij.rsp.actions.RestartServerDebugAction" text="Restart Server (Debug)"/>
       <action class="org.jboss.tools.intellij.rsp.actions.StopServerAction"
               id="org.jboss.tools.intellij.rsp.actions.StopServerAction" text="Stop Server"/>
       <action class="org.jboss.tools.intellij.rsp.actions.TerminateServerAction"

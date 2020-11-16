@@ -66,12 +66,12 @@ public class StartServerDebugAction extends AbstractTreeAction {
             final IntelliJRspClientLauncher client = RspCore.getDefault().getClient(sel.getRsp());
             new Thread("Debugging server: " + sel.getServerState().getServer().getId()) {
                 public void run() {
-                    actionPerformedInternal(sel, project, client);
+                    startServerDebugModeInternal(sel, project, client);
                 }
             }.start();
         }
     }
-    protected void actionPerformedInternal(RspTreeModel.ServerStateWrapper sel, Project project, IntelliJRspClientLauncher client) {
+    public static void startServerDebugModeInternal(RspTreeModel.ServerStateWrapper sel, Project project, IntelliJRspClientLauncher client) {
         String mode = "debug";
         ServerHandle handle = sel.getServerState().getServer();
         ServerAttributes sa = new ServerAttributes(handle.getType().getId(),
@@ -91,7 +91,7 @@ public class StartServerDebugAction extends AbstractTreeAction {
             connectDebugger(response, handle);
         }
     }
-    private void connectDebugger(StartServerResponse stat, ServerHandle handle) {
+    private static void connectDebugger(StartServerResponse stat, ServerHandle handle) {
         String host = stat.getDetails().getProperties().get(DEBUG_DETAILS_HOST);
         String port = stat.getDetails().getProperties().get(DEBUG_DETAILS_PORT);
         String type = stat.getDetails().getProperties().get(DEBUG_DETAILS_TYPE);
@@ -121,7 +121,7 @@ public class StartServerDebugAction extends AbstractTreeAction {
         }
     }
 
-    private ExecutionEnvironment getEnvironment(RunnerAndConfigurationSettings runSettings) {
+    private static ExecutionEnvironment getEnvironment(RunnerAndConfigurationSettings runSettings) {
         try {
             return ExecutionEnvironmentBuilder.create(
                     DefaultDebugExecutor.getDebugExecutorInstance(), runSettings).build();
@@ -136,7 +136,7 @@ public class StartServerDebugAction extends AbstractTreeAction {
     public static final String DEBUG_DETAILS_TYPE_JAVA = "java";
 
 
-    private RunnerAndConfigurationSettings getSettings(String host, String port, String configurationName) {
+    private static RunnerAndConfigurationSettings getSettings(String host, String port, String configurationName) {
         ConfigurationType type = RemoteConfigurationType.getInstance();
         final Project project = ProjectManager.getInstance().getOpenProjects()[0];
         RunManager runManager = RunManager.getInstance(project);

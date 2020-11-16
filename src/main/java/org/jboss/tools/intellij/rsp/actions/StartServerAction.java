@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 public class StartServerAction extends AbstractTreeAction {
-    private static final String ERROR_STARTING_SERVER = "Error starting server";
+    public static final String ERROR_STARTING_SERVER = "Error starting server";
 
     @Override
     protected boolean isVisible(Object o) {
@@ -50,12 +50,12 @@ public class StartServerAction extends AbstractTreeAction {
             final IntelliJRspClientLauncher client = RspCore.getDefault().getClient(sel.getRsp());
             new Thread("Starting server: " + sel.getServerState().getServer().getId()) {
                 public void run() {
-                    actionPerformedInternal(sel, project, client);
+                    startServerRunModeInternal(sel, project, client);
                 }
             }.start();
         }
     }
-    protected void actionPerformedInternal(RspTreeModel.ServerStateWrapper sel, Project project, IntelliJRspClientLauncher client) {
+    public static void startServerRunModeInternal(RspTreeModel.ServerStateWrapper sel, Project project, IntelliJRspClientLauncher client) {
         String mode = "run";
         ServerAttributes sa = new ServerAttributes(sel.getServerState().getServer().getType().getId(),
                 sel.getServerState().getServer().getId(), new HashMap<String,Object>());

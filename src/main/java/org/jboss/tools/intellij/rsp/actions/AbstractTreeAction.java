@@ -26,15 +26,15 @@ import java.util.Optional;
 public abstract class AbstractTreeAction extends AnAction {
     private static final String INVALID_RESPONSE = "Invalid Response from RSP";
 
-    protected void showError(String msg, String title) {
+    public static void showError(String msg, String title) {
         UIHelper.executeInUI(() -> Messages.showErrorDialog(msg, title));
     }
 
-    protected void apiError(Exception exception, String title) {
+    public static void apiError(Exception exception, String title) {
         showError(exception == null ? "Unknown Error" : exception.getMessage(), title);
     }
 
-    protected void statusError(Status stat, String title) {
+    public static void statusError(Status stat, String title) {
         showError(stat == null ? INVALID_RESPONSE : stat.getMessage(), title);
     }
 
