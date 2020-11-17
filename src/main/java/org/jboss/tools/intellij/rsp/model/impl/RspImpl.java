@@ -14,7 +14,6 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.ui.Messages;
-import com.sun.tools.javadoc.Start;
 import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
 import org.jboss.tools.intellij.rsp.download.DownloadUtility;
 import org.jboss.tools.intellij.rsp.download.UnzipUtility;
