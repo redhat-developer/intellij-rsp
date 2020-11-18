@@ -151,7 +151,7 @@ public class RspTreeModel extends AbstractTreeStructure {
 
     private class CoreDescriptor extends Descriptor<RspCore> {
         protected CoreDescriptor(RspCore element, @Nullable NodeDescriptor parentDescriptor) {
-            super(element, parentDescriptor, () -> "Runtime Server Protocol", IconLoader.getIcon("images/community-12x24.png"));
+            super(element, parentDescriptor, () -> "Runtime Server Protocol", IconLoader.getIcon("/images/community-12x24.png"));
         }
     }
 
