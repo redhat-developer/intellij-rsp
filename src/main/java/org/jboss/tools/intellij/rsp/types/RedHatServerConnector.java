@@ -24,7 +24,7 @@ import javax.swing.*;
 public class RedHatServerConnector extends AbstractServerConnector {
     public RedHatServerConnector() {
         super("redhat-server-connector", "Red Hat Server Connector",
-                8500, 8999, "images/jboss.eap-24x24.png",
+                8500, 8999, "/images/jboss.eap-24x24.png",
                 "https://download.jboss.org/jbosstools/adapters/stable/rsp-server/LATEST",
                 "org.jboss.tools.rsp.distribution.latest.version", "org.jboss.tools.rsp.distribution.latest.url");
     }
@@ -41,7 +41,7 @@ public class RedHatServerConnector extends AbstractServerConnector {
         String path = getIconFileForServerType(serverType);
         if( path == null )
             return null;
-        return IconLoader.getIcon("images/" + path);
+        return IconLoader.getIcon("/images/" + path);
     }
 
     private String getIconFileForServerType(String serverType) {
