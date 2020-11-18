@@ -26,6 +26,7 @@ intellij {
         plugins 'terminal'
     }
     pluginName 'org.jboss.tools.intellij.rsp'
+    updateSinceUntilBuild false
 }
 
 publishPlugin {
