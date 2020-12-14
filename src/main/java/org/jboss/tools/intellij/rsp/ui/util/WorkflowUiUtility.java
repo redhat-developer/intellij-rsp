@@ -43,7 +43,9 @@ public class WorkflowUiUtility {
         List<WorkflowResponseItem> items = resp.getItems();
         List<WorkflowResponseItem> prompts = new ArrayList<>();
         Project project = ProjectManager.getInstance().getOpenProjects()[0];
-
+        if( items == null ) {
+            return new HashMap<>();
+        }
         for( WorkflowResponseItem i : items ) {
             String type = i.getItemType();
             if( type == null )
