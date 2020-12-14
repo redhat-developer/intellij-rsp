@@ -294,6 +294,7 @@ public class RspCore implements IRspCore {
                 ExecUtilClone.linkProcessToTerminal(p, project, name, false);
             } catch(IOException ioe) {
                 // TODO cleanup
+                ioe.printStackTrace();
             }
         }
     }

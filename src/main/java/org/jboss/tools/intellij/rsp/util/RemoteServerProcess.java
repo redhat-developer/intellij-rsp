@@ -52,6 +52,10 @@ public class RemoteServerProcess extends Process {
         public void run() {
             try {
                 while (true) {
+                    if( queue.size() == 0 && isTerminated()) {
+                        cleanup();
+                        return;
+                    }
                     handleEventInternal(queue.take());
                 }
             } catch (InterruptedException e) {
@@ -78,7 +82,7 @@ public class RemoteServerProcess extends Process {
                 serverSysOutInternal.write(output.getText().getBytes());
             }
             if (output.getStreamType() == ServerManagementAPIConstants.STREAM_TYPE_SYSERR) {
-                serverSysErrInternal.write(output.getText().getBytes());
+                serverSysOutInternal.write(output.getText().getBytes());
             }
         } catch(IOException ioe) {
             // TODO
@@ -105,7 +109,7 @@ public class RemoteServerProcess extends Process {
         // TODO fix this
         while( !isTerminated()) {
             try {
-                Thread.sleep(5000);
+                Thread.sleep(1000);
             } catch(InterruptedException ie) {
                 throw ie;
             }
@@ -127,6 +131,22 @@ public class RemoteServerProcess extends Process {
 
     public synchronized void terminate() {
         terminated = true;
+        // necessary to delay "terminate" to allow time for output to show
+        // if no output shows when we mark terminated, the terminal closes quickly
+        new Thread("Delay Process Termination 2s") {
+            public void run() {
+                try {
+                    Thread.sleep(2000);
+                } catch(InterruptedException ie) {}
+                setTerminated();
+            }
+        }.start();
+    }
+
+    private synchronized void setTerminated() {
+        terminated = true;
+    }
+    private void cleanup() {
         try {
             serverSysIn.close();
         } catch(IOException ioe) {
@@ -149,6 +169,7 @@ public class RemoteServerProcess extends Process {
         }
         writer.interrupt();
     }
+
     private synchronized boolean isTerminated() {
         return terminated;
     }

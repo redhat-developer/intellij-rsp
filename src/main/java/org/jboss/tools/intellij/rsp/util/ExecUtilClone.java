@@ -299,7 +299,7 @@ public class ExecUtilClone {
             RspTerminalRunner runner = createTerminalRunner(project, process, title);
 
             TerminalOptionsProvider terminalOptions = ServiceManager.getService(TerminalOptionsProvider.class);
-            terminalOptions.setCloseSessionOnLogout(true);
+            terminalOptions.setCloseSessionOnLogout(false);
             final TerminalView view = TerminalView.getInstance(project);
             final Method[] method = new Method[1];
             final Object[][] parameters = new Object[1][];
