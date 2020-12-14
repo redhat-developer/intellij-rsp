@@ -67,7 +67,7 @@ public class WorkflowUiUtility {
                         String cmd = i.getProperties().get("workflow.terminal.cmd");
                         String[] asArr = CommandLineUtils.translateCommandline(cmd);
                         File wd = new File(System.getProperty("user.home"));
-                        ExecUtilClone.executeWithTerminal(project, "title", wd, false, asArr);
+                        ExecUtilClone.executeWithTerminal(project, i.getId(), wd, false, asArr);
                     } catch (IOException | CommandLineUtils.CommandLineException e) {
                         Messages.showErrorDialog(e.getMessage(), "Error running command in terminal");
                     }
