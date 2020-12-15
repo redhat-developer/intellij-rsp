@@ -116,15 +116,19 @@ public class CreateServerAction extends AbstractTreeAction {
                 if( td.getName() == null || td.getName().trim().isEmpty()) {
                     showError("Name must not be empty or missing", "Invalid Name");
                 } else {
-                    ServerAttributes csa = new ServerAttributes(typeId, td.getName(), values);
-                    try {
-                        CreateServerResponse result = client.getServerProxy().createServer(csa).get();
-                        if (!result.getStatus().isOK()) {
-                            statusError(result.getStatus(), ERROR_CREATING_SERVER);
+                    new Thread("Create Server") {
+                        public void run() {
+                            ServerAttributes csa = new ServerAttributes(typeId, td.getName(), values);
+                            try {
+                                CreateServerResponse result = client.getServerProxy().createServer(csa).get();
+                                if (!result.getStatus().isOK()) {
+                                    statusError(result.getStatus(), ERROR_CREATING_SERVER);
+                                }
+                            } catch (InterruptedException | ExecutionException e) {
+                                apiError(e, ERROR_CREATING_SERVER);
+                            }
                         }
-                    } catch (InterruptedException | ExecutionException e) {
-                        apiError(e, ERROR_CREATING_SERVER);
-                    }
+                    }.start();
                 }
             }
         });
