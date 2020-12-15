@@ -33,7 +33,7 @@ public class AttributePanel extends JPanel implements DocumentListener {
         JLabel name = new JLabel(key);
         name.setToolTipText(attr.getDescription());
         add(name);
-        field = new JTextField();
+        field = oneAttribute.isSecret() ? new JPasswordField() : new JTextField();
         if( values.get(key) != null ) {
             field.setText(asString(oneAttribute.getType(), values.get(key)));
         } else if( attr.getDefaultVal() != null ) {
