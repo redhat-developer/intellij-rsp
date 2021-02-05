@@ -1,8 +1,8 @@
 <idea-plugin>
-  <id>org.jboss.tools.intellij.rsp</id>
+  <id>com.redhat.devtools.intellij.rsp</id>
   <name>Runtime Server Protocol Connector by Red Hat</name>
   <version>1.0</version>
-  <vendor email="support@redhat.com" url="http://www.redhat.com">Red-Hat</vendor>
+  <vendor email="developers@redhat.com" url="http://www.redhat.com">Red-Hat</vendor>
 
   <description><![CDATA[
       <img src="https://raw.githubusercontent.com/redhat-developer/intellij-rsp/master/src/main/resources/images/openshift_extension.png" width="32" height="32"/>
@@ -32,49 +32,49 @@
   </extensions>
 
   <actions>
-    <group id="org.jboss.tools.intellij.rsp.tree" popup="true">
+    <group id="com.redhat.devtools.intellij.rsp.tree" popup="true">
       <!-- Application Explorer -->
       <!-- Top level: cluster -->
       <action class="org.jboss.tools.intellij.rsp.actions.DownloadRspAction"
-              id="org.jboss.tools.intellij.rsp.actions.DownloadRspAction" text="Download / Update RSP"/>
+              id="com.redhat.devtools..intellij.rsp.actions.DownloadRspAction" text="Download / Update RSP"/>
       <action class="org.jboss.tools.intellij.rsp.actions.StartRspAction"
-              id="org.jboss.tools.intellij.rsp.actions.StartRspAction" text="Start RSP"/>
+              id="com.redhat.devtools.intellij.rsp.actions.StartRspAction" text="Start RSP"/>
       <action class="org.jboss.tools.intellij.rsp.actions.StopRspAction"
-              id="org.jboss.tools.intellij.rsp.actions.StopRspAction" text="Stop RSP"/>
+              id="com.redhat.devtools..intellij.rsp.actions.StopRspAction" text="Stop RSP"/>
       <separator/>
       <action class="org.jboss.tools.intellij.rsp.actions.CreateServerAction"
-              id="org.jboss.tools.intellij.rsp.actions.CreateServerAction" text="Create Server"/>
+              id="com.redhat.devtools..intellij.rsp.actions.CreateServerAction" text="Create Server"/>
       <action class="org.jboss.tools.intellij.rsp.actions.DownloadServerAction"
-              id="org.jboss.tools.intellij.rsp.actions.DownloadServerAction" text="Download Server"/>
+              id="com.redhat.devtools..intellij.rsp.actions.DownloadServerAction" text="Download Server"/>
       <action class="org.jboss.tools.intellij.rsp.actions.DeleteServerAction"
-              id="org.jboss.tools.intellij.rsp.actions.DeleteServerAction" text="Delete Server"/>
+              id="com.redhat.devtools..intellij.rsp.actions.DeleteServerAction" text="Delete Server"/>
       <separator/>
       <action class="org.jboss.tools.intellij.rsp.actions.StartServerAction"
-              id="org.jboss.tools.intellij.rsp.actions.StartServerAction" text="Start Server (Run)"/>
+              id="com.redhat.devtools..intellij.rsp.actions.StartServerAction" text="Start Server (Run)"/>
       <action class="org.jboss.tools.intellij.rsp.actions.StartServerDebugAction"
-              id="org.jboss.tools.intellij.rsp.actions.StartServerDebugAction" text="Start Server (Debug)"/>
+              id="com.redhat.devtools..intellij.rsp.actions.StartServerDebugAction" text="Start Server (Debug)"/>
       <action class="org.jboss.tools.intellij.rsp.actions.RestartServerAction"
-              id="org.jboss.tools.intellij.rsp.actions.RestartServerAction" text="Restart Server (Run)"/>
+              id="com.redhat.devtools..intellij.rsp.actions.RestartServerAction" text="Restart Server (Run)"/>
       <action class="org.jboss.tools.intellij.rsp.actions.RestartServerDebugAction"
-              id="org.jboss.tools.intellij.rsp.actions.RestartServerDebugAction" text="Restart Server (Debug)"/>
+              id="com.redhat.devtools..intellij.rsp.actions.RestartServerDebugAction" text="Restart Server (Debug)"/>
       <action class="org.jboss.tools.intellij.rsp.actions.StopServerAction"
-              id="org.jboss.tools.intellij.rsp.actions.StopServerAction" text="Stop Server"/>
+              id="com.redhat.devtools..intellij.rsp.actions.StopServerAction" text="Stop Server"/>
       <action class="org.jboss.tools.intellij.rsp.actions.TerminateServerAction"
-              id="org.jboss.tools.intellij.rsp.actions.TerminateServerAction" text="Terminate Server"/>
+              id="com.redhat.devtools..intellij.rsp.actions.TerminateServerAction" text="Terminate Server"/>
       <separator/>
       <action class="org.jboss.tools.intellij.rsp.actions.AddDeploymentAction"
-              id="org.jboss.tools.intellij.rsp.actions.AddDeploymentAction" text="Add Deployment"/>
+              id="com.redhat.devtools..intellij.rsp.actions.AddDeploymentAction" text="Add Deployment"/>
       <action class="org.jboss.tools.intellij.rsp.actions.RemoveDeploymentAction"
-              id="org.jboss.tools.intellij.rsp.actions.RemoveDeploymentAction" text="Remove Deployment"/>
+              id="com.redhat.devtools..intellij.rsp.actions.RemoveDeploymentAction" text="Remove Deployment"/>
       <action class="org.jboss.tools.intellij.rsp.actions.IncrementalPublishServerAction"
-              id="org.jboss.tools.intellij.rsp.actions.IncrementalPublishServerAction" text="Publish Server (Incremental)"/>
+              id="com.redhat.devtools..intellij.rsp.actions.IncrementalPublishServerAction" text="Publish Server (Incremental)"/>
       <action class="org.jboss.tools.intellij.rsp.actions.FullPublishServerAction"
-              id="org.jboss.tools.intellij.rsp.actions.FullPublishServerAction" text="Publish Server (Full)"/>
+              id="com.redhat.devtools..intellij.rsp.actions.FullPublishServerAction" text="Publish Server (Full)"/>
       <separator/>
       <action class="org.jboss.tools.intellij.rsp.actions.EditServerAction"
-              id="org.jboss.tools.intellij.rsp.actions.EditServerAction" text="Edit Server..."/>
+              id="com.redhat.devtools..intellij.rsp.actions.EditServerAction" text="Edit Server..."/>
       <action class="org.jboss.tools.intellij.rsp.actions.ServerActionAction"
-              id="org.jboss.tools.intellij.rsp.actions.ServerActionAction" text="Run Server Action..."/>
+              id="com.redhat.devtools..intellij.rsp.actions.ServerActionAction" text="Run Server Action..."/>
    </group>
     <!-- Add your actions here -->
   </actions>

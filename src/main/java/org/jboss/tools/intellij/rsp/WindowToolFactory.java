@@ -44,7 +44,7 @@ public class WindowToolFactory implements ToolWindowFactory {
             ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
             RspTreeModel rspTreeModel = new RspTreeModel(core);
             StructureTreeModel stm = buildModel(rspTreeModel, project);
-            AsyncTreeModel asyncModel = new AsyncTreeModel(stm);
+            AsyncTreeModel asyncModel = new AsyncTreeModel(stm, project);
             Tree tree = new Tree(asyncModel);
             tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
             tree.setRootVisible(false);
@@ -54,7 +54,7 @@ public class WindowToolFactory implements ToolWindowFactory {
 
             tree.setCellRenderer(new NodeRenderer());
             PopupHandler.installPopupHandler(tree,
-                    "org.jboss.tools.intellij.rsp.tree", ActionPlaces.UNKNOWN);
+                    "com.redhat.devtools.intellij.rsp.tree", ActionPlaces.UNKNOWN);
             JScrollPane panel = ScrollPaneFactory.createScrollPane(tree);
             toolWindow.getContentManager().addContent(contentFactory.createContent(panel, "", false));
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException | NoSuchMethodException e) {
