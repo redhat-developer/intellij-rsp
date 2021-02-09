@@ -1,7 +1,7 @@
 # Runtime Server Protocol Connector
-[plugin-repo]: https://plugins.jetbrains.com/plugin/12030-openshift-connector-by-red-hat
-[plugin-version-svg]: https://img.shields.io/jetbrains/plugin/v/12030-openshift-connector-by-red-hat.svg
-[plugin-downloads-svg]: https://img.shields.io/jetbrains/plugin/d/12030-openshift-connector-by-red-hat.svg
+[plugin-repo]: https://plugins.jetbrains.com/plugin/16072-runtime-server-protocol-connector-by-red-hat
+[plugin-version-svg]: https://img.shields.io/jetbrains/plugin/v/16072-runtime-server-protocol-connector-by-red-hat.svg
+[plugin-downloads-svg]: https://img.shields.io/jetbrains/plugin/d/16072-runtime-server-protocol-connector-by-red-hat.svg
 
 ![Java CI with Gradle](https://github.com/redhat-developer/intellij-rsp/workflows/Java%20CI%20with%20Gradle/badge.svg)
 [![JetBrains plugins][plugin-version-svg]][plugin-repo]
