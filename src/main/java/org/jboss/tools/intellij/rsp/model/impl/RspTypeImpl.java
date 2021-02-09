@@ -65,7 +65,7 @@ public class RspTypeImpl implements IRspType {
     public Icon getIcon(String serverTypeId) {
         Icon rspIcon = iconProvider.getIcon(serverTypeId);
         if( rspIcon == null ) {
-            return IconLoader.getIcon("/images/server-dark.png");
+            return IconLoader.getIcon("/images/server-dark-24x24.png");
         }
         return rspIcon;
     }
