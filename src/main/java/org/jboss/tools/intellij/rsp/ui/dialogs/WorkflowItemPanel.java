@@ -24,10 +24,21 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
 public class WorkflowItemPanel extends JPanel implements DocumentListener, ActionListener {
+    // TODO these should be pulled from ServerManagementAPIConstants
+    public static final String WORKFLOW_ITEM_STRING_PROPERTY_LINK_URL = "workflow.item.string.property.link.url";
+    public static final String WORKFLOW_ITEM_BOOLEAN_PROPERTY_LOCAL_FILE = "workflow.item.boolean.property.local.file";
+
+
+
     private static final String COMBO_TRUE = "Yes (true)";
     private static final String COMBO_FALSE = "No (false)";
 
@@ -54,13 +65,37 @@ public class WorkflowItemPanel extends JPanel implements DocumentListener, Actio
     }
 
     private void handleSmall(WorkflowResponseItem item, String msg) {
+
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        String linkedUrl = null;
+        if(item.getProperties() != null && item.getProperties().get(WORKFLOW_ITEM_STRING_PROPERTY_LINK_URL) != null ) {
+            linkedUrl = item.getProperties().get(WORKFLOW_ITEM_STRING_PROPERTY_LINK_URL);
+        }
         if (msg != null && !msg.isEmpty()) {
-            add(new JLabel(msg));
+            JLabel l = new JLabel(msg);
+            if( linkedUrl != null ) {
+                linkLabelToUrl(l, linkedUrl);
+            }
+            add(l);
         }
         handleInput(item, values);
     }
 
+    private void linkLabelToUrl(JLabel jl, String url) {
+        jl.setForeground(Color.BLUE.darker());
+        jl.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        jl.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    Desktop.getDesktop().browse(new URI(url));
+                } catch (IOException ioException) {
+                } catch (URISyntaxException uriSyntaxException) {
+                }
+            }
+        });
+        jl.setText("<html><a href=''>" + jl.getText() + "</a></html>");
+    }
     private void handleLarge(WorkflowResponseItem item, String msg) {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         if (msg != null && !msg.isEmpty()) {
