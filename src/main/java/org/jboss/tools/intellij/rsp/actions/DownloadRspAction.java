@@ -23,9 +23,10 @@ public class DownloadRspAction extends AbstractTreeAction {
 
     @Override
     protected boolean isEnabled(Object o) {
-        boolean canDownload = o instanceof IRsp && ((IRsp)o).getState() == IRspCore.IJServerState.MISSING;
-        if( !canDownload )
-            return false;
+        boolean downloadMissing = o instanceof IRsp && ((IRsp)o).getState() == IRspCore.IJServerState.MISSING;
+        if( downloadMissing )
+            return true;
+
         IRsp server = (IRsp)o;
         String installed = server.getInstalledVersion();
         String latest = server.getLatestVersion();

@@ -39,13 +39,13 @@ public class VersionComparatorUtil {
         if( actual == null )
             return true;
 
-        String[] splitActual = actual.split("\\.");
-        String[] splitTest = test.split("\\.");
+        String[] splitActual = actual.split("[-\\.]");
+        String[] splitTest = test.split("[-\\.]");
 
         // Find the number of segments actually available for comparison
         int comparableSegments = splitActual.length;
         if( splitTest.length < splitActual.length)
-            comparableSegments = splitActual.length;
+            comparableSegments = splitTest.length;
 
         for( int i = 0; i < comparableSegments; i++ ) {
             int actualSegment = -1;
