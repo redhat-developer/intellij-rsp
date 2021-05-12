@@ -45,6 +45,7 @@ public class SelectDownloadRuntimeDialog extends DialogWrapper implements ListSe
         }
         setTitle("Download Server Runtime...");
         init();
+        getButton(getOKAction()).setEnabled(list.getSelectedValue() != null);
     }
 
     @Nullable
@@ -60,6 +61,7 @@ public class SelectDownloadRuntimeDialog extends DialogWrapper implements ListSe
         if( o instanceof DownloadRuntimeDescription) {
             selected = (DownloadRuntimeDescription)o;
         }
+        getButton(getOKAction()).setEnabled(o != null);
     }
 
     public DownloadRuntimeDescription getSelected() {
