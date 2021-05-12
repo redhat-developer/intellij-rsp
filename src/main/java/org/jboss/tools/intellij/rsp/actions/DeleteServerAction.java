@@ -13,13 +13,17 @@ package org.jboss.tools.intellij.rsp.actions;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.ui.DialogWrapper;
 import org.jboss.tools.intellij.rsp.client.IntelliJRspClientLauncher;
 import org.jboss.tools.intellij.rsp.model.IRsp;
 import org.jboss.tools.intellij.rsp.model.impl.RspCore;
 import org.jboss.tools.intellij.rsp.ui.tree.RspTreeModel;
 import org.jboss.tools.rsp.api.dao.Status;
 
+import javax.annotation.Nullable;
+import javax.swing.*;
 import javax.swing.tree.TreePath;
+import java.awt.*;
 import java.util.concurrent.ExecutionException;
 
 public class DeleteServerAction extends AbstractTreeAction {
@@ -35,19 +39,41 @@ public class DeleteServerAction extends AbstractTreeAction {
         return o instanceof RspTreeModel.ServerStateWrapper;
     }
 
+
+    private static class AreYouSureDialog extends DialogWrapper {
+        public AreYouSureDialog() {
+            super(true); // use current window as parent
+            init();
+            setTitle("Delete Server?");
+        }
+
+        @Nullable
+        @Override
+        protected JComponent createCenterPanel() {
+            JPanel dialogPanel = new JPanel(new BorderLayout());
+            JLabel label = new JLabel("Are you sure you want to delete this server?");
+            label.setPreferredSize(new Dimension(100, 100));
+            dialogPanel.add(label, BorderLayout.CENTER);
+            return dialogPanel;
+        }
+    }
+
     @Override
     protected void actionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
         if( selected instanceof RspTreeModel.ServerStateWrapper) {
             RspTreeModel.ServerStateWrapper sel = (RspTreeModel.ServerStateWrapper)selected;
             Project project = ProjectManager.getInstance().getOpenProjects()[0];
-            IntelliJRspClientLauncher client = RspCore.getDefault().getClient(sel.getRsp());
-            try {
-                Status stat = client.getServerProxy().deleteServer(sel.getServerState().getServer()).get();
-                if( !stat.isOK()) {
-                    statusError(stat, ERROR_DELETING_SERVER);
+
+            if (new AreYouSureDialog().showAndGet()) {
+                IntelliJRspClientLauncher client = RspCore.getDefault().getClient(sel.getRsp());
+                try {
+                    Status stat = client.getServerProxy().deleteServer(sel.getServerState().getServer()).get();
+                    if( !stat.isOK()) {
+                        statusError(stat, ERROR_DELETING_SERVER);
+                    }
+                } catch (InterruptedException | ExecutionException ex) {
+                    apiError(ex, ERROR_DELETING_SERVER);
                 }
-            } catch (InterruptedException | ExecutionException ex) {
-                apiError(ex, ERROR_DELETING_SERVER);
             }
         }
     }
