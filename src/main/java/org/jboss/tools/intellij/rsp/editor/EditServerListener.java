@@ -50,7 +50,7 @@ public class EditServerListener extends FileDocumentSynchronizationVetoer {
         } else {
             ss = RspCore.getDefault().findServerInRsp(rspObj, serverId);
             if( ss == null ) {
-                error = "Server " + ss.getServer().getId() + " not found in RSP " + rspId;
+                error = "Server " + serverId + " not found in RSP " + rspId;
             }
         }
 
