@@ -21,12 +21,15 @@ import org.jboss.tools.rsp.api.dao.ListDownloadRuntimeResponse;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class SelectDownloadRuntimeDialog extends DialogWrapper implements ListSelectionListener {
     private final ListDownloadRuntimeResponse runtimeResponse;
@@ -107,8 +110,46 @@ public class SelectDownloadRuntimeDialog extends DialogWrapper implements ListSe
         listScroller.setPreferredSize(new Dimension(250, 250));
         contentPane = new JPanel();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
-        JLabel instructions = new JLabel("Please select a runtime to download...");
+        JLabel instructions = new JLabel("Please select a runtime to download.");
+
+        JPanel filterBox = new JPanel();
+        filterBox.setLayout(new BoxLayout(filterBox, BoxLayout.X_AXIS));
+        JLabel filterLabel = new JLabel("Filter: ");
+        JTextField filterField = new JTextField();
+        filterBox.add(filterLabel);
+        filterBox.add(filterField);
+        filterField.getDocument().addDocumentListener(new DocumentListener(){
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                changed();
+            }
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                changed();
+            }
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                changed();
+            }
+            public void changed() {
+                String val = filterField.getText();
+                if( val != null && !val.isEmpty()) {
+                    java.util.List<DownloadRuntimeDescription> dlrtsMatching = new ArrayList<>(dlrts);
+                    Iterator<DownloadRuntimeDescription> it = dlrtsMatching.iterator();
+                    while(it.hasNext()) {
+                        if( !it.next().getName().toLowerCase().contains(val.toLowerCase())) {
+                            it.remove();
+                        }
+                    }
+                    list.setListData(dlrtsMatching.toArray());
+                } else if( val != null && val.isEmpty()) {
+                    list.setListData(dlrts.toArray());
+                }
+            }
+        });
+
         contentPane.add(instructions);
+        contentPane.add(filterBox);
         contentPane.add(listScroller);
     }
 
