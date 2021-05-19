@@ -79,13 +79,17 @@ public class WorkflowUiUtility {
             }
         }
         if( prompts.size() > 0 ) {
-            final Map<String, Object> values = new HashMap<>();
+            final Boolean[] isOk = new Boolean[1];
+            final Map<String, Object> values = new HashMap<String, Object>();
             UIHelper.executeInUI(() -> {
                 WorkflowDialog wd = new WorkflowDialog(prompts.toArray(new WorkflowResponseItem[0]));
-                wd.show();
-                values.putAll(wd.getAttributes());
+                boolean ok = wd.showAndGet();
+                isOk[0] = ok;
+                if(  ok ) {
+                    values.putAll(wd.getAttributes());
+                }
             });
-            return values;
+            return isOk[0] ? values : null;
         }
         // Fallback impl
         return new HashMap<String, Object>();
