@@ -27,6 +27,7 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.Map;
 
 public class AddDeploymentDialog extends DialogWrapper {
@@ -42,6 +43,7 @@ public class AddDeploymentDialog extends DialogWrapper {
         this.attributeValues = values;
         setTitle("Add a deployment");
         init();
+        getOkButton().setEnabled(false);
     }
 
     @Nullable
@@ -70,6 +72,10 @@ public class AddDeploymentDialog extends DialogWrapper {
         return locationPanel.getPath();
     }
 
+    public JButton getOkButton() {
+        return getButton(getOKAction());
+    }
+
     public class LocationPanel extends JPanel implements DocumentListener {
         String val;
         JTextField field;
@@ -92,6 +98,24 @@ public class AddDeploymentDialog extends DialogWrapper {
                 }
             });
             field = new JTextField();
+            field.getDocument().addDocumentListener(new DocumentListener() {
+                public void changedUpdate(DocumentEvent e) {
+                    validateField();
+                }
+
+                public void removeUpdate(DocumentEvent e) {
+                    validateField();
+                }
+
+                public void insertUpdate(DocumentEvent e) {
+                    validateField();
+                }
+
+                public void validateField() {
+                    String s = field.getText();
+                    getOkButton().setEnabled(s != null && new File(s).exists());
+                }
+            });
             field.setPreferredSize(new Dimension(150, (int)field.getPreferredSize().getHeight()));
             field.getDocument().addDocumentListener(this);
             add(name);
