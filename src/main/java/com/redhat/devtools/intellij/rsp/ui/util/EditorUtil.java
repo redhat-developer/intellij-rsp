@@ -28,6 +28,7 @@ import java.nio.file.Files;
 public class EditorUtil {
     public static void openFileInEditor(Project project, File f) {
         VirtualFile vf =  LocalFileSystem.getInstance().refreshAndFindFileByIoFile(f);
+        vf.putUserData(AllowNonProjectEditing.ALLOW_NON_PROJECT_EDITING, true);
         FileEditorManager.getInstance(project).openFile(vf, true);
     }
 
