@@ -32,25 +32,29 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 public class SelectDownloadRuntimeDialog extends DialogWrapper implements ListSelectionListener {
-    private final ListDownloadRuntimeResponse runtimeResponse;
+    private ListDownloadRuntimeResponse runtimeResponse;
     private final IRsp rsp;
     private HashMap<String, DownloadRuntimeDescription> dataMap;
     private JPanel contentPane;
     private JBList list;
     private DownloadRuntimeDescription selected = null;
-    public SelectDownloadRuntimeDialog(IRsp rsp, ListDownloadRuntimeResponse runtimeResponse) {
+    public SelectDownloadRuntimeDialog(IRsp rsp) {
         super((Project)null, true, IdeModalityType.IDE);
         this.rsp = rsp;
+        setTitle("Download Server Runtime (Loading...)");
+        init();
+        getButton(getOKAction()).setEnabled(list.getSelectedValue() != null);
+    }
+
+    public void setDownloadRuntimes(ListDownloadRuntimeResponse runtimeResponse) {
+        setTitle("Download Server Runtime...");
         this.runtimeResponse = runtimeResponse;
         dataMap = new HashMap<>();
         for( DownloadRuntimeDescription descriptor : runtimeResponse.getRuntimes() ) {
             dataMap.put(descriptor.getId(), descriptor);
         }
-        setTitle("Download Server Runtime...");
-        init();
-        getButton(getOKAction()).setEnabled(list.getSelectedValue() != null);
+        list.setListData(getDownloadRuntimeList().toArray());
     }
-
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
@@ -94,11 +98,16 @@ public class SelectDownloadRuntimeDialog extends DialogWrapper implements ListSe
         }
     }
 
-    private void createLayout() {
-        java.util.List<DownloadRuntimeDescription> dlrts = new ArrayList<>(dataMap.values());
-        Collections.sort(dlrts, (o1,o2) -> {
+    private java.util.List<DownloadRuntimeDescription> getDownloadRuntimeList() {
+        ArrayList<DownloadRuntimeDescription> ret = dataMap == null ? new ArrayList<>() : new ArrayList<>(dataMap.values());
+        Collections.sort(ret, (o1,o2) -> {
             return AlphanumComparator.staticCompare(o1.getName(), o2.getName());
         });
+        return ret;
+    }
+
+    private void createLayout() {
+        java.util.List<DownloadRuntimeDescription> dlrts = getDownloadRuntimeList();
         list = new JBList(dlrts);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         DownloadRuntimeCellRenderer renderer = new DownloadRuntimeCellRenderer();
@@ -134,7 +143,7 @@ public class SelectDownloadRuntimeDialog extends DialogWrapper implements ListSe
             public void changed() {
                 String val = filterField.getText();
                 if( val != null && !val.isEmpty()) {
-                    java.util.List<DownloadRuntimeDescription> dlrtsMatching = new ArrayList<>(dlrts);
+                    java.util.List<DownloadRuntimeDescription> dlrtsMatching = getDownloadRuntimeList();
                     Iterator<DownloadRuntimeDescription> it = dlrtsMatching.iterator();
                     while(it.hasNext()) {
                         if( !it.next().getName().toLowerCase().contains(val.toLowerCase())) {

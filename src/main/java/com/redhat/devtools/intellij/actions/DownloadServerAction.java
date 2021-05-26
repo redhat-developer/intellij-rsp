@@ -11,6 +11,7 @@
 package com.redhat.devtools.intellij.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -50,17 +51,10 @@ public class DownloadServerAction extends AbstractTreeAction {
             final IRsp server = (IRsp) selected;
             if (server.getState() == IRspCore.IJServerState.STARTED) {
                 Project project = ProjectManager.getInstance().getOpenProjects()[0];
-                IntelliJRspClientLauncher client = RspCore.getDefault().getClient(server);
-                ListDownloadRuntimeResponse runtimeResponse = null;
-                try {
-                    runtimeResponse = client.getServerProxy().listDownloadableRuntimes().get();
-                } catch (InterruptedException | ExecutionException ex) {
-                    apiError(ex, ERROR_FETCHING_DOWNLOADABLE_RUNTIMES);
-                    return;
-                }
 
-                SelectDownloadRuntimeDialog td = new SelectDownloadRuntimeDialog(server, runtimeResponse);
-                UIHelper.executeInUI(() -> {
+                final IntelliJRspClientLauncher client = RspCore.getDefault().getClient(server);
+                final SelectDownloadRuntimeDialog td = new SelectDownloadRuntimeDialog(server);
+                ApplicationManager.getApplication().invokeLater(() -> {
                     td.show();
                     DownloadRuntimeDescription chosen = td.getSelected();
                     if (chosen != null && td.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
@@ -71,6 +65,19 @@ public class DownloadServerAction extends AbstractTreeAction {
                         }.start();
                     }
                 });
+                new Thread("Load downloadable runtimes...") {
+                    public void run() {
+                        ListDownloadRuntimeResponse runtimeResponse = null;
+                        try {
+                            runtimeResponse = client.getServerProxy().listDownloadableRuntimes().get();
+                            td.setDownloadRuntimes(runtimeResponse);
+                        } catch (InterruptedException | ExecutionException ex) {
+                            apiError(ex, ERROR_FETCHING_DOWNLOADABLE_RUNTIMES);
+                            return;
+                        }
+
+                    }
+                }.start();
             }
         }
     }
