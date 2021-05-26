@@ -29,6 +29,8 @@
     <!-- Add your extensions here -->
     <toolWindow id="RSP Servers" anchor="left" factoryClass="com.redhat.devtools.intellij.rsp.WindowToolFactory" icon="/META-INF/pluginIcon13x13.svg"/>
     <fileDocumentSynchronizationVetoer implementation="com.redhat.devtools.intellij.rsp.editor.EditServerListener" order="first" />
+    <nonProjectFileWritingAccessExtension implementation="com.redhat.devtools.intellij.common.editor.AllowNonProjectEditing" />
+    <postStartupActivity implementation="com.redhat.devtools.intellij.rsp.extension.RSPPluginInitializer" />
   </extensions>
 
   <actions>
