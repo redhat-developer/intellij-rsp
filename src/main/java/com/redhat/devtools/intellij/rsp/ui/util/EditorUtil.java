@@ -14,6 +14,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.redhat.devtools.intellij.common.editor.AllowNonProjectEditing;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -33,12 +34,12 @@ public class EditorUtil {
     public static void createAndOpenVirtualFile(String name, String content, Project project) {//, String namespace, String kind) {
         try {
             VirtualFile vf = createTempFile(name, content);
-//            vf.putUserData(KIND_PLURAL, kind);
-//            vf.putUserData(PROJECT, project);
-//            vf.putUserData(NAMESPACE, namespace);
-            File fileToDelete = new File(vf.getPath());
-            fileToDelete.deleteOnExit();
-            FileEditorManager.getInstance(project).openFile(vf, true);
+            if( vf != null ) {
+                vf.putUserData(AllowNonProjectEditing.ALLOW_NON_PROJECT_EDITING, true);
+                File fileToDelete = new File(vf.getPath());
+                fileToDelete.deleteOnExit();
+                FileEditorManager.getInstance(project).openFile(vf, true);
+            }
         } catch (IOException e) {
             // TODO
         }
