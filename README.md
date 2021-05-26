@@ -13,6 +13,8 @@
 
 A JetBrains IntelliJ plugin for interacting with Application Servers of all types. This extension is currently in Preview Mode and works with JBoss, Wildfly, JBoss EAP, Tomcat, Glassfish, Felix, Karaf, Jetty, Minishift, CDK, and CRC. 
 
+## Build / Package
+Type `./gradlew buildPlugin`
 
 ## Release notes
 
