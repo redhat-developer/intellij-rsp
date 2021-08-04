@@ -235,7 +235,7 @@ public class ExecUtilClone {
             this.title = title;
         }
         @Override
-        protected Process createProcess(@Nullable String s) {
+        public Process createProcess(@Nullable String s) {
             return process;
         }
 
