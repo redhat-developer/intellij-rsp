@@ -20,7 +20,7 @@ targetCompatibility = '1.8'
 intellij {
     version ideaVersion //for a full list of IntelliJ IDEA releases please see https://www.jetbrains.com/intellij-repository/releases
     def versions = ideaVersion.substring(3).split("\\.")
-    if (versions[0] == "2020" || (versions[0] == "2019" && versions[1] != "1")) {
+    if (versions[0] == "2021" || versions[0] == "2020" || (versions[0] == "2019" && versions[1] != "1")) {
         plugins 'java', 'terminal'
     } else {
         plugins 'terminal'
