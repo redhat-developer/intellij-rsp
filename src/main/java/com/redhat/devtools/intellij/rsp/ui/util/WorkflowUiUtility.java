@@ -14,6 +14,7 @@ import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.Messages;
+import com.redhat.devtools.intellij.common.utils.ExecHelper;
 import com.redhat.devtools.intellij.rsp.ui.dialogs.WorkflowDialog;
 import com.redhat.devtools.intellij.rsp.util.CommandLineUtils;
 import com.redhat.devtools.intellij.rsp.util.ExecUtilClone;
@@ -24,6 +25,7 @@ import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +71,7 @@ public class WorkflowUiUtility {
                         String cmd = i.getProperties().get("workflow.terminal.cmd");
                         String[] asArr = CommandLineUtils.translateCommandline(cmd);
                         File wd = new File(System.getProperty("user.home"));
-                        ExecUtilClone.executeWithTerminal(project, i.getId(), wd, false, asArr);
+                        ExecHelper.executeWithTerminalWidget(project, i.getId(), asArr);
                     } catch (IOException | CommandLineUtils.CommandLineException e) {
                         Messages.showErrorDialog(e.getMessage(), "Error running command in terminal");
                     }

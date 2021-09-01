@@ -10,13 +10,17 @@
  ******************************************************************************/
 package com.redhat.devtools.intellij.rsp.model.impl;
 
+import com.intellij.execution.process.BaseProcessHandler;
+import com.intellij.execution.process.ProcessHandler;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.redhat.devtools.intellij.common.utils.ExecHelper;
 import com.redhat.devtools.intellij.rsp.model.*;
 import com.redhat.devtools.intellij.rsp.util.ExecUtilClone;
 import com.redhat.devtools.intellij.rsp.util.JavaUtils;
 import com.redhat.devtools.intellij.rsp.util.PortFinder;
 import com.redhat.devtools.intellij.rsp.util.ProcessMonitorThread;
+import com.redhat.devtools.intellij.rsp.util.RspProcessHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,13 +70,14 @@ public class ReferenceRspControllerImpl implements IRspStateController {
             callback.updateRspState(IRspCore.IJServerState.STARTED);
             return new ServerConnectionInfo("localhost", Integer.parseInt(portInUse));
         }
-        Process p = startRSP(rspHome, port, java, callback);
-        if( p != null ) {
-            setRunningProcess(p);
+        BaseProcessHandler handler = startRSP(rspHome, port, java, callback);
+        if( handler != null ) {
+            setRunningProcess(handler.getProcess());
             try {
                 Project project = ProjectManager.getInstance().getOpenProjects()[0];
                 try {
-                    ExecUtilClone.linkProcessToTerminal(p, project, serverType.getId(), false);
+                    String name = serverType.getId();
+                    ExecHelper.linkProcessToTerminal(handler, project, name, false);
                 } catch(Throwable t) {
                     t.printStackTrace();
                 }
@@ -114,7 +119,7 @@ public class ReferenceRspControllerImpl implements IRspStateController {
         return false;
     }
 
-    private Process startRSP(String rspHome, int port, File java, IRspStartCallback callback) {
+    private BaseProcessHandler startRSP(String rspHome, int port, File java, IRspStartCallback callback) {
         callback.updateRspState(IRspCore.IJServerState.STARTING);
         File workingDir = new File(rspHome);
         File felix = new File( new File(workingDir, "bin"), "felix.jar");
@@ -126,6 +131,7 @@ public class ReferenceRspControllerImpl implements IRspStateController {
         String jar = "-jar";
 
         String[] cmdArr = new String[] {cmd, portFlag, id, logbackFlag, jar, felix.getAbsolutePath()};
+        String cmdLine = String.join(" ", cmdArr);
         try {
             Process p = Runtime.getRuntime().exec(cmdArr, null, workingDir);
             ProcessMonitorThread pmt = new ProcessMonitorThread(p, (Process proc9) -> {
@@ -133,7 +139,7 @@ public class ReferenceRspControllerImpl implements IRspStateController {
                 setRunningProcess(null);
             });
             pmt.start();
-            return p;
+            return new RspProcessHandler(p, "Run Felix", cmdLine);
         } catch (IOException e) {
             e.printStackTrace();
         }

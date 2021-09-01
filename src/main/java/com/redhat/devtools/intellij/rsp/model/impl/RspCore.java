@@ -15,6 +15,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
+import com.redhat.devtools.intellij.common.utils.ExecHelper;
 import com.redhat.devtools.intellij.rsp.model.*;
 import com.redhat.devtools.intellij.rsp.types.CommunityServerConnector;
 import com.redhat.devtools.intellij.rsp.ui.dialogs.StringPromptDialog;
@@ -22,6 +23,7 @@ import com.redhat.devtools.intellij.rsp.client.IntelliJRspClientLauncher;
 import com.redhat.devtools.intellij.rsp.types.RedHatServerConnector;
 import com.redhat.devtools.intellij.rsp.ui.util.UIHelper;
 import com.redhat.devtools.intellij.rsp.util.ExecUtilClone;
+import com.redhat.devtools.intellij.rsp.util.RspProcessHandler;
 import org.jboss.tools.rsp.api.ICapabilityKeys;
 import org.jboss.tools.rsp.api.dao.*;
 
@@ -290,7 +292,7 @@ public class RspCore implements IRspCore {
             Project project = ProjectManager.getInstance().getOpenProjects()[0];
 
             try {
-                ExecUtilClone.linkProcessToTerminal(p, project, name, false);
+                ExecHelper.linkProcessToTerminal(new RspProcessHandler(p,name, "run server " + name), project, name,false);
             } catch(IOException ioe) {
                 // TODO cleanup
                 ioe.printStackTrace();
