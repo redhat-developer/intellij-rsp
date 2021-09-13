@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author olkornii@redhat.com
  */
-public class checkRspConnectorsExists extends AbstractRspServersTest{
+public class CheckRspConnectorsExists {
     public static void checkRspConnectors(ComponentFixture rspViewTree){
         List<RemoteText> treeElements = rspViewTree.findAllText();
         assertTrue(treeElements.size() == 2);

@@ -32,7 +32,7 @@ import com.redhat.devtools.intellij.commonUiTestLibrary.fixtures.mainIdeWindow.t
 import com.redhat.devtools.intellij.commonUiTestLibrary.fixtures.dialogs.information.TipDialog;
 import com.redhat.devtools.intellij.commonUiTestLibrary.fixtures.mainIdeWindow.ideStatusBar.IdeStatusBar;
 
-import com.redhat.devtools.intellij.rsp.tests.checkRspConnectorsExists;
+import com.redhat.devtools.intellij.rsp.tests.CheckRspConnectorsExists;
 
 import static com.intellij.remoterobot.stepsProcessing.StepWorkerKt.step;
 import static com.intellij.remoterobot.utils.RepeatUtilsKt.waitFor;
@@ -49,7 +49,7 @@ public class BasicTests {
 
     @BeforeAll
     public static void connect() {
-        robot = UITestRunner.runIde(UITestRunner.IdeaVersion.V_2020_3, 8580);
+        robot = UITestRunner.runIde(UITestRunner.IdeaVersion.V_2020_2, 8580);
         createEmptyProject();
         final ToolWindowsPane toolWindowsPane = robot.find(ToolWindowsPane.class);
         waitFor(Duration.ofSeconds(15), Duration.ofSeconds(1), "The 'RSP servers' stripe button is not available.", () -> isStripeButtonAvailable(toolWindowsPane, "RSP Servers"));
@@ -67,7 +67,7 @@ public class BasicTests {
 
     @Test
     public void checkRspConnectorsExists() {
-        step("New Empty Project", () -> checkRspConnectorsExists.checkRspConnectors(rspViewTree));
+        step("New Empty Project", () -> CheckRspConnectorsExists.checkRspConnectors(rspViewTree));
     }
 
     private static void createEmptyProject(){
