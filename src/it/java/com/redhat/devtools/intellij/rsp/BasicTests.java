@@ -21,6 +21,7 @@ import com.intellij.remoterobot.fixtures.dataExtractor.RemoteText;
 import com.intellij.remoterobot.utils.WaitForConditionTimeoutException;
 import com.redhat.devtools.intellij.rsp.dialogs.ProjectStructureDialog;
 import com.redhat.devtools.intellij.rsp.mainIdeWindow.RspToolFixture;
+import com.redhat.devtools.intellij.rsp.tests.RunRspConnectorsTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ import com.redhat.devtools.intellij.commonUiTestLibrary.fixtures.mainIdeWindow.t
 import com.redhat.devtools.intellij.commonUiTestLibrary.fixtures.dialogs.information.TipDialog;
 import com.redhat.devtools.intellij.commonUiTestLibrary.fixtures.mainIdeWindow.ideStatusBar.IdeStatusBar;
 
-import com.redhat.devtools.intellij.rsp.tests.CheckRspConnectorsExists;
+import com.redhat.devtools.intellij.rsp.tests.CheckRspConnectorsExistsTest;
 
 import static com.intellij.remoterobot.stepsProcessing.StepWorkerKt.step;
 import static com.intellij.remoterobot.utils.RepeatUtilsKt.waitFor;
@@ -67,7 +68,12 @@ public class BasicTests {
 
     @Test
     public void checkRspConnectorsExists() {
-        step("New Empty Project", () -> CheckRspConnectorsExists.checkRspConnectors(rspViewTree));
+        step("New Empty Project", () -> CheckRspConnectorsExistsTest.checkRspConnectors(rspViewTree));
+    }
+
+    @Test
+    public void runRspConnectors() {
+        step("Run RSP Connectors", () -> RunRspConnectorsTest.runRspServers(robot, rspViewTree));
     }
 
     private static void createEmptyProject(){
