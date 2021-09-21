@@ -12,12 +12,6 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven {
-        url 'https://repository.jboss.org/nexus/content/repositories/snapshots'
-    }
-    maven {
-        url 'https://repository.jboss.org/nexus/content/groups/public'
-    }
-    maven {
         url 'https://repository.jboss.org'
     }
     maven {
