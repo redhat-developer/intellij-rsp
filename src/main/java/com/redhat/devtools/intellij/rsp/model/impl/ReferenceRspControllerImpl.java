@@ -12,8 +12,10 @@ package com.redhat.devtools.intellij.rsp.model.impl;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.pty4j.PtyProcess;
+import com.pty4j.PtyProcessBuilder;
+import com.redhat.devtools.intellij.common.utils.ExecHelper;
 import com.redhat.devtools.intellij.rsp.model.*;
-import com.redhat.devtools.intellij.rsp.util.ExecUtilClone;
 import com.redhat.devtools.intellij.rsp.util.JavaUtils;
 import com.redhat.devtools.intellij.rsp.util.PortFinder;
 import com.redhat.devtools.intellij.rsp.util.ProcessMonitorThread;
@@ -66,13 +68,13 @@ public class ReferenceRspControllerImpl implements IRspStateController {
             callback.updateRspState(IRspCore.IJServerState.STARTED);
             return new ServerConnectionInfo("localhost", Integer.parseInt(portInUse));
         }
-        Process p = startRSP(rspHome, port, java, callback);
+        PtyProcess p = startRSP(rspHome, port, java, callback);
         if( p != null ) {
             setRunningProcess(p);
             try {
                 Project project = ProjectManager.getInstance().getOpenProjects()[0];
                 try {
-                    ExecUtilClone.linkProcessToTerminal(p, project, serverType.getId(), false);
+                    ExecHelper.linkProcessToTerminal(p, project, serverType.getId(), false, "Starting RSP Server");
                 } catch(Throwable t) {
                     t.printStackTrace();
                 }
@@ -114,7 +116,7 @@ public class ReferenceRspControllerImpl implements IRspStateController {
         return false;
     }
 
-    private Process startRSP(String rspHome, int port, File java, IRspStartCallback callback) {
+    private PtyProcess startRSP(String rspHome, int port, File java, IRspStartCallback callback) {
         callback.updateRspState(IRspCore.IJServerState.STARTING);
         File workingDir = new File(rspHome);
         File felix = new File( new File(workingDir, "bin"), "felix.jar");
@@ -127,7 +129,10 @@ public class ReferenceRspControllerImpl implements IRspStateController {
 
         String[] cmdArr = new String[] {cmd, portFlag, id, logbackFlag, jar, felix.getAbsolutePath()};
         try {
-            Process p = Runtime.getRuntime().exec(cmdArr, null, workingDir);
+            PtyProcessBuilder builder = new PtyProcessBuilder(cmdArr);
+            builder.setDirectory(workingDir.getPath());
+            builder.setRedirectErrorStream(true);
+            PtyProcess p = builder.start();
             ProcessMonitorThread pmt = new ProcessMonitorThread(p, (Process proc9) -> {
                 callback.updateRspState(IRspCore.IJServerState.STOPPED);
                 setRunningProcess(null);
@@ -167,9 +172,7 @@ public class ReferenceRspControllerImpl implements IRspStateController {
         }
         return portInUse;
     }
-    private boolean isWorkspaceLocked() {
-        return getLockedWorkspacePort() == null ? false : true;
-    }
+
     private File getLockFile() {
         String userHome = JavaUtils.getUserHome();
         return new File(userHome).toPath().resolve(".rsp").resolve(serverType.getId()).resolve(".lock").toFile();

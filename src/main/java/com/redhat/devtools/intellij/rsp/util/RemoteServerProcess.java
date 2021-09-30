@@ -10,6 +10,8 @@
  ******************************************************************************/
 package com.redhat.devtools.intellij.rsp.util;
 
+import com.pty4j.PtyProcess;
+import com.pty4j.WinSize;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.ServerProcessOutput;
 
@@ -21,7 +23,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Used to wrap output from a remote server process into something
  * usable by the terminal view.
  */
-public class RemoteServerProcess extends Process {
+public class RemoteServerProcess extends PtyProcess {
     private boolean terminated = false;
     private OutputStream serverSysIn;
     private PipedOutputStream serverSysOutInternal;
@@ -41,6 +43,26 @@ public class RemoteServerProcess extends Process {
         } catch(IOException ioe) {
             // TODO ?
         }
+    }
+
+    @Override
+    public boolean isRunning() {
+        return !isTerminated();
+    }
+
+    @Override
+    public void setWinSize(WinSize winSize) {
+
+    }
+
+    @Override
+    public WinSize getWinSize() throws IOException {
+        return null;
+    }
+
+    @Override
+    public int getPid() {
+        return 0;
     }
 
     private class RSPThread extends Thread {

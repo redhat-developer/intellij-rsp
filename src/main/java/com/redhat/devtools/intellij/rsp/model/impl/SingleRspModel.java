@@ -10,6 +10,7 @@
  ******************************************************************************/
 package com.redhat.devtools.intellij.rsp.model.impl;
 
+import com.pty4j.PtyProcess;
 import com.redhat.devtools.intellij.rsp.model.IRspType;
 import com.redhat.devtools.intellij.rsp.client.IntelliJRspClientLauncher;
 import com.redhat.devtools.intellij.rsp.model.IRsp;
@@ -125,7 +126,7 @@ public class SingleRspModel {
         this.jobs = new ArrayList<>();
     }
 
-    public Process addServerProcess(ServerProcess serverProcess) {
+    public PtyProcess addServerProcess(ServerProcess serverProcess) {
         String id = serverProcess.getServer().toString() + ":" + serverProcess.getProcessId();
         RemoteServerProcess sp = new RemoteServerProcess();
         processes.put(id, sp);
@@ -136,7 +137,7 @@ public class SingleRspModel {
         String id = serverProcess.getServer().toString() + ":" + serverProcess.getProcessId();
         RemoteServerProcess sp = processes.get(id);
         if( sp != null ) {
-            sp.terminate();;
+            sp.terminate();
             processes.remove(id);
         }
     }
