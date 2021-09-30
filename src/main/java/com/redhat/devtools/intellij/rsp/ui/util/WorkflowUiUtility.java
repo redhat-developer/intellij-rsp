@@ -10,13 +10,18 @@
  ******************************************************************************/
 package com.redhat.devtools.intellij.rsp.ui.util;
 
+import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.util.io.BaseDataReader;
+import com.intellij.util.io.BaseOutputReader;
+import com.redhat.devtools.intellij.common.utils.ExecHelper;
 import com.redhat.devtools.intellij.rsp.ui.dialogs.WorkflowDialog;
 import com.redhat.devtools.intellij.rsp.util.CommandLineUtils;
-import com.redhat.devtools.intellij.rsp.util.ExecUtilClone;
+import java.nio.charset.Charset;
+import java.util.Collections;
 import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.api.dao.WorkflowResponse;
 import org.jboss.tools.rsp.api.dao.WorkflowResponseItem;
@@ -27,6 +32,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Workflow Utility
@@ -69,7 +76,7 @@ public class WorkflowUiUtility {
                         String cmd = i.getProperties().get("workflow.terminal.cmd");
                         String[] asArr = CommandLineUtils.translateCommandline(cmd);
                         File wd = new File(System.getProperty("user.home"));
-                        ExecUtilClone.executeWithTerminal(project, i.getId(), wd, false, asArr);
+                        ExecHelper.executeWithTerminal(project, i.getId(), wd, false, Collections.emptyMap(), asArr);
                     } catch (IOException | CommandLineUtils.CommandLineException e) {
                         Messages.showErrorDialog(e.getMessage(), "Error running command in terminal");
                     }

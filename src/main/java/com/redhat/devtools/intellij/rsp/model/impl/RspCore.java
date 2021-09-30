@@ -10,18 +10,46 @@
  ******************************************************************************/
 package com.redhat.devtools.intellij.rsp.model.impl;
 
+import com.intellij.execution.executors.DefaultRunExecutor;
+import com.intellij.execution.process.OSProcessHandler;
+import com.intellij.execution.ui.RunContentManager;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.terminal.TerminalExecutionConsole;
+import com.intellij.util.io.BaseDataReader;
+import com.intellij.util.io.BaseInputStreamReader;
+import com.intellij.util.io.BaseOutputReader;
+import com.pty4j.PtyProcess;
+import com.redhat.devtools.intellij.common.utils.ExecHelper;
+import com.redhat.devtools.intellij.common.utils.ExecProcessHandler;
+import com.redhat.devtools.intellij.common.utils.ExecRunContentDescriptor;
 import com.redhat.devtools.intellij.rsp.model.*;
 import com.redhat.devtools.intellij.rsp.types.CommunityServerConnector;
 import com.redhat.devtools.intellij.rsp.ui.dialogs.StringPromptDialog;
 import com.redhat.devtools.intellij.rsp.client.IntelliJRspClientLauncher;
 import com.redhat.devtools.intellij.rsp.types.RedHatServerConnector;
 import com.redhat.devtools.intellij.rsp.ui.util.UIHelper;
-import com.redhat.devtools.intellij.rsp.util.ExecUtilClone;
+import com.sun.xml.fastinfoset.util.CharArray;
+import java.awt.BorderLayout;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.IllegalCharsetNameException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.JPanel;
+import org.apache.commons.io.FileUtils;
 import org.jboss.tools.rsp.api.ICapabilityKeys;
 import org.jboss.tools.rsp.api.dao.*;
 
@@ -33,6 +61,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The primary model for the framework. It mostly just links events from rsp and client
@@ -285,12 +315,12 @@ public class RspCore implements IRspCore {
     public void serverProcessCreated(IRsp rsp, ServerProcess serverProcess) {
         SingleRspModel model = findModel(rsp.getRspType().getId());
         if( model != null ) {
-            Process p = model.addServerProcess(serverProcess);
+            PtyProcess p = model.addServerProcess(serverProcess);
             String name = serverProcess.getServer().getId() + ":" + serverProcess.getProcessId();
             Project project = ProjectManager.getInstance().getOpenProjects()[0];
 
             try {
-                ExecUtilClone.linkProcessToTerminal(p, project, name, false);
+                ExecHelper.linkProcessToTerminal(p, project, name, false, "Server " + serverProcess.getServer().getId());
             } catch(IOException ioe) {
                 // TODO cleanup
                 ioe.printStackTrace();
