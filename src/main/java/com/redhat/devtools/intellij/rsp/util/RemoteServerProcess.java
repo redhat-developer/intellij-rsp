@@ -12,6 +12,8 @@ package com.redhat.devtools.intellij.rsp.util;
 
 import com.pty4j.PtyProcess;
 import com.pty4j.WinSize;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.ServerProcessOutput;
 
@@ -78,7 +80,10 @@ public class RemoteServerProcess extends PtyProcess {
                         cleanup();
                         return;
                     }
-                    handleEventInternal(queue.take());
+                    ServerProcessOutput serverProcessOutput = queue.poll(1, TimeUnit.SECONDS);
+                    if (serverProcessOutput != null) {
+                        handleEventInternal(serverProcessOutput);
+                    }
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
