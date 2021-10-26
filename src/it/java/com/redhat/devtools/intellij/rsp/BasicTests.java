@@ -28,13 +28,15 @@ import org.junit.jupiter.api.Test;
 
 import com.redhat.devtools.intellij.commonUiTestLibrary.UITestRunner;
 import com.redhat.devtools.intellij.commonUiTestLibrary.fixtures.dialogs.FlatWelcomeFrame;
-import com.redhat.devtools.intellij.commonUiTestLibrary.fixtures.dialogs.projectManipulation.NewProjectDialog;
+import com.redhat.devtools.intellij.commonUiTestLibrary.fixtures.dialogs.project.NewProjectDialogWizard;
+import com.redhat.devtools.intellij.commonUiTestLibrary.fixtures.dialogs.project.pages.NewProjectFirstPage;
 import com.redhat.devtools.intellij.commonUiTestLibrary.fixtures.mainIdeWindow.toolWindowsPane.ToolWindowsPane;
 import com.redhat.devtools.intellij.commonUiTestLibrary.fixtures.dialogs.information.TipDialog;
 import com.redhat.devtools.intellij.commonUiTestLibrary.fixtures.mainIdeWindow.ideStatusBar.IdeStatusBar;
 
 import com.redhat.devtools.intellij.rsp.tests.CheckRspConnectorsExistsTest;
 
+import static com.intellij.remoterobot.search.locators.Locators.byXpath;
 import static com.intellij.remoterobot.stepsProcessing.StepWorkerKt.step;
 import static com.intellij.remoterobot.utils.RepeatUtilsKt.waitFor;
 
@@ -50,11 +52,11 @@ public class BasicTests {
 
     @BeforeAll
     public static void connect() {
-        robot = UITestRunner.runIde(UITestRunner.IdeaVersion.V_2020_2, 8580);
+        robot = UITestRunner.runIde(UITestRunner.IdeaVersion.V_2020_3);
         createEmptyProject();
         final ToolWindowsPane toolWindowsPane = robot.find(ToolWindowsPane.class);
         waitFor(Duration.ofSeconds(15), Duration.ofSeconds(1), "The 'RSP servers' stripe button is not available.", () -> isStripeButtonAvailable(toolWindowsPane, "RSP Servers"));
-        toolWindowsPane.stripeButton("RSP Servers").click();
+        toolWindowsPane.stripeButton("RSP Servers", false).click();
 
         RspToolFixture rspToolFixture = robot.find(RspToolFixture.class);
         rspViewTree = rspToolFixture.getRspViewTree();
@@ -77,12 +79,12 @@ public class BasicTests {
     }
 
     private static void createEmptyProject(){
-        final FlatWelcomeFrame flatWelcomeFrame = robot.find(FlatWelcomeFrame.class);
-        flatWelcomeFrame.createNewProject();
-        final NewProjectDialog newProjectDialogFixture = flatWelcomeFrame.find(NewProjectDialog.class, Duration.ofSeconds(20));
-        newProjectDialogFixture.selectNewProjectType("Empty Project");
-        newProjectDialogFixture.next();
-        newProjectDialogFixture.finish();
+        robot.find(FlatWelcomeFrame.class).createNewProject();
+        final NewProjectDialogWizard newProjectDialogWizard = robot.find(NewProjectDialogWizard.class, Duration.ofSeconds(20));
+        NewProjectFirstPage newProjectFirstPage = newProjectDialogWizard.find(NewProjectFirstPage.class, Duration.ofSeconds(10));
+        newProjectFirstPage.findAll(ComponentFixture.class, byXpath("JBList", "//div[@class='JBList']")).get(0).findText("Empty Project").click();
+        newProjectDialogWizard.next();
+        newProjectDialogWizard.finish();
 
         final IdeStatusBar ideStatusBar = robot.find(IdeStatusBar.class);
         ideStatusBar.waitUntilProjectImportIsComplete();
@@ -93,7 +95,7 @@ public class BasicTests {
 
     private static boolean isStripeButtonAvailable(ToolWindowsPane toolWindowsPane, String label) {
         try {
-            toolWindowsPane.stripeButton(label);
+            toolWindowsPane.stripeButton(label, false);
         } catch (WaitForConditionTimeoutException e) {
             return false;
         }
