@@ -126,15 +126,19 @@ public class SingleRspModel {
         this.jobs = new ArrayList<>();
     }
 
+    private String internalIdForProcess(ServerProcess p) {
+        ServerHandle sh = p.getServer();
+        String id = sh.getType().getId() + ":" + sh.getId() + ":" + p.getProcessId();
+        return id;
+    }
     public PtyProcess addServerProcess(ServerProcess serverProcess) {
-        String id = serverProcess.getServer().toString() + ":" + serverProcess.getProcessId();
         RemoteServerProcess sp = new RemoteServerProcess();
-        processes.put(id, sp);
+        processes.put(internalIdForProcess(serverProcess), sp);
         return sp;
     }
 
     public void serverProcessTerminated(ServerProcess serverProcess) {
-        String id = serverProcess.getServer().toString() + ":" + serverProcess.getProcessId();
+        String id = internalIdForProcess(serverProcess);
         RemoteServerProcess sp = processes.get(id);
         if( sp != null ) {
             sp.terminate();
@@ -142,11 +146,11 @@ public class SingleRspModel {
         }
     }
 
-    public void serverProcessOutputAppended(ServerProcessOutput serverProcessOutput) {
-        String id = serverProcessOutput.getServer().toString() + ":" + serverProcessOutput.getProcessId();
-        RemoteServerProcess sp = processes.get(id);
+    public void serverProcessOutputAppended(ServerProcessOutput spo) {
+        ServerProcess mock = new ServerProcess(spo.getServer(), spo.getProcessId());
+        RemoteServerProcess sp = processes.get(internalIdForProcess(mock));
         if( sp != null ) {
-            sp.handleEvent(serverProcessOutput);
+            sp.handleEvent(spo);
         }
     }
 }
