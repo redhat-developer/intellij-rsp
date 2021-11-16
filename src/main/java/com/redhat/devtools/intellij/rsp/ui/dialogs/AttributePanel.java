@@ -10,13 +10,20 @@
  ******************************************************************************/
 package com.redhat.devtools.intellij.rsp.ui.dialogs;
 
+import com.intellij.openapi.fileChooser.FileChooser;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attribute;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Map;
 
 public class AttributePanel extends JPanel implements DocumentListener {
@@ -33,13 +40,51 @@ public class AttributePanel extends JPanel implements DocumentListener {
         JLabel name = new JLabel(key);
         name.setToolTipText(attr.getDescription());
         add(name);
-        field = oneAttribute.isSecret() ? new JPasswordField() : new JTextField();
-        if( values.get(key) != null ) {
-            field.setText(asString(oneAttribute.getType(), values.get(key)));
-        } else if( attr.getDefaultVal() != null ) {
-            field.setText(asString(oneAttribute.getType(), attr.getDefaultVal()));
+
+
+        if( oneAttribute.getType().equals(ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FILE )) {
+            field = new JTextField();
+            JButton button = new JButton("Browse...");
+            add(field);
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    Project project = ProjectManager.getInstance().getOpenProjects()[0];
+                    final FileChooserDescriptor descriptor = FileChooserDescriptorFactory.createSingleLocalFileDescriptor();
+                    final VirtualFile result = FileChooser.chooseFile(descriptor, project, null);
+                    VirtualFile vf1 = result == null ? null : result;
+                    if( vf1 != null ) {
+                        field.setText(vf1.getPath());
+                    }
+                }
+            });
+        } else if( oneAttribute.getType().equals(ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FOLDER )) {
+            field = new JTextField();
+            JButton button = new JButton("Browse...");
+            add(field);
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    Project project = ProjectManager.getInstance().getOpenProjects()[0];
+                    final FileChooserDescriptor descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor();
+                    final VirtualFile result = FileChooser.chooseFile(descriptor, project, null);
+                    VirtualFile vf1 = result == null ? null : result;
+                    if( vf1 != null ) {
+                        field.setText(vf1.getPath());
+                    }
+                }
+            });
+        } else {
+            field = oneAttribute.isSecret() ? new JPasswordField() : new JTextField();
+            if (values.get(key) != null) {
+                field.setText(asString(oneAttribute.getType(), values.get(key)));
+            } else if (attr.getDefaultVal() != null) {
+                field.setText(asString(oneAttribute.getType(), attr.getDefaultVal()));
+            }
+            add(field);
         }
-        add(field);
+
+
         field.getDocument().addDocumentListener(this);
     }
 

@@ -58,13 +58,17 @@ public class WorkflowDialog extends DialogWrapper  implements IWorkflowItemListe
     }
 
     private boolean isComplete() {
-        boolean isComplete = true;
         for( int i = 0; i < items.length; i++ ) {
-            if( items[i].getPrompt() != null && !items[i].getPrompt().getResponseType().equals(ServerManagementAPIConstants.ATTR_TYPE_NONE)) {
-                String id = items[i].getId();
-                if( attributeValues.get(id) == null )
-                    return false;
+            if( items[i].getPrompt() == null ) {
+                continue;
             }
+            String type = items[i].getPrompt().getResponseType();
+            if( type.equals(ServerManagementAPIConstants.ATTR_TYPE_NONE))
+                continue;
+            String id = items[i].getId();
+            if( attributeValues.get(id) == null )
+                return false;
+            // API does not state which fields are required or optional. Ugh
         }
         return true;
     }

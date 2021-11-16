@@ -10,7 +10,13 @@
  ******************************************************************************/
 package com.redhat.devtools.intellij.rsp.ui.dialogs;
 
+import com.intellij.openapi.fileChooser.FileChooser;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.ComboBox;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBPasswordField;
 import com.intellij.ui.components.JBScrollPane;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
@@ -32,11 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 public class WorkflowItemPanel extends JPanel implements DocumentListener, ActionListener {
-    // TODO these should be pulled from ServerManagementAPIConstants
     public static final String WORKFLOW_ITEM_STRING_PROPERTY_LINK_URL = "workflow.item.string.property.link.url";
-    public static final String WORKFLOW_ITEM_BOOLEAN_PROPERTY_LOCAL_FILE = "workflow.item.boolean.property.local.file";
-
-
 
     private static final String COMBO_TRUE = "Yes (true)";
     private static final String COMBO_FALSE = "No (false)";
@@ -158,6 +160,43 @@ public class WorkflowItemPanel extends JPanel implements DocumentListener, Actio
                     box.setMaximumSize(new Dimension(Integer.MAX_VALUE, box.getMinimumSize().height));
                     add(box);
                 }
+            } else if( details.getResponseType().equals(ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FILE)) {
+                field = new JTextField();
+                field.getDocument().addDocumentListener(this);
+                field.setColumns(30);
+                JButton button = new JButton("Browse...");
+                add(field);
+                add(button);
+                button.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        Project project = ProjectManager.getInstance().getOpenProjects()[0];
+                        final FileChooserDescriptor descriptor = FileChooserDescriptorFactory.createSingleLocalFileDescriptor();
+                        final VirtualFile result = FileChooser.chooseFile(descriptor, project, null);
+                        VirtualFile vf1 = result == null ? null : result;
+                        if( vf1 != null ) {
+                            field.setText(vf1.getPath());
+                        }
+                    }
+                });
+            } else if( details.getResponseType().equals(ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FOLDER)) {
+                field = new JTextField();
+                field.setColumns(30);
+                field.getDocument().addDocumentListener(this);
+                JButton button = new JButton("Browse...");
+                add(field);
+                button.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        Project project = ProjectManager.getInstance().getOpenProjects()[0];
+                        final FileChooserDescriptor descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor();
+                        final VirtualFile result = FileChooser.chooseFile(descriptor, project, null);
+                        VirtualFile vf1 = result == null ? null : result;
+                        if( vf1 != null ) {
+                            field.setText(vf1.getPath());
+                        }
+                    }
+                });
             }
         }
     }
