@@ -11,6 +11,8 @@
     ]]></description>
 
   <change-notes><![CDATA[
+  <p><b>0.2.2</b></p>
+  <p>Add support for file and folder browsing in some workflows</p>
   <p><b>0.1.0</b></p>
   <p>Initial release</p>
     ]]>
