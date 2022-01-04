@@ -1,0 +1,38 @@
+name: Generate plugin archive for new release
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'The projectVersion found in gradle.properties file'
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        run: ./gradlew buildPlugin
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          release_name: ${{ github.event.inputs.version }}
+      - name: Attach zip to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: '${{ github.workspace }}/build/distributions/Runtime Server Protocol Connector by Red Hat-${{ github.event.inputs.version }}.zip'
+          asset_name: 'Runtime Server Protocol Connector by Red Hat-${{ github.event.inputs.version }}.zip'
+          asset_content_type: application/zip
