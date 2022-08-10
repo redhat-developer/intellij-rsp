@@ -23,7 +23,7 @@ import static com.intellij.remoterobot.search.locators.Locators.byXpath;
 /**
  * @author olkornii@redhat.com
  */
-@DefaultXpath(by = "InternalDecorator type", xpath = "//div[@accessiblename='RSP Servers Tool Window' and @class='InternalDecorator']")
+@DefaultXpath(by = "InternalDecorator type", xpath = "//div[@accessiblename='RSP Servers Tool Window' and @class='InternalDecoratorImpl']")
 @FixtureName(name = "RSP Servers Tool Window")
 public class RspToolFixture extends CommonContainerFixture {
     public RspToolFixture(@NotNull RemoteRobot remoteRobot, @NotNull RemoteComponent remoteComponent) {
