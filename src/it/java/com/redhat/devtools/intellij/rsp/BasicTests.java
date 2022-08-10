@@ -83,9 +83,10 @@ BasicTests {
         flatWelcomeFrame.createNewProject();
         final NewProjectDialogWizard newProjectDialogWizard = flatWelcomeFrame.find(NewProjectDialogWizard.class, Duration.ofSeconds(20));
         selectNewProjectType("Empty Project");
-        newProjectDialogWizard.finish();
+//        newProjectDialogWizard.finish(); // temporary commented
+        robot.find(ComponentFixture.class, byXpath("//div[@accessiblename='Finish' and @class='JButton' and @text='Finish']"), Duration.ofSeconds(5)).click(); // temporary workaround
 
-        final IdeStatusBar ideStatusBar = robot.find(IdeStatusBar.class);
+        final IdeStatusBar ideStatusBar = robot.find(IdeStatusBar.class, Duration.ofSeconds(5));
         ideStatusBar.waitUntilProjectImportIsComplete();
         ProjectStructureDialog.cancelProjectStructureDialogIfItAppears(robot);
         closeTipDialogIfItAppears();
