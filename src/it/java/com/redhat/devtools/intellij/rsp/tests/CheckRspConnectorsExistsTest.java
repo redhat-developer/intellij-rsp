@@ -15,6 +15,7 @@ import com.intellij.remoterobot.fixtures.dataExtractor.RemoteText;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -23,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class CheckRspConnectorsExistsTest {
     public static void checkRspConnectors(ComponentFixture rspViewTree){
         List<RemoteText> treeElements = rspViewTree.findAllText();
-        assertTrue(treeElements.size() == 2);
+        assertEquals(2, treeElements.size());
 
         String firstPosition = treeElements.get(0).getText();
         assertTrue(firstPosition.contains("Community Server Connector by Red Hat"));
