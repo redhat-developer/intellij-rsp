@@ -14,6 +14,7 @@ import com.intellij.remoterobot.RemoteRobot;
 import com.intellij.remoterobot.fixtures.ComponentFixture;
 import com.intellij.remoterobot.fixtures.JPopupMenuFixture;
 import com.redhat.devtools.intellij.commonuitest.fixtures.mainidewindow.idestatusbar.IdeStatusBar;
+import com.redhat.devtools.intellij.rsp.mainIdeWindow.RightClickMenu;
 import org.assertj.swing.core.MouseButton;
 
 import java.time.Duration;
@@ -30,12 +31,12 @@ public class RunRspConnectorsTest extends AbstractRspServersTest {
         for (int i = 0; i < treeElementsCount; i++){
             int serverNumber = i;
             rspViewTree.findAllText().get(serverNumber).click(MouseButton.RIGHT_BUTTON);
-            JPopupMenuFixture contextMenu = robot.find(JPopupMenuFixture.class, JPopupMenuFixture.Companion.byType(), Duration.ofSeconds(10));
+            RightClickMenu contextMenu = robot.find(RightClickMenu.class, Duration.ofSeconds(10));
             contextMenu.select("Download / Update RSP");
             final IdeStatusBar ideStatusBar = robot.find(IdeStatusBar.class);
             ideStatusBar.waitUntilAllBgTasksFinish();
             rspViewTree.findAllText().get(serverNumber).click(MouseButton.RIGHT_BUTTON);
-            contextMenu = robot.find(JPopupMenuFixture.class, JPopupMenuFixture.Companion.byType(), Duration.ofSeconds(10));
+            contextMenu = robot.find(RightClickMenu.class, Duration.ofSeconds(10));
             contextMenu.select("Start RSP");
             waitFor(Duration.ofSeconds(15), Duration.ofSeconds(1), "Server did not started.", () -> isRspServerStarted(rspViewTree ,serverNumber));
         }

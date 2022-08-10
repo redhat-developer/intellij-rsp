@@ -6,8 +6,6 @@ plugins {
     id "jacoco"
 }
 
-downloadRobotServerPlugin.version = remoteRobotVersion
-
 repositories {
     mavenLocal()
     mavenCentral()
