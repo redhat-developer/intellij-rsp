@@ -23,6 +23,7 @@ import static com.intellij.remoterobot.search.locators.Locators.byXpath;
 import com.redhat.devtools.intellij.rsp.dialogs.ProjectStructureDialog;
 import com.redhat.devtools.intellij.rsp.mainIdeWindow.RspToolFixture;
 
+import com.redhat.devtools.intellij.rsp.mainIdeWindow.SingleHeighLabelFixture;
 import com.redhat.devtools.intellij.rsp.tests.RunRspConnectorsTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -91,6 +92,7 @@ BasicTests {
         ProjectStructureDialog.cancelProjectStructureDialogIfItAppears(robot);
         closeTipDialogIfItAppears();
         closeGotItPopup();
+        closeOpenedEditors();
         ideStatusBar.waitUntilAllBgTasksFinish();
     }
 
@@ -123,7 +125,8 @@ BasicTests {
     public static void closeTipDialogIfItAppears() {
         try {
             TipDialog tipDialog = robot.find(TipDialog.class, Duration.ofSeconds(10));
-            tipDialog.close();
+//            tipDialog.close(); // temporary commented
+            robot.find(ComponentFixture.class, byXpath("//div[@accessiblename='Close' and @class='JButton' and @text='Close']"), Duration.ofSeconds(5)).click(); // temporary workaround
         } catch (WaitForConditionTimeoutException e) {
             e.printStackTrace();
         }
@@ -134,6 +137,14 @@ BasicTests {
             robot.find(ComponentFixture.class, byXpath("JBList", "//div[@accessiblename='Got It' and @class='JButton' and @text='Got It']"), Duration.ofSeconds(10)).click();
         } catch (WaitForConditionTimeoutException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void closeOpenedEditors() {
+        List<SingleHeighLabelFixture> singleHeighLabelsList = robot.findAll(SingleHeighLabelFixture.class, byXpath("//div[@class='SingleHeightLabel']"));
+        System.out.println("Next opened editors will be closed: " + singleHeighLabelsList);
+        for (SingleHeighLabelFixture singleHeighLabel : singleHeighLabelsList) {
+            singleHeighLabel.find(ComponentFixture.class, byXpath("//div[@accessiblename='Close. Alt-Click to Close Others (Ctrl+F4)' and @class='InplaceButton']")).click();
         }
     }
 }
