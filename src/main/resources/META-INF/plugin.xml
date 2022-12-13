@@ -5,7 +5,7 @@
   <vendor email="developers@redhat.com" url="https://www.redhat.com">Red-Hat</vendor>
 
   <description><![CDATA[
-      <img src="https://raw.githubusercontent.com/redhat-developer/intellij-rsp/master/src/main/resources/images/openshift_extension.png" width="32" height="32"/>
+      <img src="https://raw.githubusercontent.com/redhat-developer/intellij-rsp/master/src/main/resources/images/rsp_ui_icon.png" width="32" height="32"/>
       <p>A plugin for interacting with an RSP Server to control various runtimes or application servers.</p>
     ]]></description>
 
