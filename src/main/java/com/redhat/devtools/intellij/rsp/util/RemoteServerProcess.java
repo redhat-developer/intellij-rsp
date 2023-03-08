@@ -10,6 +10,7 @@
  ******************************************************************************/
 package com.redhat.devtools.intellij.rsp.util;
 
+import com.intellij.execution.process.SelfKiller;
 import com.pty4j.PtyProcess;
 import com.pty4j.WinSize;
 import java.util.Objects;
@@ -25,31 +26,35 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Used to wrap output from a remote server process into something
  * usable by the terminal view.
  */
-public class RemoteServerProcess extends PtyProcess {
+public class RemoteServerProcess extends PtyProcess implements SelfKiller {
     private boolean terminated = false;
+    private boolean terminating = false;
     private OutputStream serverSysIn;
     private PipedOutputStream serverSysOutInternal;
     private PipedOutputStream serverSysErrInternal;
     private PipedInputStream serverSysOut;
     private PipedInputStream serverSysErr;
     private RSPThread writer;
-    public RemoteServerProcess() {
-        serverSysIn = new OutputStream() { @Override public void write(int b) { } };
-        serverSysOut =new PipedInputStream();
-        serverSysErr =new PipedInputStream();
+    private String name;
+
+    public RemoteServerProcess(String name) {
+        serverSysIn = new OutputStream() {
+            @Override
+            public void write(int b) {
+            }
+        };
+        serverSysOut = new PipedInputStream();
+        serverSysErr = new PipedInputStream();
         serverSysOutInternal = new PipedOutputStream();
         serverSysErrInternal = new PipedOutputStream();
         try {
             serverSysOut.connect(serverSysOutInternal);
             serverSysErr.connect(serverSysErrInternal);
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             // TODO ?
+            ioe.printStackTrace();
         }
-    }
-
-    @Override
-    public boolean isRunning() {
-        return !isTerminated();
+        this.name = name;
     }
 
     @Override
@@ -69,15 +74,16 @@ public class RemoteServerProcess extends PtyProcess {
 
     private class RSPThread extends Thread {
         private BlockingQueue<ServerProcessOutput> queue;
+
         public RSPThread() {
             super("Server Process Output Processor");
             queue = new LinkedBlockingQueue<ServerProcessOutput>();
         }
+
         public void run() {
             try {
                 while (true) {
-                    if( queue.size() == 0 && isTerminated()) {
-                        cleanup();
+                    if (queue.size() == 0 && isTerminating()) {
                         return;
                     }
                     ServerProcessOutput serverProcessOutput = queue.poll(1, TimeUnit.SECONDS);
@@ -87,16 +93,20 @@ public class RemoteServerProcess extends PtyProcess {
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+            } finally {
+                cleanup();
+                setTerminated();
             }
         }
+
         public void addElement(ServerProcessOutput out) {
-            if( out != null )
+            if (out != null)
                 queue.add(out);
         }
     }
 
     public void handleEvent(ServerProcessOutput output) {
-        if( writer == null ) {
+        if (writer == null) {
             writer = new RSPThread();
             writer.start();
         }
@@ -109,9 +119,9 @@ public class RemoteServerProcess extends PtyProcess {
                 serverSysOutInternal.write(output.getText().getBytes());
             }
             if (output.getStreamType() == ServerManagementAPIConstants.STREAM_TYPE_SYSERR) {
-                serverSysOutInternal.write(output.getText().getBytes());
+                serverSysErrInternal.write(output.getText().getBytes());
             }
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             // TODO
         }
     }
@@ -134,70 +144,92 @@ public class RemoteServerProcess extends PtyProcess {
     @Override
     public int waitFor() throws InterruptedException {
         // TODO fix this
-        while( !isTerminated()) {
+        while (!isTerminated()) {
             try {
                 Thread.sleep(1000);
-            } catch(InterruptedException ie) {
+            } catch (InterruptedException ie) {
                 throw ie;
             }
         }
         return 0;
     }
 
+
+    @Override
+    public boolean isRunning() {
+        return !isTerminated();
+    }
+
+    @Override
+    public boolean isAlive() {
+        return !isTerminated();
+    }
+
     @Override
     public int exitValue() {
-        if( isTerminated() )
+        if (isTerminated())
             return 0;
         throw new IllegalThreadStateException("Server not terminated yet");
     }
 
     @Override
     public void destroy() {
-
+        setTerminating();
+        cleanup();
+        setTerminated();
     }
 
-    public synchronized void terminate() {
-        terminated = true;
-        // necessary to delay "terminate" to allow time for output to show
-        // if no output shows when we mark terminated, the terminal closes quickly
-        new Thread("Delay Process Termination 2s") {
-            public void run() {
-                try {
-                    Thread.sleep(2000);
-                } catch(InterruptedException ie) {}
-                setTerminated();
-            }
-        }.start();
+    public synchronized void setTerminating() {
+        this.terminating = true;
+        if( this.writer == null ) {
+            cleanup();
+            setTerminated();
+        }
     }
 
     private synchronized void setTerminated() {
-        terminated = true;
+        this.terminated = true;
     }
+
     private void cleanup() {
         try {
             serverSysIn.close();
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
         }
         try {
             serverSysOut.close();
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
         }
         try {
             serverSysErr.close();
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
+        }
+        try {
+            serverSysOutInternal.flush();
+        } catch( IOException ioe) {
         }
         try {
             serverSysOutInternal.close();
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
+        }
+        try {
+            serverSysErrInternal.flush();
+        } catch( IOException ioe) {
         }
         try {
             serverSysErrInternal.close();
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
         }
-        writer.interrupt();
+        if( writer != null ) {
+            writer.interrupt();
+        }
     }
 
     private synchronized boolean isTerminated() {
-        return terminated;
+        return this.terminated;
     }
+    private synchronized boolean isTerminating() {
+        return this.terminating;
+    }
+
 }

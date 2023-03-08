@@ -132,8 +132,9 @@ public class SingleRspModel {
         return id;
     }
     public PtyProcess addServerProcess(ServerProcess serverProcess) {
-        RemoteServerProcess sp = new RemoteServerProcess();
-        processes.put(internalIdForProcess(serverProcess), sp);
+        String id = internalIdForProcess(serverProcess);
+        RemoteServerProcess sp = new RemoteServerProcess(id);
+        processes.put(id, sp);
         return sp;
     }
 
@@ -141,7 +142,7 @@ public class SingleRspModel {
         String id = internalIdForProcess(serverProcess);
         RemoteServerProcess sp = processes.get(id);
         if( sp != null ) {
-            sp.terminate();
+            sp.setTerminating();
             processes.remove(id);
         }
     }
