@@ -104,7 +104,7 @@ BasicTests {
 
     private static void openRspServersTab(){
         final ToolWindowsPane toolWindowsPane = robot.find(ToolWindowsPane.class);
-        waitFor(Duration.ofSeconds(10), Duration.ofSeconds(1), "The 'Kubernetes' stripe button is not available.", () -> isStripeButtonAvailable(toolWindowsPane, "RSP Servers"));
+        waitFor(Duration.ofSeconds(10), Duration.ofSeconds(1), "The 'RSP' stripe button is not available.", () -> isStripeButtonAvailable(toolWindowsPane, "RSP Servers"));
         toolWindowsPane.stripeButton("RSP Servers", false).click();
    }
 
