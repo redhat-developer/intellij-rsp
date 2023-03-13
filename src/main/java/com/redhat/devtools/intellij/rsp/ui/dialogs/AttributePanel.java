@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 import java.util.Map;
 
 public class AttributePanel extends JPanel implements DocumentListener {
+    private static final int TEXTFIELD_MAX_SIZE=10;
     private final Attribute attr;
     private String key;
     private Map<String, Object> values;
@@ -41,11 +42,15 @@ public class AttributePanel extends JPanel implements DocumentListener {
         name.setToolTipText(attr.getDescription());
         add(name);
 
+        Object valueObj = values.get(key);
+        String valueStr = (valueObj == null ? "" : valueObj.toString());
 
         if( oneAttribute.getType().equals(ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FILE )) {
-            field = new JTextField();
+            field = new JTextField(TEXTFIELD_MAX_SIZE/2);
+            if( valueStr != null ) field.setText(valueStr);
             JButton button = new JButton("Browse...");
             add(field);
+            add(button);
             button.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -59,9 +64,11 @@ public class AttributePanel extends JPanel implements DocumentListener {
                 }
             });
         } else if( oneAttribute.getType().equals(ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FOLDER )) {
-            field = new JTextField();
+            field = new JTextField(TEXTFIELD_MAX_SIZE/2);
+            if( valueStr != null ) field.setText(valueStr);
             JButton button = new JButton("Browse...");
             add(field);
+            add(button);
             button.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -75,7 +82,7 @@ public class AttributePanel extends JPanel implements DocumentListener {
                 }
             });
         } else {
-            field = oneAttribute.isSecret() ? new JPasswordField() : new JTextField();
+            field = oneAttribute.isSecret() ? new JPasswordField(TEXTFIELD_MAX_SIZE) : new JTextField(TEXTFIELD_MAX_SIZE);
             if (values.get(key) != null) {
                 field.setText(asString(oneAttribute.getType(), values.get(key)));
             } else if (attr.getDefaultVal() != null) {

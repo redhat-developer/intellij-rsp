@@ -19,12 +19,21 @@ import java.util.function.Supplier;
  */
 public class UIHelper {
     public static void executeInUI(Runnable runnable) {
+        executeInUISync(runnable);
+    }
+
+    public static void executeInUISync(Runnable runnable) {
         if (ApplicationManager.getApplication().isDispatchThread()) {
             runnable.run();
         } else {
             ApplicationManager.getApplication().invokeAndWait(runnable);
         }
     }
+
+    public static void executeInUIAsync(Runnable runnable) {
+        ApplicationManager.getApplication().invokeLater(runnable);
+    }
+
 
     public static <T> T executeInUI(Supplier<T> supplier) {
         if (ApplicationManager.getApplication().isDispatchThread()) {

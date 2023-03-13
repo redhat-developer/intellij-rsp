@@ -109,28 +109,9 @@ public class CreateServerAction extends AbstractTreeAction {
             values.put(DefaultServerAttributes.SERVER_HOME_FILE, bean1.getLocation());
         }
 
-        NewServerDialog td = new NewServerDialog(required2, optional2, values);
+        NewServerDialog td = new NewServerDialog(client, typeId, required2, optional2, values);
         UIHelper.executeInUI(() -> {
             td.show();
-            if( td.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
-                if( td.getName() == null || td.getName().trim().isEmpty()) {
-                    showError("Name must not be empty or missing", "Invalid Name");
-                } else {
-                    new Thread("Create Server") {
-                        public void run() {
-                            ServerAttributes csa = new ServerAttributes(typeId, td.getName(), values);
-                            try {
-                                CreateServerResponse result = client.getServerProxy().createServer(csa).get();
-                                if (!result.getStatus().isOK()) {
-                                    statusError(result.getStatus(), ERROR_CREATING_SERVER);
-                                }
-                            } catch (InterruptedException | ExecutionException e) {
-                                apiError(e, ERROR_CREATING_SERVER);
-                            }
-                        }
-                    }.start();
-                }
-            }
         });
     }
 }

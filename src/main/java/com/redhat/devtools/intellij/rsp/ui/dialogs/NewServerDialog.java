@@ -12,15 +12,27 @@ package com.redhat.devtools.intellij.rsp.ui.dialogs;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.redhat.devtools.intellij.rsp.actions.AbstractTreeAction;
+import com.redhat.devtools.intellij.rsp.client.IntelliJRspClientLauncher;
+import com.redhat.devtools.intellij.rsp.ui.util.UIHelper;
 import org.jboss.tools.rsp.api.dao.Attributes;
+import org.jboss.tools.rsp.api.dao.CreateServerResponse;
+import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.awt.event.InputMethodEvent;
+import java.awt.event.InputMethodListener;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class NewServerDialog extends DialogWrapper implements DocumentListener {
+    private static final String ERROR_CREATING_SERVER = "Error creating server";
+
+    private IntelliJRspClientLauncher client;
+    private String typeId;
     private final Attributes optional;
     private final Attributes required;
     private AttributesPanel requiredPanel;
@@ -29,9 +41,10 @@ public class NewServerDialog extends DialogWrapper implements DocumentListener {
     private JTextField nameField;
     private String name;
     private JPanel contentPane;
-
-    public NewServerDialog(Attributes required, Attributes optional, Map<String, Object> values) {
+    public NewServerDialog(IntelliJRspClientLauncher client, String typeId, Attributes required, Attributes optional, Map<String, Object> values) {
         super((Project)null, true, IdeModalityType.IDE);
+        this.client = client;
+        this.typeId = typeId;
         this.required = required;
         this.optional = optional;
         this.attributeValues = values;
@@ -49,19 +62,42 @@ public class NewServerDialog extends DialogWrapper implements DocumentListener {
     private void createLayout() {
         requiredPanel = new AttributesPanel(required, "Required Attributes", attributeValues);
         optionalPanel = new AttributesPanel(optional, "Optional Attributes", attributeValues);
-
+        getOKAction().setEnabled(false);
         contentPane = new JPanel();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+
+        JPanel nameWrapper = new JPanel();
+        contentPane.add(nameWrapper);
+        nameWrapper.setLayout(new BoxLayout(nameWrapper, BoxLayout.X_AXIS));
         JLabel name = new JLabel("Server Name: ");
-        contentPane.add(name);
+        nameWrapper.add(name);
         nameField = new JTextField();
-        contentPane.add(nameField);
+        nameWrapper.add(nameField);
+
         if( required != null && required.getAttributes().size() > 0 )
             contentPane.add(requiredPanel);
         if( optional != null && optional.getAttributes().size() > 0 )
             contentPane.add(optionalPanel);
         nameField.getDocument().addDocumentListener(this);
+        nameField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent documentEvent) {
+                String nameText = nameField.getText();
+                getOKAction().setEnabled(nameText != null && nameText.trim().length() > 0);
+            }
 
+            @Override
+            public void removeUpdate(DocumentEvent documentEvent) {
+                String nameText = nameField.getText();
+                getOKAction().setEnabled(nameText != null && nameText.trim().length() > 0);
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent documentEvent) {
+                String nameText = nameField.getText();
+                getOKAction().setEnabled(nameText != null && nameText.trim().length() > 0);
+            }
+        });
     }
 
     public String getName() {
@@ -82,4 +118,29 @@ public class NewServerDialog extends DialogWrapper implements DocumentListener {
     public void changedUpdate(DocumentEvent e) {
         name = nameField.getText();
     }
+
+    protected void doOKAction() {
+        if (getOKAction().isEnabled()) {
+            getOKAction().setEnabled(false);
+            new Thread("Create Server") {
+                public void run() {
+                    ServerAttributes csa = new ServerAttributes(typeId, getName(), attributeValues);
+                    try {
+                        CreateServerResponse result = client.getServerProxy().createServer(csa).get();
+                        if (!result.getStatus().isOK()) {
+                            UIHelper.executeInUI(() -> {
+                                getOKAction().setEnabled(true);
+                                AbstractTreeAction.statusError(result.getStatus(), ERROR_CREATING_SERVER);
+                            });
+                        } else {
+                            UIHelper.executeInUI(() -> close(OK_EXIT_CODE));
+                        }
+                    } catch (InterruptedException | ExecutionException e) {
+                        AbstractTreeAction.apiError(e, ERROR_CREATING_SERVER);
+                    }
+                }
+            }.start();
+        }
+    }
+
 }
