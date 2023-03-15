@@ -21,6 +21,7 @@ import org.jboss.tools.rsp.api.dao.Status;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import java.util.ArrayList;
 import java.util.Optional;
 
 public abstract class AbstractTreeAction extends AnAction {
@@ -40,47 +41,63 @@ public abstract class AbstractTreeAction extends AnAction {
 
     @Override
     public void update(AnActionEvent e) {
-        Object o = getSelectedElementFromEvent(e);
+        Object[] o = getSelectedElementsFromEvent(e);
         e.getPresentation().setVisible(isVisible(o));
         e.getPresentation().setEnabled(isEnabled(o));
 
     }
 
-    protected boolean isEnabled(Object o) {
+    protected boolean isEnabled(Object[] o) {
         return true;
     }
 
-    protected boolean isVisible(Object o) {
+    protected boolean isVisible(Object[] o) {
         return true;
     }
 
     @Override
     public void actionPerformed(AnActionEvent e) {
-        Object userObj = getSelectedElementFromEvent(e);
-        actionPerformed(e, getSelectedPath(getTree(e)).get(), userObj);
+        Object[] userObjs = getSelectedElementsFromEvent(e);
+        actionPerformed(e, getSelectedPaths(getTree(e)), userObjs);
     }
 
-    private Object getSelectedElementFromEvent(AnActionEvent e) {
-        Optional<TreePath> selectedPath = getSelectedPath(getTree(e));
-        if (!selectedPath.isPresent())
+
+    private Object[] getSelectedElementsFromEvent(AnActionEvent e) {
+        TreePath[] selectedPaths = getSelectedPaths(getTree(e));
+        if (selectedPaths == null)
             return null;
-        Object selected = selectedPath.get().getLastPathComponent();
-        if (!(selected instanceof DefaultMutableTreeNode)) {
-            return null;
+        ArrayList<Object> ret = new ArrayList<>();
+        for (int i = 0; i < selectedPaths.length; i++) {
+            Object selected = selectedPaths[i].getLastPathComponent();
+            if ((selected instanceof DefaultMutableTreeNode)) {
+                DefaultMutableTreeNode selected2 = (DefaultMutableTreeNode) selected;
+                Object sel = selected2.getUserObject();
+                if (!(sel instanceof RspTreeModel.Descriptor)) {
+                    ret.add(sel);
+                } else {
+                    ret.add(((RspTreeModel.Descriptor) sel).getElement());
+                }
+            }
         }
-        DefaultMutableTreeNode selected2 = (DefaultMutableTreeNode)selected;
-        Object sel = selected2.getUserObject();
-        if( !(sel instanceof RspTreeModel.Descriptor)) {
-            return sel;
-        } else {
-            return ((RspTreeModel.Descriptor)sel).getElement();
+        return ret.toArray();
+    }
+
+    protected void actionPerformed(AnActionEvent e, TreePath[] treePaths, Object[] selected) {
+        if( treePaths != null && treePaths.length > 0 && selected != null && selected.length > 0 ) {
+            singleSelectionActionPerformed(e, treePaths[0], selected[0]);
         }
     }
 
-    protected abstract void actionPerformed(AnActionEvent e, TreePath treePath, Object selected);
+    protected void singleSelectionActionPerformed(AnActionEvent e, TreePath treePaths, Object selected) {
+
+    }
 
     public Optional<TreePath> getSelectedPath(Tree tree) {
         return Optional.ofNullable(tree.getSelectionModel().getSelectionPath());
+    }
+
+    public TreePath[] getSelectedPaths(Tree tree) {
+        return tree.getSelectionModel().getSelectionPaths();
     }
 
     protected Tree getTree(AnActionEvent e) {
@@ -91,4 +108,19 @@ public abstract class AbstractTreeAction extends AnAction {
     public boolean isDumbAware() {
         return false;
     }
+
+    protected boolean safeSingleItemClass( Object[] arr, Class c) {
+        return arr != null && arr.length == 1 && c.isInstance(arr[0]);
+    }
+    protected boolean safeMultiItemClass( Object[] arr, Class c) {
+        if( arr != null ) {
+            for( int i = 0; i < arr.length; i++ ) {
+                if( !c.isInstance(arr[i])) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
 }

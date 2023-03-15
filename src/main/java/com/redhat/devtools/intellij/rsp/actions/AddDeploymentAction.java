@@ -30,17 +30,17 @@ public class AddDeploymentAction extends AbstractTreeAction {
     private static final String ERROR_ADDING = "Error adding deployment";
 
     @Override
-    protected boolean isVisible(Object o) {
-        return o instanceof RspTreeModel.ServerStateWrapper;
+    protected boolean isVisible(Object[] o) {
+        return safeSingleItemClass(o, RspTreeModel.ServerStateWrapper.class);
     }
 
     @Override
-    protected boolean isEnabled(Object o) {
-        return o instanceof RspTreeModel.ServerStateWrapper;
+    protected boolean isEnabled(Object[] o) {
+        return safeSingleItemClass(o, RspTreeModel.ServerStateWrapper.class);
     }
 
     @Override
-    protected void actionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
+    protected void singleSelectionActionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
         if( selected instanceof RspTreeModel.ServerStateWrapper) {
             RspTreeModel.ServerStateWrapper wrap = (RspTreeModel.ServerStateWrapper)selected;
             IRsp rsp = wrap.getRsp();

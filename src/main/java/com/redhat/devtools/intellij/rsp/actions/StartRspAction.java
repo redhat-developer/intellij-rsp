@@ -19,21 +19,21 @@ import javax.swing.tree.TreePath;
 
 public class StartRspAction extends AbstractTreeAction {
     @Override
-    protected boolean isVisible(Object o) {
-        return o instanceof IRsp;
+    protected boolean isVisible(Object[] o) {
+        return safeSingleItemClass(o, IRsp.class);
     }
 
     @Override
-    protected boolean isEnabled(Object o) {
-        if( o instanceof IRsp ) {
-            IRsp rsp = (IRsp)o;
+    protected boolean isEnabled(Object[] o) {
+        if( o != null && o.length > 0 && o[0] instanceof IRsp ) {
+            IRsp rsp = (IRsp)o[0];
             return rsp.getState() == IRspCore.IJServerState.STOPPED && rsp.exists();
         }
         return false;
     }
 
     @Override
-    protected void actionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
+    protected void singleSelectionActionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
         if( selected instanceof IRsp) {
             IRsp server = (IRsp)selected;
             new Thread("Start RSP Server: " + server.getRspType().getId()) {

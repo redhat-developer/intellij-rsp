@@ -23,6 +23,7 @@ import com.redhat.devtools.intellij.rsp.model.IRspCore;
 import com.redhat.devtools.intellij.rsp.model.impl.RspCore;
 import com.redhat.devtools.intellij.rsp.ui.dialogs.NewServerDialog;
 import com.redhat.devtools.intellij.rsp.model.IRsp;
+import com.redhat.devtools.intellij.rsp.ui.tree.RspTreeModel;
 import com.redhat.devtools.intellij.rsp.ui.util.UIHelper;
 import org.jboss.tools.rsp.api.DefaultServerAttributes;
 import org.jboss.tools.rsp.api.dao.*;
@@ -39,17 +40,21 @@ public class CreateServerAction extends AbstractTreeAction {
     private static final String ERROR_CREATING_SERVER = "Error creating server";
 
     @Override
-    protected boolean isVisible(Object o) {
-        return o instanceof IRsp;
+    protected boolean isVisible(Object[] o) {
+        return safeSingleItemClass(o, IRsp.class);
     }
 
     @Override
-    protected boolean isEnabled(Object o) {
-        return o instanceof IRsp && ((IRsp)o).getState() == IRspCore.IJServerState.STARTED;
+    protected boolean isEnabled(Object[] o) {
+        if( safeSingleItemClass(o, IRsp.class) ) {
+            if( ((IRsp)o[0]).getState() == IRspCore.IJServerState.STARTED) {
+                return true;
+            }
+        }
+        return false;
     }
-
     @Override
-    protected void actionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
+    protected void singleSelectionActionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
         if( selected instanceof IRsp) {
             IRsp server = (IRsp)selected;
             if( server.getState() == IRspCore.IJServerState.STARTED) {
