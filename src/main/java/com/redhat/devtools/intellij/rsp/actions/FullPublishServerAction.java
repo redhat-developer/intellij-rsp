@@ -17,7 +17,8 @@ import javax.swing.tree.TreePath;
 
 public class FullPublishServerAction extends IncrementalPublishServerAction {
     @Override
-    protected void actionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
-        actionPerformedInternal(e, treePath, selected, ServerManagementAPIConstants.PUBLISH_FULL);
+    protected void actionPerformed(AnActionEvent e, TreePath[] treePath, Object[] selected) {
+        if( treePath.length == 1 && selected.length == 1 )
+            actionPerformedInternal(e, treePath[0], selected[0], ServerManagementAPIConstants.PUBLISH_FULL);
     }
 }

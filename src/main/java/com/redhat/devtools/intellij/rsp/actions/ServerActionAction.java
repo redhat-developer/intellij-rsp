@@ -35,17 +35,17 @@ public class ServerActionAction extends AbstractTreeAction {
     private static final String ERROR_EXECUTE_ACTIONS = "Error executing server action";
 
     @Override
-    protected boolean isVisible(Object o) {
-        return o instanceof RspTreeModel.ServerStateWrapper;
+    protected boolean isVisible(Object[] o) {
+        return safeSingleItemClass(o, RspTreeModel.ServerStateWrapper.class);
     }
 
     @Override
-    protected boolean isEnabled(Object o) {
-        return o instanceof RspTreeModel.ServerStateWrapper;
+    protected boolean isEnabled(Object[] o) {
+        return safeSingleItemClass(o, RspTreeModel.ServerStateWrapper.class);
     }
 
     @Override
-    protected void actionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
+    protected void singleSelectionActionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
         if( selected instanceof RspTreeModel.ServerStateWrapper) {
             RspTreeModel.ServerStateWrapper state = (RspTreeModel.ServerStateWrapper)selected;
             Project project = ProjectManager.getInstance().getOpenProjects()[0];

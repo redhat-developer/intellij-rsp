@@ -27,18 +27,19 @@ public class IncrementalPublishServerAction extends AbstractTreeAction {
     private static final String ERROR_PUBLISHING = "Error publishing to server";
 
     @Override
-    protected boolean isVisible(Object o) {
-        return o instanceof RspTreeModel.ServerStateWrapper;
+    protected boolean isVisible(Object[] o) {
+        return safeSingleItemClass(o,RspTreeModel.ServerStateWrapper.class);
     }
 
     @Override
-    protected boolean isEnabled(Object o) {
-        return o instanceof RspTreeModel.ServerStateWrapper;
+    protected boolean isEnabled(Object[] o) {
+        return safeSingleItemClass(o,RspTreeModel.ServerStateWrapper.class);
     }
 
     @Override
-    protected void actionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
-        actionPerformedInternal(e, treePath, selected, ServerManagementAPIConstants.PUBLISH_INCREMENTAL);
+    protected void actionPerformed(AnActionEvent e, TreePath[] treePath, Object[] selected) {
+        if( treePath.length == 1 && selected.length == 1 )
+            actionPerformedInternal(e, treePath[0], selected[0], ServerManagementAPIConstants.PUBLISH_INCREMENTAL);
     }
     protected void actionPerformedInternal(AnActionEvent e, TreePath treePath, Object selected, int kind) {
         if (selected instanceof RspTreeModel.ServerStateWrapper) {

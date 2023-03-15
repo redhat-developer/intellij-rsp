@@ -27,21 +27,21 @@ public class StopServerAction extends AbstractTreeAction {
     private static final String ERROR_STOPPING_SERVER = "Error stopping server";
 
     @Override
-    protected boolean isVisible(Object o) {
-        return o instanceof RspTreeModel.ServerStateWrapper;
+    protected boolean isVisible(Object[] o) {
+        return safeSingleItemClass(o, RspTreeModel.ServerStateWrapper.class);
     }
 
     @Override
-    protected boolean isEnabled(Object o) {
-        if( o instanceof RspTreeModel.ServerStateWrapper) {
-            int state = ((RspTreeModel.ServerStateWrapper)o).getServerState().getState();
+    protected boolean isEnabled(Object[] o) {
+        if( o != null && o.length > 0 && o[0] instanceof RspTreeModel.ServerStateWrapper) {
+            int state = ((RspTreeModel.ServerStateWrapper)o[0]).getServerState().getState();
             return state == ServerManagementAPIConstants.STATE_STARTED;
         }
         return false;
     }
 
     @Override
-    protected void actionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
+    protected void singleSelectionActionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
         if (selected instanceof RspTreeModel.ServerStateWrapper) {
             RspTreeModel.ServerStateWrapper sel = (RspTreeModel.ServerStateWrapper) selected;
             Project project = ProjectManager.getInstance().getOpenProjects()[0];

@@ -27,17 +27,17 @@ public class RemoveDeploymentAction extends AbstractTreeAction {
     private static final String ERROR_REMOVING_DEPLOYMENT = "Error removing deployment";
 
     @Override
-    protected boolean isVisible(Object o) {
-        return o instanceof RspTreeModel.DeployableStateWrapper;
+    protected boolean isVisible(Object[] o) {
+        return safeSingleItemClass(o, RspTreeModel.DeployableStateWrapper.class);
     }
 
     @Override
-    protected boolean isEnabled(Object o) {
-        return o instanceof RspTreeModel.DeployableStateWrapper;
+    protected boolean isEnabled(Object[] o) {
+        return safeSingleItemClass(o, RspTreeModel.DeployableStateWrapper.class);
     }
 
     @Override
-    protected void actionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
+    protected void singleSelectionActionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
         if( selected instanceof RspTreeModel.DeployableStateWrapper) {
             RspTreeModel.DeployableStateWrapper wrap = (RspTreeModel.DeployableStateWrapper)selected;
             ServerDeployableReference sdr = getServerDeployableReference(wrap);

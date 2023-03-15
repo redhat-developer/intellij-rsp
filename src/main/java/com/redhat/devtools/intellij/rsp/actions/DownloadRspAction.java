@@ -22,7 +22,8 @@ import java.io.File;
 public class DownloadRspAction extends AbstractTreeAction {
 
     @Override
-    protected boolean isEnabled(Object o) {
+    protected boolean isEnabled(Object[] o2) {
+        Object o = (o2 != null && o2.length == 1 ? o2[0] : null);
         boolean isRSP = o instanceof IRsp;
         if( !isRSP )
             return false;
@@ -44,12 +45,12 @@ public class DownloadRspAction extends AbstractTreeAction {
 
         return false;
     }
-    protected boolean isVisible(Object o) {
-        return o instanceof IRsp;
+    protected boolean isVisible(Object[] o) {
+        return safeSingleItemClass(o, IRsp.class);
     }
 
     @Override
-    protected void actionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
+    protected void singleSelectionActionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
         if( selected instanceof IRsp) {
             IRsp server = (IRsp)selected;
             String installed = server.getInstalledVersion();

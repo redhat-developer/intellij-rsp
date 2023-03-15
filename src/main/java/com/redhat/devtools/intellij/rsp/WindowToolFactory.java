@@ -46,7 +46,7 @@ public class WindowToolFactory implements ToolWindowFactory {
             StructureTreeModel stm = buildModel(rspTreeModel, project);
             AsyncTreeModel asyncModel = new AsyncTreeModel(stm, project);
             Tree tree = new Tree(asyncModel);
-            tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+            tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
             tree.setRootVisible(false);
             core.addChangeListener((Object o) -> {
                 refresh(o, stm, rspTreeModel);

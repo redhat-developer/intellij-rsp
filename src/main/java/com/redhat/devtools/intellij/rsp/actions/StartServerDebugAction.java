@@ -43,14 +43,14 @@ public class StartServerDebugAction extends AbstractTreeAction {
     private static final String ERROR_STARTING_SERVER = "Error starting server";
 
     @Override
-    protected boolean isVisible(Object o) {
-        return o instanceof RspTreeModel.ServerStateWrapper;
+    protected boolean isVisible(Object[] o) {
+        return safeSingleItemClass(o, RspTreeModel.ServerStateWrapper.class);
     }
 
     @Override
-    protected boolean isEnabled(Object o) {
-        if( o instanceof RspTreeModel.ServerStateWrapper) {
-            int state = ((RspTreeModel.ServerStateWrapper)o).getServerState().getState();
+    protected boolean isEnabled(Object[] o) {
+        if( o != null && o.length > 0 && o[0] instanceof RspTreeModel.ServerStateWrapper) {
+            int state = ((RspTreeModel.ServerStateWrapper)o[0]).getServerState().getState();
             return state == ServerManagementAPIConstants.STATE_STOPPED || state == ServerManagementAPIConstants.STATE_UNKNOWN;
         }
         return false;
@@ -58,8 +58,7 @@ public class StartServerDebugAction extends AbstractTreeAction {
 
 
     @Override
-    protected void actionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
-
+    protected void singleSelectionActionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
         if (selected instanceof RspTreeModel.ServerStateWrapper) {
             final RspTreeModel.ServerStateWrapper sel = (RspTreeModel.ServerStateWrapper) selected;
             final Project project = ProjectManager.getInstance().getOpenProjects()[0];

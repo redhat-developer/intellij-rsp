@@ -19,17 +19,17 @@ import javax.swing.tree.TreePath;
 
 public class StopRspAction extends AbstractTreeAction {
     @Override
-    protected boolean isVisible(Object o) {
-        return o instanceof IRsp;
+    protected boolean isVisible(Object[] o) {
+        return safeSingleItemClass(o, IRsp.class);
     }
 
     @Override
-    protected boolean isEnabled(Object o) {
-        return o instanceof IRsp && ((IRsp)o).getState() != IRspCore.IJServerState.STOPPED && ((IRsp)o).exists();
+    protected boolean isEnabled(Object[] o) {
+        return safeSingleItemClass(o, IRsp.class) && ((IRsp)o[0]).getState() != IRspCore.IJServerState.STOPPED && ((IRsp)o[0]).exists();
     }
 
     @Override
-    protected void actionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
+    protected void singleSelectionActionPerformed(AnActionEvent e, TreePath treePath, Object selected) {
         if( selected instanceof IRsp) {
             IRsp server = (IRsp)selected;
             new Thread("Start RSP Server: " + server.getRspType().getId()) {
