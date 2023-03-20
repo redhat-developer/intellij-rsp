@@ -14,6 +14,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.redhat.devtools.intellij.rsp.actions.AbstractTreeAction;
 import com.redhat.devtools.intellij.rsp.client.IntelliJRspClientLauncher;
+import com.redhat.devtools.intellij.rsp.telemetry.TelemetryService;
 import com.redhat.devtools.intellij.rsp.ui.util.UIHelper;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
@@ -127,6 +128,7 @@ public class NewServerDialog extends DialogWrapper implements DocumentListener {
                     ServerAttributes csa = new ServerAttributes(typeId, getName(), attributeValues);
                     try {
                         CreateServerResponse result = client.getServerProxy().createServer(csa).get();
+                        TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_SERVER_CREATE, typeId, result.getStatus());
                         if (!result.getStatus().isOK()) {
                             UIHelper.executeInUI(() -> {
                                 getOKAction().setEnabled(true);
@@ -137,6 +139,7 @@ public class NewServerDialog extends DialogWrapper implements DocumentListener {
                         }
                     } catch (InterruptedException | ExecutionException e) {
                         AbstractTreeAction.apiError(e, ERROR_CREATING_SERVER);
+                        TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_SERVER_CREATE, typeId, e);
                     }
                 }
             }.start();

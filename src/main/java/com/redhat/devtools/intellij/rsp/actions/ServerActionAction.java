@@ -17,6 +17,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.redhat.devtools.intellij.rsp.client.IntelliJRspClientLauncher;
 import com.redhat.devtools.intellij.rsp.model.IRspCore;
 import com.redhat.devtools.intellij.rsp.model.impl.RspCore;
+import com.redhat.devtools.intellij.rsp.telemetry.TelemetryService;
 import com.redhat.devtools.intellij.rsp.ui.dialogs.SelectServerActionDialog;
 import com.redhat.devtools.intellij.rsp.ui.tree.RspTreeModel;
 import com.redhat.devtools.intellij.rsp.ui.util.UIHelper;
@@ -63,6 +64,9 @@ public class ServerActionAction extends AbstractTreeAction {
                 UIHelper.executeInUI(() -> {
                     td.show();
                     ServerActionWorkflow chosen = td.getSelected();
+                    TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_SERVER_ACTION,
+                            state.getServerState().getServer().getType().getId(), null, null,
+                            new String[]{"actionId"}, new String[]{chosen.getActionId()});
                     if( chosen != null && td.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
                         new Thread("Server Action Workflow: " + chosen.getActionLabel()) {
                             public void run() {

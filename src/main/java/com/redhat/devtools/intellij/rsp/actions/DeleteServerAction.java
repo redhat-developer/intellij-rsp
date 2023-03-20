@@ -17,6 +17,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.redhat.devtools.intellij.rsp.client.IntelliJRspClientLauncher;
 import com.redhat.devtools.intellij.rsp.model.IRsp;
 import com.redhat.devtools.intellij.rsp.model.impl.RspCore;
+import com.redhat.devtools.intellij.rsp.telemetry.TelemetryService;
 import com.redhat.devtools.intellij.rsp.ui.tree.RspTreeModel;
 import org.jboss.tools.rsp.api.dao.Status;
 
@@ -85,10 +86,13 @@ public class DeleteServerAction extends AbstractTreeAction {
                             IntelliJRspClientLauncher client = RspCore.getDefault().getClient(sel.getRsp());
                             try {
                                 Status stat = client.getServerProxy().deleteServer(sel.getServerState().getServer()).get();
+                                String serverType = sel.getServerState().getServer().getType().getId();
+                                TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_SERVER_REMOVE, serverType, stat);
                                 if( !stat.isOK()) {
                                     fails.add(stat);
                                 }
                             } catch (InterruptedException | ExecutionException ex) {
+                                TelemetryService.instance().send(TelemetryService.TELEMETRY_SERVER_REMOVE, ex);
                                 apiError(ex,  arr.size() > 1 ? ERROR_DELETING_SERVERS : ERROR_DELETING_SERVER);
                             }
                         }

@@ -13,6 +13,7 @@ package com.redhat.devtools.intellij.rsp.actions;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.redhat.devtools.intellij.rsp.telemetry.TelemetryService;
 import com.redhat.devtools.intellij.rsp.ui.tree.RspTreeModel;
 import com.redhat.devtools.intellij.rsp.client.IntelliJRspClientLauncher;
 import com.redhat.devtools.intellij.rsp.model.IRsp;
@@ -47,6 +48,8 @@ public class RestartServerAction extends AbstractTreeAction {
             RspTreeModel.ServerStateWrapper sel = (RspTreeModel.ServerStateWrapper) selected;
             Project project = ProjectManager.getInstance().getOpenProjects()[0];
             IntelliJRspClientLauncher client = RspCore.getDefault().getClient(sel.getRsp());
+            telemActionCalled(sel);
+
             new Thread("Stop Server: " + sel.getServerState().getServer().getId()) {
                 public void run() {
                     actionInternal(sel, project, client);
@@ -54,6 +57,14 @@ public class RestartServerAction extends AbstractTreeAction {
             }.start();
         }
     }
+
+    protected void telemActionCalled(RspTreeModel.ServerStateWrapper sel) {
+        String typeId = sel.getServerState().getServer().getType().getId();
+        String[] keys = new String[]{"mode"};
+        String[] vals = new String[]{"run"};
+        TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_SERVER_RESTART, typeId, null, null, keys, vals);
+    }
+
     private void actionInternal(RspTreeModel.ServerStateWrapper sel, Project project, IntelliJRspClientLauncher client) {
         IRspCoreChangeListener listener = new IRspCoreChangeListener() {
             @Override

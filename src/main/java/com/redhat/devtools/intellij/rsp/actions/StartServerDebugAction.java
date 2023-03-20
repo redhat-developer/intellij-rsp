@@ -23,16 +23,14 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.redhat.devtools.intellij.rsp.telemetry.TelemetryService;
 import com.redhat.devtools.intellij.rsp.ui.tree.RspTreeModel;
 import com.redhat.devtools.intellij.rsp.util.PortFinder;
 import com.redhat.devtools.intellij.rsp.client.IntelliJRspClientLauncher;
 import com.redhat.devtools.intellij.rsp.model.impl.RspCore;
 import com.redhat.devtools.intellij.rsp.ui.util.UIHelper;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
-import org.jboss.tools.rsp.api.dao.LaunchParameters;
-import org.jboss.tools.rsp.api.dao.ServerAttributes;
-import org.jboss.tools.rsp.api.dao.ServerHandle;
-import org.jboss.tools.rsp.api.dao.StartServerResponse;
+import org.jboss.tools.rsp.api.dao.*;
 
 import javax.swing.tree.TreePath;
 import java.util.HashMap;
@@ -79,6 +77,10 @@ public class StartServerDebugAction extends AbstractTreeAction {
         final StartServerResponse response;
         try {
             response = client.getServerProxy().startServerAsync(params).get();
+            String serverType = sel.getServerState().getServer().getType().getId();
+            Status stat = response == null ? null : response.getStatus();
+            TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_SERVER_START, stat, serverType,
+                    new String[]{"debug"}, new String[]{Boolean.toString(true)});
         } catch (InterruptedException | ExecutionException ex) {
             UIHelper.executeInUI(() -> apiError(ex, ERROR_STARTING_SERVER));
             return;

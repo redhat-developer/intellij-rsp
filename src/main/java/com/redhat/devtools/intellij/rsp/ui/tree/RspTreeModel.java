@@ -257,6 +257,24 @@ public class RspTreeModel extends AbstractTreeStructure {
         return stateString.toUpperCase();
     }
 
+    public static String getPublishTypeString(int type) {
+        String stateString = "unknown";
+        switch(type) {
+            case ServerManagementAPIConstants.PUBLISH_AUTO:
+                stateString = "auto";
+                break;
+            case ServerManagementAPIConstants.PUBLISH_FULL:
+                stateString = "full";
+                break;
+            case ServerManagementAPIConstants.PUBLISH_INCREMENTAL:
+                stateString = "incremental";
+                break;
+            case ServerManagementAPIConstants.PUBLISH_CLEAN:
+                stateString = "clean";
+                break;
+        }
+        return stateString.toUpperCase();
+    }
     public static String getPublishStateString(int state) {
         String stateString = "unknown";
         switch(state) {

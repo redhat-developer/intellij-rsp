@@ -1,6 +1,6 @@
 <idea-plugin>
   <id>com.redhat.devtools.intellij.rsp</id>
-  <name>Runtime Server Protocol Connector by Red Hat</name>
+  <name>Server Connector by Red Hat</name>
   <version>1.0</version>
   <vendor email="developers@redhat.com" url="https://www.redhat.com">Red-Hat</vendor>
 
@@ -24,7 +24,7 @@
        on how to target different products -->
   <depends>com.intellij.modules.lang</depends>
   <depends>org.jetbrains.plugins.terminal</depends>
-  <depends>com.intellij.modules.java</depends>
+  <depends>com.redhat.devtools.intellij.telemetry</depends>
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->

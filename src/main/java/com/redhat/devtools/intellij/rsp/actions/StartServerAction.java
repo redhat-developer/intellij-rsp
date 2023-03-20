@@ -13,6 +13,7 @@ package com.redhat.devtools.intellij.rsp.actions;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.redhat.devtools.intellij.rsp.telemetry.TelemetryService;
 import com.redhat.devtools.intellij.rsp.ui.tree.RspTreeModel;
 import com.redhat.devtools.intellij.rsp.client.IntelliJRspClientLauncher;
 import com.redhat.devtools.intellij.rsp.model.impl.RspCore;
@@ -20,6 +21,7 @@ import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
+import org.jboss.tools.rsp.api.dao.Status;
 
 import javax.swing.tree.TreePath;
 import java.util.HashMap;
@@ -63,10 +65,15 @@ public class StartServerAction extends AbstractTreeAction {
 
         try {
             StartServerResponse stat = client.getServerProxy().startServerAsync(params).get();
+            String serverType = sel.getServerState().getServer().getType().getId();
+            Status statObj = stat == null ? null : stat.getStatus();
+            TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_SERVER_START, statObj, serverType,
+                    new String[]{"debug"}, new String[]{Boolean.toString(false)});
             if( !stat.getStatus().isOK()) {
                 statusError(stat.getStatus(), ERROR_STARTING_SERVER);
             }
         } catch (InterruptedException | ExecutionException ex) {
+            TelemetryService.instance().send(TelemetryService.TELEMETRY_SERVER_START, ex);
             apiError(ex, ERROR_STARTING_SERVER);
         }
     }
