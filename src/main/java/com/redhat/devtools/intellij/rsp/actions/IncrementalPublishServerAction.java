@@ -15,6 +15,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.redhat.devtools.intellij.rsp.client.IntelliJRspClientLauncher;
 import com.redhat.devtools.intellij.rsp.model.impl.RspCore;
+import com.redhat.devtools.intellij.rsp.telemetry.TelemetryService;
 import com.redhat.devtools.intellij.rsp.ui.tree.RspTreeModel;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.PublishServerRequest;
@@ -51,10 +52,14 @@ public class IncrementalPublishServerAction extends AbstractTreeAction {
             IntelliJRspClientLauncher client = RspCore.getDefault().getClient(server.getRsp());
             try {
                 Status stat = client.getServerProxy().publishAsync(req).get();
+                TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_PUBLISH,
+                        server.getServerState().getServer().getType().getId(), stat, null,
+                        new String[]{"kind"}, new String[]{RspTreeModel.getPublishTypeString(kind)});
                 if( !stat.isOK()) {
                     statusError(stat, ERROR_PUBLISHING);
                 }
             } catch (InterruptedException | ExecutionException ex) {
+                TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_PUBLISH, server.getServerState().getServer().getType().getId(), ex);
                 apiError(ex, ERROR_PUBLISHING);
             }
         }

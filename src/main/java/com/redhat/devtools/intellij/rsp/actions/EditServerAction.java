@@ -11,6 +11,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.redhat.devtools.intellij.rsp.client.IntelliJRspClientLauncher;
 import com.redhat.devtools.intellij.rsp.model.impl.RspCore;
+import com.redhat.devtools.intellij.rsp.telemetry.TelemetryService;
 import com.redhat.devtools.intellij.rsp.ui.tree.RspTreeModel;
 import org.apache.commons.io.FileUtils;
 import com.redhat.devtools.intellij.rsp.editor.EditServerListener;
@@ -40,8 +41,10 @@ public class EditServerAction extends AbstractTreeAction {
             RspTreeModel.ServerStateWrapper server = (RspTreeModel.ServerStateWrapper) selected;
             Project project = ProjectManager.getInstance().getOpenProjects()[0];
             IntelliJRspClientLauncher client = RspCore.getDefault().getClient(server.getRsp());
+            String typeId = server.getServerState().getServer().getType().getId();
             try {
                 GetServerJsonResponse response = client.getServerProxy().getServerAsJson(server.getServerState().getServer()).get();
+                TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_SERVER_EDIT, typeId, response.getStatus());
                 if (response.getStatus() != null && !response.getStatus().isOK()) {
                     showError(response.getStatus().getMessage(), "Error loading server descriptor content.");
                 } else {
@@ -58,15 +61,19 @@ public class EditServerAction extends AbstractTreeAction {
                         vf.setWritable(true);
                         OpenFileDescriptor desc = new OpenFileDescriptor(project, vf, 0);
                         Editor editors = FileEditorManager.getInstance(project).openTextEditor(desc, true);
+                        // DOES THIS ACTUALLY SAVE WHEN USER SAVES?!??!?!?! TODO REALLY DO THIS?!?!
                     } catch (IOException ioException) {
                         showError(ioException.getMessage(), "Error displaying server descriptor content.");
                     }
                 }
             } catch (InterruptedException interruptedException) {
+                TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_SERVER_EDIT, typeId, interruptedException);
                 showError("Error displaying server descriptor content: " + interruptedException.getMessage(), "Error");
             } catch (ExecutionException executionException) {
+                TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_SERVER_EDIT, typeId, executionException);
                 showError("Error displaying server descriptor content: " + executionException.getMessage(), "Error");
             } catch (IOException ioe) {
+                TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_SERVER_EDIT, typeId, ioe);
                 showError("Error displaying server descriptor content: " + ioe.getMessage(), "Error");
             }
         }

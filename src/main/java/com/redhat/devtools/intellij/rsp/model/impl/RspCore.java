@@ -23,6 +23,7 @@ import com.redhat.devtools.intellij.rsp.model.IRspCore;
 import com.redhat.devtools.intellij.rsp.model.IRspCoreChangeListener;
 import com.redhat.devtools.intellij.rsp.model.IRspType;
 import com.redhat.devtools.intellij.rsp.model.ServerConnectionInfo;
+import com.redhat.devtools.intellij.rsp.telemetry.TelemetryService;
 import com.redhat.devtools.intellij.rsp.types.CommunityServerConnector;
 import com.redhat.devtools.intellij.rsp.types.RedHatServerConnector;
 import com.redhat.devtools.intellij.rsp.ui.dialogs.StringPromptDialog;
@@ -105,12 +106,13 @@ public class RspCore implements IRspCore {
                 if( srm != null ) {
                     srm.setClient(launcher);
                 }
+                telemetry().sendWithType(TelemetryService.TELEMETRY_START_RSP, server.getRspType().getId());
             } catch(IOException e ) {
-
+                telemetry().sendWithType(TelemetryService.TELEMETRY_START_RSP, server.getRspType().getId(), e);
             } catch(InterruptedException ie) {
-
+                telemetry().sendWithType(TelemetryService.TELEMETRY_START_RSP, server.getRspType().getId(), ie);
             } catch( ExecutionException ee) {
-
+                telemetry().sendWithType(TelemetryService.TELEMETRY_START_RSP, server.getRspType().getId(), ee);
             }
         }
     }
@@ -123,6 +125,12 @@ public class RspCore implements IRspCore {
     @Override
     public void stopServer(IRsp server) {
         server.stop();
+        telemetry().sendWithType(TelemetryService.TELEMETRY_STOP_RSP, server.getRspType().getId());
+
+    }
+
+    private TelemetryService telemetry() {
+        return TelemetryService.instance();
     }
 
     @Override

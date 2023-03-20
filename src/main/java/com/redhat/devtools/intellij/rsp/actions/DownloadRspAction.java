@@ -12,9 +12,11 @@ package com.redhat.devtools.intellij.rsp.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.redhat.devtools.intellij.rsp.model.IRspCore;
+import com.redhat.devtools.intellij.rsp.telemetry.TelemetryService;
 import com.redhat.devtools.intellij.rsp.util.VersionComparatorUtil;
 import com.redhat.devtools.intellij.rsp.model.IRsp;
 import com.redhat.devtools.intellij.rsp.model.impl.RspTypeImpl;
+import org.jboss.tools.rsp.api.dao.Status;
 
 import javax.swing.tree.TreePath;
 import java.io.File;
@@ -60,6 +62,8 @@ public class DownloadRspAction extends AbstractTreeAction {
                 new Thread("Updating RSP " + server.getRspType().getName()) {
                     public void run() {
                         deleteDirectory(RspTypeImpl.getServerTypeInstallLocation(server.getRspType()));
+                        TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_DOWNLOAD_RSP,
+                                server.getRspType().getId(), (Status)null, null, new String[]{"version"}, new String[]{latest});
                         server.download();
                     }
                 }.start();

@@ -1,4 +1,4 @@
-# Runtime Server Protocol Connector
+# Server Connector
 [plugin-repo]: https://plugins.jetbrains.com/plugin/16072-runtime-server-protocol-connector-by-red-hat
 [plugin-version-svg]: https://img.shields.io/jetbrains/plugin/v/16072-runtime-server-protocol-connector-by-red-hat.svg
 [plugin-downloads-svg]: https://img.shields.io/jetbrains/plugin/d/16072-runtime-server-protocol-connector-by-red-hat.svg

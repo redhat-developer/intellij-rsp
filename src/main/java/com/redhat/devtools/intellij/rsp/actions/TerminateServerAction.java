@@ -15,6 +15,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.redhat.devtools.intellij.rsp.client.IntelliJRspClientLauncher;
 import com.redhat.devtools.intellij.rsp.model.impl.RspCore;
+import com.redhat.devtools.intellij.rsp.telemetry.TelemetryService;
 import com.redhat.devtools.intellij.rsp.ui.tree.RspTreeModel;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Status;
@@ -47,12 +48,17 @@ public class TerminateServerAction extends AbstractTreeAction {
             Project project = ProjectManager.getInstance().getOpenProjects()[0];
             IntelliJRspClientLauncher client = RspCore.getDefault().getClient(sel.getRsp());
             StopServerAttributes ssa = new StopServerAttributes(sel.getServerState().getServer().getId(), true);
+            String serverType = sel.getServerState().getServer().getType().getId();
             try {
                 Status stat = client.getServerProxy().stopServerAsync(ssa).get();
+                TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_SERVER_STOP, serverType, stat, null,
+                        new String[]{"force"}, new String[]{Boolean.toString(true)});
                 if( !stat.isOK()) {
                     statusError(stat, ERROR_TERMINATE_SERVER);
                 }
             } catch (InterruptedException | ExecutionException ex) {
+                TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_SERVER_STOP, serverType, null, ex,
+                        new String[]{"force"}, new String[]{Boolean.toString(true)});
                 apiError(ex, ERROR_TERMINATE_SERVER);
             }
         }

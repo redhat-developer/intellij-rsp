@@ -11,6 +11,7 @@
 package com.redhat.devtools.intellij.rsp.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.redhat.devtools.intellij.rsp.telemetry.TelemetryService;
 import com.redhat.devtools.intellij.rsp.ui.tree.RspTreeModel;
 import com.redhat.devtools.intellij.rsp.model.IRsp;
 import com.redhat.devtools.intellij.rsp.model.impl.RspCore;
@@ -54,10 +55,12 @@ public class RemoveDeploymentAction extends AbstractTreeAction {
     protected void actionPerformedThread(RSPServer rspServer, ServerDeployableReference sdr) {
         try {
             Status stat = rspServer.removeDeployable(sdr).get();
+            TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_DEPLOYMENT_REMOVE, sdr.getServer().getType().getId(), stat);
             if( stat == null || !stat.isOK()) {
                 statusError(stat, ERROR_REMOVING_DEPLOYMENT);
             }
         } catch (InterruptedException | ExecutionException ex) {
+            TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_DEPLOYMENT_REMOVE, sdr.getServer().getType().getId(), ex);
             apiError(ex, ERROR_REMOVING_DEPLOYMENT);
         }
     }

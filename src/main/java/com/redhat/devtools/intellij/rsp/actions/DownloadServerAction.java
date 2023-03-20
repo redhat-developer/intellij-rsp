@@ -18,6 +18,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.redhat.devtools.intellij.rsp.client.IntelliJRspClientLauncher;
 import com.redhat.devtools.intellij.rsp.model.IRspCore;
 import com.redhat.devtools.intellij.rsp.model.impl.RspCore;
+import com.redhat.devtools.intellij.rsp.telemetry.TelemetryService;
 import com.redhat.devtools.intellij.rsp.ui.dialogs.SelectDownloadRuntimeDialog;
 import com.redhat.devtools.intellij.rsp.ui.util.WorkflowUiUtility;
 import com.redhat.devtools.intellij.rsp.model.IRsp;
@@ -59,6 +60,7 @@ public class DownloadServerAction extends AbstractTreeAction {
                     if (chosen != null && td.getExitCode() == DialogWrapper.OK_EXIT_CODE) {
                         new Thread("Download Runtime Workflow: " + server.getRspType().getName()) {
                             public void run() {
+                                TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_DOWNLOAD_RUNTIME, chosen.getId());
                                 initiateDownloadRuntimeWorkflow(server, client, chosen);
                             }
                         }.start();

@@ -13,6 +13,7 @@ package com.redhat.devtools.intellij.rsp.actions;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.redhat.devtools.intellij.rsp.model.impl.RspCore;
+import com.redhat.devtools.intellij.rsp.telemetry.TelemetryService;
 import com.redhat.devtools.intellij.rsp.ui.dialogs.AddDeploymentDialog;
 import com.redhat.devtools.intellij.rsp.ui.tree.RspTreeModel;
 import com.redhat.devtools.intellij.rsp.ui.util.UIHelper;
@@ -59,6 +60,7 @@ public class AddDeploymentAction extends AbstractTreeAction {
         try {
             options = rspServer.listDeploymentOptions(sh).get();
         } catch (InterruptedException | ExecutionException interruptedException) {
+            TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_DEPLOYMENT_ADD, sh.getType().getId(), interruptedException);
             apiError(interruptedException, ERROR_LISTING);
             return;
         }
@@ -84,12 +86,15 @@ public class AddDeploymentAction extends AbstractTreeAction {
                     public void run() {
                         try {
                             Status stat = rspServer.addDeployable(asReference(sh, label, path, opts)).get();
+                            TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_DEPLOYMENT_ADD, sh.getType().getId(), stat);
                             if( !stat.isOK()) {
                                 statusError(stat, ERROR_ADDING);
                             }
                         } catch (InterruptedException e) {
+                            TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_DEPLOYMENT_ADD, sh.getType().getId(), e);
                             apiError(e, ERROR_ADDING);
                         } catch (ExecutionException e) {
+                            TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_DEPLOYMENT_ADD, sh.getType().getId(), e);
                             apiError(e, ERROR_ADDING);
                         }
                     }
