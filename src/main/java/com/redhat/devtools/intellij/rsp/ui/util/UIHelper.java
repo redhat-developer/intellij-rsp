@@ -11,7 +11,9 @@
 package com.redhat.devtools.intellij.rsp.ui.util;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 
+import java.awt.*;
 import java.util.function.Supplier;
 
 /**
@@ -30,8 +32,11 @@ public class UIHelper {
         }
     }
 
-    public static void executeInUIAsync(Runnable runnable) {
-        ApplicationManager.getApplication().invokeLater(runnable);
+    public static void executeInUIAsync(Runnable runnable, ModalityState modality) {
+        ApplicationManager.getApplication().invokeLater(runnable, modality);
+    }
+    public static void executeInUIAsync(Runnable runnable, Component componentForModality) {
+        ApplicationManager.getApplication().invokeLater(runnable, ModalityState.stateForComponent(componentForModality));
     }
 
 

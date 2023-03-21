@@ -10,6 +10,8 @@
  ******************************************************************************/
 package com.redhat.devtools.intellij.rsp.ui.dialogs;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.redhat.devtools.intellij.rsp.actions.AbstractTreeAction;
@@ -40,7 +42,7 @@ public class NewServerDialog extends DialogWrapper implements DocumentListener {
     private AttributesPanel optionalPanel;
     private Map<String, Object> attributeValues;
     private JTextField nameField;
-    private String name;
+    private String fName;
     private JPanel contentPane;
     public NewServerDialog(IntelliJRspClientLauncher client, String typeId, Attributes required, Attributes optional, Map<String, Object> values) {
         super((Project)null, true, IdeModalityType.IDE);
@@ -102,22 +104,22 @@ public class NewServerDialog extends DialogWrapper implements DocumentListener {
     }
 
     public String getName() {
-        return name;
+        return fName;
     }
 
     @Override
     public void insertUpdate(DocumentEvent e) {
-        name = nameField.getText();
+        fName = nameField.getText();
     }
 
     @Override
     public void removeUpdate(DocumentEvent e) {
-        name = nameField.getText();
+        fName = nameField.getText();
     }
 
     @Override
     public void changedUpdate(DocumentEvent e) {
-        name = nameField.getText();
+        fName = nameField.getText();
     }
 
     protected void doOKAction() {
@@ -125,17 +127,17 @@ public class NewServerDialog extends DialogWrapper implements DocumentListener {
             getOKAction().setEnabled(false);
             new Thread("Create Server") {
                 public void run() {
-                    ServerAttributes csa = new ServerAttributes(typeId, getName(), attributeValues);
+                    ServerAttributes csa = new ServerAttributes(typeId, fName, attributeValues);
                     try {
                         CreateServerResponse result = client.getServerProxy().createServer(csa).get();
                         TelemetryService.instance().sendWithType(TelemetryService.TELEMETRY_SERVER_CREATE, typeId, result.getStatus());
                         if (!result.getStatus().isOK()) {
-                            UIHelper.executeInUI(() -> {
+                            UIHelper.executeInUIAsync(() -> {
                                 getOKAction().setEnabled(true);
                                 AbstractTreeAction.statusError(result.getStatus(), ERROR_CREATING_SERVER);
-                            });
+                            }, contentPane);
                         } else {
-                            UIHelper.executeInUI(() -> close(OK_EXIT_CODE));
+                            UIHelper.executeInUIAsync(() -> close(OK_EXIT_CODE), contentPane);
                         }
                     } catch (InterruptedException | ExecutionException e) {
                         AbstractTreeAction.apiError(e, ERROR_CREATING_SERVER);
