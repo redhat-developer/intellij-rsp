@@ -100,6 +100,11 @@ public class StartServerDebugAction extends AbstractTreeAction {
             return;
 
         PortFinder.waitForServer(host, Integer.parseInt(port), 5000);
+        try {
+            Thread.sleep(5000);
+        } catch( Exception e ) {
+
+        }
 
         if(DEBUG_DETAILS_TYPE_JAVA.equals(type)) {
             String configurationName = handle.getId() + " Remote Debug";
@@ -116,6 +121,7 @@ public class StartServerDebugAction extends AbstractTreeAction {
                                                 DefaultDebugExecutor.getDebugExecutorInstance().getId(),
                                                 runSettings)).execute(env);
                             } catch (com.intellij.execution.ExecutionException e) {
+                                e.printStackTrace();
                             }
                         }
                     });
@@ -123,11 +129,12 @@ public class StartServerDebugAction extends AbstractTreeAction {
     }
 
     private static ExecutionEnvironment getEnvironment(RunnerAndConfigurationSettings runSettings) {
+        System.out.println("****\n****\n**** runSettings has value " + runSettings);
         try {
             return ExecutionEnvironmentBuilder.create(
                     DefaultDebugExecutor.getDebugExecutorInstance(), runSettings).build();
         } catch (com.intellij.execution.ExecutionException e) {
-
+            e.printStackTrace();
         }
         return null;
     }
@@ -138,9 +145,26 @@ public class StartServerDebugAction extends AbstractTreeAction {
 
 
     private static RunnerAndConfigurationSettings getSettings(String host, String port, String configurationName) {
-        ConfigurationType type = RemoteConfigurationType.getInstance();
+        System.out.println("****\n****\n**** begin getSettings");
+
+        try {
+            RunnerAndConfigurationSettings ret = getSettings2(host, port, configurationName);
+            System.out.println("****\n****\n**** end getSettings");
+            return ret;
+        } catch (Throwable t) {
+            System.out.println("****\n****\n**** end getSettings with error");
+
+            t.printStackTrace();
+            return null;
+        }
+    }
+    private static RunnerAndConfigurationSettings getSettings2(String host, String port, String configurationName) {
         final Project project = ProjectManager.getInstance().getOpenProjects()[0];
         RunManager runManager = RunManager.getInstance(project);
+        RunnerAndConfigurationSettings runSettings1s = runManager.findConfigurationByTypeAndName(
+                "Remote", configurationName);
+
+        ConfigurationType type = RemoteConfigurationType.getInstance();
         RunnerAndConfigurationSettings runSettings = runManager.findConfigurationByTypeAndName(
                 type.getId(), configurationName);
         if( runSettings == null ) {
