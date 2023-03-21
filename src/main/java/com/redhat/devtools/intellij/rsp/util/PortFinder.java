@@ -47,8 +47,15 @@ public class PortFinder {
                 } catch (IOException ioe) {
                     // ignore
                 }
+                return;
             } catch (IOException e) {
                 // ignore
+            }
+            try {
+                Thread.sleep(200);
+            } catch(InterruptedException ie) {
+                Thread.interrupted();
+                return;
             }
         }
     }

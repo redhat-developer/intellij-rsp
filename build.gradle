@@ -92,8 +92,8 @@ test {
 
 intellij {
     version = ideaVersion //for a full list of Jetbrains IDEA releases please see https://www.jetbrains.com/intellij-repository/releases
-    pluginName = 'Runtime Server Protocol by Red Hat'
-    plugins = ['java', 'terminal', 'com.redhat.devtools.intellij.telemetry:0.0.3.33' ]
+    pluginName = 'Server Connector by Red Hat'
+    plugins = ['com.intellij.java', 'terminal', 'com.redhat.devtools.intellij.telemetry:0.0.3.33' ]
     updateSinceUntilBuild = false
 }
 
