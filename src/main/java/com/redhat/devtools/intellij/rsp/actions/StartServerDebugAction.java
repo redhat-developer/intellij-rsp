@@ -100,12 +100,6 @@ public class StartServerDebugAction extends AbstractTreeAction {
             return;
 
         PortFinder.waitForServer(host, Integer.parseInt(port), 5000);
-        try {
-            Thread.sleep(5000);
-        } catch( Exception e ) {
-
-        }
-
         if(DEBUG_DETAILS_TYPE_JAVA.equals(type)) {
             String configurationName = handle.getId() + " Remote Debug";
             RunnerAndConfigurationSettings runSettings = getSettings(host, port, configurationName);
@@ -129,7 +123,6 @@ public class StartServerDebugAction extends AbstractTreeAction {
     }
 
     private static ExecutionEnvironment getEnvironment(RunnerAndConfigurationSettings runSettings) {
-        System.out.println("****\n****\n**** runSettings has value " + runSettings);
         try {
             return ExecutionEnvironmentBuilder.create(
                     DefaultDebugExecutor.getDebugExecutorInstance(), runSettings).build();
@@ -145,15 +138,10 @@ public class StartServerDebugAction extends AbstractTreeAction {
 
 
     private static RunnerAndConfigurationSettings getSettings(String host, String port, String configurationName) {
-        System.out.println("****\n****\n**** begin getSettings");
-
         try {
             RunnerAndConfigurationSettings ret = getSettings2(host, port, configurationName);
-            System.out.println("****\n****\n**** end getSettings");
             return ret;
         } catch (Throwable t) {
-            System.out.println("****\n****\n**** end getSettings with error");
-
             t.printStackTrace();
             return null;
         }
