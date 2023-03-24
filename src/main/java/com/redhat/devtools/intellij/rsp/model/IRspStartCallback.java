@@ -15,4 +15,5 @@ package com.redhat.devtools.intellij.rsp.model;
  */
 public interface IRspStartCallback {
     public void updateRspState(IRspCore.IJServerState state);
+    public void updateRspState(IRspCore.IJServerState state, boolean launched);
 }

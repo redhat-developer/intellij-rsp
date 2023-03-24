@@ -65,7 +65,7 @@ public class ReferenceRspControllerImpl implements IRspStateController {
 
         String portInUse = getLockedWorkspacePort();
         if( portInUse != null) {
-            callback.updateRspState(IRspCore.IJServerState.STARTED);
+            callback.updateRspState(IRspCore.IJServerState.STARTED, false);
             return new ServerConnectionInfo("localhost", Integer.parseInt(portInUse));
         }
         PtyProcess p = startRSP(rspHome, port, java, callback);
@@ -84,7 +84,7 @@ public class ReferenceRspControllerImpl implements IRspStateController {
 
             boolean started = waitForPortInUse(port);
             if (started) {
-                callback.updateRspState(IRspCore.IJServerState.STARTED);
+                callback.updateRspState(IRspCore.IJServerState.STARTED, true);
                 return new ServerConnectionInfo("localhost", port);
             } else {
                 terminate(callback);
