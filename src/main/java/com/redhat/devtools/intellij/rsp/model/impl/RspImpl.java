@@ -38,6 +38,7 @@ public class RspImpl implements IRsp, IRspStartCallback {
     private String latestVersion;
     private String downloadUrl;
     private IRspCore.IJServerState currentState;
+    private boolean launched;
 
     public RspImpl(IRspCore model, IRspType type,
                    String latestVersion, String downloadUrl,
@@ -120,6 +121,11 @@ public class RspImpl implements IRsp, IRspStartCallback {
     }
 
     @Override
+    public boolean wasLaunched() {
+        return this.launched;
+    }
+
+    @Override
     public boolean exists() {
         File f = new File(this.type.getServerHome());
         boolean b = f.exists();
@@ -177,9 +183,14 @@ public class RspImpl implements IRsp, IRspStartCallback {
     }
 
 
-    @Override
     public void updateRspState(IRspCore.IJServerState state) {
         this.currentState = state;
+        model.stateUpdated(this);
+    }
+    @Override
+    public void updateRspState(IRspCore.IJServerState state, boolean launched) {
+        this.currentState = state;
+        this.launched = launched;
         model.stateUpdated(this);
     }
 }

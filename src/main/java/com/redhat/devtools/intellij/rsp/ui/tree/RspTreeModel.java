@@ -17,6 +17,7 @@ import com.intellij.ide.util.treeView.NodeDescriptor;
 import com.intellij.ide.util.treeView.PresentableNodeDescriptor;
 import com.intellij.openapi.util.IconLoader;
 import com.redhat.devtools.intellij.rsp.model.IRsp;
+import com.redhat.devtools.intellij.rsp.model.IRspCore;
 import com.redhat.devtools.intellij.rsp.model.impl.RspCore;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.DeployableState;
@@ -231,6 +232,10 @@ public class RspTreeModel extends AbstractTreeStructure {
     }
 
     public static String getRspState(IRsp rsp) {
+        IRspCore.IJServerState state = rsp.getState();
+        if( state == IRspCore.IJServerState.STARTED && !rsp.wasLaunched()) {
+            return "Connected";
+        }
         return rsp.getState().toString().toUpperCase();
     }
 

@@ -58,7 +58,13 @@ public interface IRsp {
      * Get the current state of the rsp
      * @return
      */
-    IRspCore.IJServerState getState();
+    public IRspCore.IJServerState getState();
+
+    /**
+     * Return whether the rsp process was launched from this extension
+     * @return
+     */
+    public boolean wasLaunched();
 
     /**
      * Return whether the RSP exists at the expected location or not
