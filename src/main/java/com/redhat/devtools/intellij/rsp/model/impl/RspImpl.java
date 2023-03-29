@@ -141,6 +141,7 @@ public class RspImpl implements IRsp, IRspStartCallback {
 
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
+                    indicator.setIndeterminate(false);
                     File toDl = getRspDownloadLocation();
                     toDl.getParentFile().mkdirs();
                     File toExtract = new File(serverHome);
