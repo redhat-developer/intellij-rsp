@@ -6,7 +6,6 @@ if [ $apiStatus -ne 0 ]; then
 fi
 
 oldver=`cat gradle.properties  | grep "projectVersion=" | cut -f 2 -d "="`
-oldver="0.3.0-SNAPSHOT"
 charLen=`echo $oldver | grep -i snapshot | wc -c`
 if [[ $charLen -eq "0" ]]
    then
@@ -28,7 +27,19 @@ printf "$changelogString" >> tmpPluginXml
 cat src/main/resources/META-INF/plugin.xml  | tail -n +12 >> tmpPluginXml
 mv tmpPluginXml src/main/resources/META-INF/plugin.xml
 
+git commit -a -m "Upversion to $finalVer for release" --signoff
+git push origin master
+git tag v$finalVer
+git push origin v$finalVer
 
+
+newLastSegment=`echo $finalVer | cut -f 3 -d "." | awk '{ print $0 + 1;}' | bc`
+newverPrefix=`echo $finalVer | cut -f 1,2 -d "."`
+newver=$newverPrefix.$newLastSegment-SNAPSHOT
+cat gradle.properties | sed "s/$finalVer/$newver/g" > gradle.properties2; 
+mv gradle.properties2 gradle.properties
+git commit -a -m "Move to $newver" --signoff
+git push origin master
 
 
 
