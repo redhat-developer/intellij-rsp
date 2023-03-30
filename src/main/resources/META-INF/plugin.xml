@@ -9,6 +9,20 @@
     ]]></description>
 
   <change-notes><![CDATA[
+  <h3>0.5.0</h3>
+  <ul>
+      <li>Fixes <a href="https://github.com/redhat-developer/intellij-rsp/issues/147">#147</a> - progress monitor issue</li>
+      <li>Fixes <a href="https://github.com/redhat-developer/intellij-rsp/issues/145">#145</a> - connected vs started rsp state</li>
+      <li>Fixes <a href="https://github.com/redhat-developer/intellij-rsp/issues/142">#142</a> - remote debug of wildfly does not work</li>
+      <li>Fixes <a href="https://github.com/redhat-developer/intellij-rsp/issues/141">#141</a> - new server wizard modality issue</li>
+      <li>Fixes <a href="https://github.com/redhat-developer/intellij-rsp/issues/139">#139</a> - Adding telemetry</li>
+      <li>Fixes <a href="https://github.com/redhat-developer/intellij-rsp/issues/112">#112</a> - delete several servers at once</li>
+      <li>Fixes <a href="https://github.com/redhat-developer/intellij-rsp/issues/136">#136</a> - New server from local folder does not fill in server-home</li>
+      <li>Fixes <a href="https://github.com/redhat-developer/intellij-rsp/issues/128">#128</a> <a href="https://github.com/redhat-developer/intellij-rsp/issues/123">#123</a> - add newer IJ validation</li>
+      <li>Fixes <a href="https://github.com/redhat-developer/intellij-rsp/issues/130">#130</a> - tomcat shutdown process never recognized as terminated in UI</li>
+      <li>Fixes <a href="https://github.com/redhat-developer/intellij-rsp/issues/126">#126</a> - intellij-rsp rsp icon</li>
+      <li>Fixes <a href="https://github.com/redhat-developer/intellij-rsp/issues/127">#127</a> - remove word overview</li>
+</ul>
   <p><b>0.2.3</b></p>
   <p>Add support for file and folder browsing in some workflows</p>
   <p><b>0.1.0</b></p>
