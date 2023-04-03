@@ -115,7 +115,8 @@ read -p "Press enter to continue"
 
 assetUrl=`cat createReleaseResponse.json | grep assets_url | cut -c 1-17 --complement | rev | cut -c3- | rev | sed 's/api.github.com/uploads.github.com/g'`
 rm createReleaseResponse.json
-zipFileName=`ls -t build/distributions/*.zip | head -n 1`
+zipFileName=`ls -t -1 build/distributions/ | grep ".zip$" | head -n 1`
+zipFileNameSafe=`echo $zipFileName | sed 's/ /_/g'`
 zipLoc=build/distributions/$zipFileName
 echo "Running command to add artifact to release: "
 	echo curl -L \
@@ -124,7 +125,7 @@ echo "Running command to add artifact to release: "
 	  -H "Authorization: Bearer $ghtoken"\
 	  -H "X-GitHub-Api-Version: 2022-11-28" \
 	  -H "Content-Type: application/octet-stream" \
-	  "$assetUrl?name=$zipFileName" \
+	  "$assetUrl?name=$zipFileNameSafe" \
 	  --data-binary "@$zipLoc"
 if [ "$debug" -eq 0 ]; then
 	curl -L \
@@ -133,8 +134,8 @@ if [ "$debug" -eq 0 ]; then
 	  -H "Authorization: Bearer $ghtoken"\
 	  -H "X-GitHub-Api-Version: 2022-11-28" \
 	  -H "Content-Type: application/octet-stream" \
-	  "$assetUrl?name=$zipFileName" \
-	  --data-binary "@$zipFileName"
+	  "$assetUrl?name=$zipFileNameSafe" \
+	  --data-binary "@$zipLoc"
 fi
 echo ""
 echo "Please go verify the release looks correct and the distribution was added correctly."
