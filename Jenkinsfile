@@ -47,9 +47,10 @@ node('rhel7'){
             if (!isSnapshot) {
                 stage("Promote the build to stable") {
                     def zip = findFiles(glob: '**/*.zip')
-                    sh "rsync -Pzrlt --rsh=ssh --protocol=28 \"${zip[0].path}\" ${UPLOAD_LOCATION}/stable/intellij-rsp/"
+                    sh "sftp -C ${UPLOAD_LOCATION}/intellij/stable/intellij-rsp/ <<< \$'put -p ${zip[0].path}'"
                 }
             }
         }
     }
 }
+
