@@ -57,6 +57,15 @@ else
 	echo git push origin $curBranch
 fi
 
+
+echo "Need to run a build"
+read -p "Press enter to continue"
+
+./gradlew buildPlugin
+echo "Did it succeed?"
+read -p "Press enter to continue"
+
+
 echo ""
 echo "Tagging and pushing to origin"
 git tag v$finalVer
