@@ -37,7 +37,8 @@ echo "$commitMsgs"
 read -p "Press enter to continue"
 
 
-finalVer=`echo $oldver | sed 's/-SNAPSHOT//g'`
+cleanVer=`echo $oldver | sed 's/-SNAPSHOT//g'`
+finalVer=$cleanVer.Final
 cat gradle.properties | sed "s/$oldver/$finalVer/g" > gradle.properties2; 
 mv gradle.properties2 gradle.properties
 
