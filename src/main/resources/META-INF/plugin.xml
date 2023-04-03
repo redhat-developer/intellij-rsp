@@ -9,6 +9,10 @@
     ]]></description>
 
   <change-notes><![CDATA[
+  <h3>0.5.1.Final</h3>
+  <ul>
+
+</ul>
   <h3>0.5.0</h3>
   <ul>
       <li>Fixes <a href="https://github.com/redhat-developer/intellij-rsp/issues/147">#147</a> - progress monitor issue</li>
