@@ -25,8 +25,8 @@ node('rhel7'){
 	if(params.UPLOAD_LOCATION) {
 		stage('Upload') {
 			def filesToPush = findFiles(glob: '**/*.zip')
-			sh "rsync -Pzrlt --rsh=ssh --protocol=28 \"${filesToPush[0].path}\" ${UPLOAD_LOCATION}/snapshots/intellij-rsp/"
-            stash name:'zip', includes:filesToPush[0].path
+			sh "sftp -C ${UPLOAD_LOCATION}/intellij/stable/intellij-rsp/ <<< \$'put -p ${filesToPush[0].path}'"
+			stash name:'zip', includes:filesToPush[0].path
 		}
     }
 
