@@ -88,10 +88,9 @@ echo "Time to do github release"
 read -p "Press enter to continue"
 
 
-oldVerFinal=$oldver.Final
-echo "Making a release on github for $oldVerFinal"
+echo "Making a release on github for $finalVer"
 commitMsgsClean=`git log --color --pretty=format:'%s' --abbrev-commit | head -n $commits | awk '{ print " * " $0;}' | awk '{printf "%s\\\\n", $0}' | sed 's/"/\\"/g'`
-createReleasePayload="{\"tag_name\":\"v$finalVer\",\"target_commitish\":\"$curBranch\",\"name\":\"$oldVerFinal\",\"body\":\"Release of $finalVer:\n\n"$commitMsgsClean"\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false}"
+createReleasePayload="{\"tag_name\":\"v$finalVer\",\"target_commitish\":\"$curBranch\",\"name\":\"$finalVer\",\"body\":\"Release of $finalVer:\n\n"$commitMsgsClean"\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false}"
 
 if [ "$debug" -eq 0 ]; then
 	curl -L \
