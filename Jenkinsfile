@@ -25,7 +25,7 @@ node('rhel7'){
 	if(params.UPLOAD_LOCATION) {
 		stage('Upload') {
 			def filesToPush = findFiles(glob: '**/*.zip')
-			sh "sftp -C ${UPLOAD_LOCATION}/snapshots/intellij-rsp/ <<< \$'put -p ${filesToPush[0].path}'"
+			sh "sftp -C ${UPLOAD_LOCATION}/snapshots/intellij-rsp/ <<< \$'put -p \"${filesToPush[0].path}\"'"
 			stash name:'zip', includes:filesToPush[0].path
 		}
     }
@@ -47,7 +47,7 @@ node('rhel7'){
             if (!isSnapshot) {
                 stage("Promote the build to stable") {
                     def zip = findFiles(glob: '**/*.zip')
-                    sh "sftp -C ${UPLOAD_LOCATION}/stable/intellij-rsp/ <<< \$'put -p ${zip[0].path}'"
+                    sh "sftp -C ${UPLOAD_LOCATION}/stable/intellij-rsp/ <<< \$'put -p \"${zip[0].path}\"'"
                 }
             }
         }
