@@ -5,15 +5,12 @@
 
   <description><![CDATA[
       <img src="https://raw.githubusercontent.com/redhat-developer/intellij-rsp/master/src/main/resources/images/rsp_ui_icon.png" width="32" height="32"/>
-      <p>A plugin for interacting with various RSP Servers to control various runtimes or application servers.</p>
+      <p>A plugin for interacting with various RSP Servers to control runtimes or application servers.</p>
     ]]></description>
 
   <change-notes><![CDATA[
-  <h3>0.5.1.Final</h3>
-  <ul>
-
-</ul>
-  <h3>0.5.0</h3>
+  <h3>0.7.0</h3>
+  <p>Version 0.7.0 introduces full feature parity with the suite of RSP extensions in VS-Code.</p>
   <ul>
       <li>Fixes <a href="https://github.com/redhat-developer/intellij-rsp/issues/147">#147</a> - progress monitor issue</li>
       <li>Fixes <a href="https://github.com/redhat-developer/intellij-rsp/issues/145">#145</a> - connected vs started rsp state</li>
@@ -30,7 +27,7 @@
   <p><b>0.2.3</b></p>
   <p>Add support for file and folder browsing in some workflows</p>
   <p><b>0.1.0</b></p>
-  <p>Initial release</p>
+  <p>Initial Implementation</p>
     ]]>
   </change-notes>
 
