@@ -55,7 +55,7 @@ BasicTests {
 
     @BeforeAll
     public static void connect() {
-        robot = UITestRunner.runIde(IntelliJVersion.COMMUNITY_V_2021_3, 8580);
+        robot = UITestRunner.runIde(IntelliJVersion.COMMUNITY_V_2022_2, 8580);
         createEmptyProject();
         openRspServersTab();
 
