@@ -72,8 +72,8 @@ configurations {
         exclude group: 'org.slf4j', module: 'slf4j-api'
     }
     compileOptions {
-        sourceCompatibility = 11
-        targetCompatibility = 11
+        sourceCompatibility = 17
+        targetCompatibility = 17
     }
 
     integrationTestImplementation.extendsFrom testImplementation

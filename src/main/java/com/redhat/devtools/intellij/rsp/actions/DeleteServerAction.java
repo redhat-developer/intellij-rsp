@@ -21,7 +21,6 @@ import com.redhat.devtools.intellij.rsp.telemetry.TelemetryService;
 import com.redhat.devtools.intellij.rsp.ui.tree.RspTreeModel;
 import org.jboss.tools.rsp.api.dao.Status;
 
-import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.tree.TreePath;
 import java.awt.*;
@@ -54,7 +53,6 @@ public class DeleteServerAction extends AbstractTreeAction {
             setTitle(plural ? "Delete Servers?" : "Delete Server?");
         }
 
-        @Nullable
         @Override
         protected JComponent createCenterPanel() {
             JPanel dialogPanel = new JPanel(new BorderLayout());
