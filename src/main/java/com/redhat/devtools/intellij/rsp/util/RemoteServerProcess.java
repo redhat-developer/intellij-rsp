@@ -67,7 +67,6 @@ public class RemoteServerProcess extends PtyProcess implements SelfKiller {
         return null;
     }
 
-    @Override
     public int getPid() {
         return 0;
     }

@@ -186,7 +186,7 @@ public class RspTreeModel extends AbstractTreeStructure {
                             element.ds.getReference().getLabel() + "   [" +
                                     getRunStateString(element.ds.getState()) + ", " +
                                     getPublishStateString(element.ds.getPublishState()) + "]",
-                    IconLoader.getIcon("images/jar_obj.gif"));
+                    IconLoader.getIcon("images/jar_obj.png"));
         }
     }
 
