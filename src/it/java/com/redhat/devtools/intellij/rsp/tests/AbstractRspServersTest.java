@@ -21,4 +21,9 @@ public abstract class AbstractRspServersTest {
         RemoteText server = rspViewTree.findAllText().get(serverNumber);
         return server.getText().contains("[STARTED]");
     }
+
+    public static boolean isRspServerStopped(ComponentFixture rspViewTree, int serverNumber){
+        RemoteText server = rspViewTree.findAllText().get(serverNumber);
+        return server.getText().contains("[STOPPED]");
+    }
 }
