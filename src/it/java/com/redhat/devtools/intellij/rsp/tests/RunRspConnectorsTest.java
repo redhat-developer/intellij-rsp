@@ -35,10 +35,16 @@ public class RunRspConnectorsTest extends AbstractRspServersTest {
             contextMenu.select("Download / Update RSP");
             final IdeStatusBar ideStatusBar = robot.find(IdeStatusBar.class);
             ideStatusBar.waitUntilAllBgTasksFinish();
+
             rspViewTree.findAllText().get(serverNumber).click(MouseButton.RIGHT_BUTTON);
             contextMenu = robot.find(RightClickMenu.class, Duration.ofSeconds(10));
             contextMenu.select("Start RSP");
             waitFor(Duration.ofSeconds(15), Duration.ofSeconds(1), "Server did not started.", () -> isRspServerStarted(rspViewTree ,serverNumber));
+
+            rspViewTree.findAllText().get(serverNumber).click(MouseButton.RIGHT_BUTTON);
+            contextMenu = robot.find(RightClickMenu.class, Duration.ofSeconds(10));
+            contextMenu.select("Stop RSP");
+            waitFor(Duration.ofSeconds(15), Duration.ofSeconds(1), "Server did not stopped.", () -> isRspServerStopped(rspViewTree ,serverNumber));
         }
     }
 }
