@@ -20,9 +20,9 @@ import com.intellij.remoterobot.fixtures.ComponentFixture;
 import com.intellij.remoterobot.fixtures.dataExtractor.RemoteText;
 import com.intellij.remoterobot.utils.WaitForConditionTimeoutException;
 import static com.intellij.remoterobot.search.locators.Locators.byXpath;
+
 import com.redhat.devtools.intellij.rsp.dialogs.ProjectStructureDialog;
 import com.redhat.devtools.intellij.rsp.mainIdeWindow.RspToolFixture;
-
 import com.redhat.devtools.intellij.rsp.mainIdeWindow.SingleHeighLabelFixture;
 import com.redhat.devtools.intellij.rsp.tests.RunRspConnectorsTest;
 import org.junit.jupiter.api.AfterAll;
@@ -35,7 +35,7 @@ import com.redhat.devtools.intellij.commonuitest.fixtures.dialogs.information.Ti
 import com.redhat.devtools.intellij.commonuitest.utils.runner.IntelliJVersion;
 import com.redhat.devtools.intellij.commonuitest.fixtures.dialogs.project.NewProjectDialogWizard;
 import com.redhat.devtools.intellij.commonuitest.fixtures.mainidewindow.idestatusbar.IdeStatusBar;
-import com.redhat.devtools.intellij.commonuitest.fixtures.mainidewindow.toolwindowspane.ToolWindowsPane;
+import com.redhat.devtools.intellij.commonuitest.fixtures.mainidewindow.toolwindowspane.ToolWindowPane;
 
 import com.redhat.devtools.intellij.rsp.tests.CheckRspConnectorsExistsTest;
 
@@ -76,7 +76,7 @@ BasicTests {
 
     @Test
     public void runRspConnectors() {
-        step("Run RSP Connectors", () -> RunRspConnectorsTest.runRspServers(robot, rspViewTree));
+        step("Start/Stop RSP Connectors", () -> RunRspConnectorsTest.runRspServers(robot, rspViewTree));
     }
 
     private static void createEmptyProject(){
@@ -84,8 +84,8 @@ BasicTests {
         flatWelcomeFrame.createNewProject();
         final NewProjectDialogWizard newProjectDialogWizard = flatWelcomeFrame.find(NewProjectDialogWizard.class, Duration.ofSeconds(20));
         selectNewProjectType("Empty Project");
-//        newProjectDialogWizard.finish(); // temporary commented
-        robot.find(ComponentFixture.class, byXpath("//div[@accessiblename='Finish' and @class='JButton' and @text='Finish']"), Duration.ofSeconds(5)).click(); // temporary workaround
+        newProjectDialogWizard.finish();
+//        robot.find(ComponentFixture.class, byXpath("//div[@accessiblename='Finish' and @class='JButton' and @text='Finish']"), Duration.ofSeconds(5)).click(); // workaround, if needed
 
         final IdeStatusBar ideStatusBar = robot.find(IdeStatusBar.class, Duration.ofSeconds(5));
         ideStatusBar.waitUntilProjectImportIsComplete();
@@ -103,14 +103,14 @@ BasicTests {
     }
 
     private static void openRspServersTab(){
-        final ToolWindowsPane toolWindowsPane = robot.find(ToolWindowsPane.class);
-        waitFor(Duration.ofSeconds(10), Duration.ofSeconds(1), "The 'RSP' stripe button is not available.", () -> isStripeButtonAvailable(toolWindowsPane, "RSP Servers"));
-        toolWindowsPane.stripeButton("RSP Servers", false).click();
+        final ToolWindowPane toolWindowPane = robot.find(ToolWindowPane.class);
+        waitFor(Duration.ofSeconds(10), Duration.ofSeconds(1), "The 'RSP' stripe button is not available.", () -> isStripeButtonAvailable(toolWindowPane, "RSP Servers"));
+        toolWindowPane.stripeButton("RSP Servers", false).click();
    }
 
-    private static boolean isStripeButtonAvailable(ToolWindowsPane toolWindowsPane, String label) {
+    private static boolean isStripeButtonAvailable(ToolWindowPane toolWindowPane, String label) {
         try {
-            toolWindowsPane.stripeButton(label, false);
+            toolWindowPane.stripeButton(label, false);
         } catch (WaitForConditionTimeoutException e) {
             return false;
         }
@@ -134,7 +134,7 @@ BasicTests {
 
     public static void closeGotItPopup() {
         try {
-            robot.find(ComponentFixture.class, byXpath("JBList", "//div[@accessiblename='Got It' and @class='JButton' and @text='Got It']"), Duration.ofSeconds(10)).click();
+            robot.find(ComponentFixture.class, byXpath("GotIt Popup", "//div[@accessiblename='Got It' and @class='JButton' and @text='Got It']"), Duration.ofSeconds(10)).click();
         } catch (WaitForConditionTimeoutException e) {
             e.printStackTrace();
         }
