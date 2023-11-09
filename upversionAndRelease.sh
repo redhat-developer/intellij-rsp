@@ -89,7 +89,13 @@ read -p "Press enter to continue"
 
 
 echo "Making a release on github for $finalVer"
-commitMsgsClean=`git log --color --pretty=format:'%s' --abbrev-commit | head -n $commits | awk '{ print " * " $0;}' | awk '{printf "%s\\\\n", $0}' | sed 's/"/\\"/g'`
+git log --color --pretty=format:'%s' --abbrev-commit | head -n $commits | awk '{ print " zzz " $0;}' | awk '{printf "%s\\\\n", $0}' | sed 's/"/\\"/g' > tmp1.txt
+cat tmp1.txt  | sed 's/zzz/\*/g' > tmp2.txt
+commitMsgsClean="$(<tmp2.txt)"
+rm tmp1.txt
+rm tmp2.txt
+
+
 createReleasePayload="{\"tag_name\":\"v$finalVer\",\"target_commitish\":\"$curBranch\",\"name\":\"$finalVer\",\"body\":\"Release of $finalVer:\n\n"$commitMsgsClean"\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false}"
 
 if [ "$debug" -eq 0 ]; then
