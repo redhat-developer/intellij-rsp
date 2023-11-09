@@ -9,6 +9,11 @@
     ]]></description>
 
   <change-notes><![CDATA[
+  <h3>0.8.0.Final</h3>
+  <p>Version 0.8.0 primarily fixes small issues that allow intellij-rsp to work with newer versions of intelliJ.</p>
+  <ul>
+
+</ul>
   <h3>0.7.0</h3>
   <p>Version 0.7.0 introduces full feature parity with the suite of RSP extensions in VS-Code.</p>
   <ul>
