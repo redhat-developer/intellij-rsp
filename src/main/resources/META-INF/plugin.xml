@@ -9,6 +9,10 @@
     ]]></description>
 
   <change-notes><![CDATA[
+  <h3>0.8.1.Final</h3>
+  <ul>
+
+</ul>
   <h3>0.8.0.Final</h3>
   <p>Version 0.8.0 primarily fixes small issues that allow intellij-rsp to work with newer versions of intelliJ.</p>
   <ul>
