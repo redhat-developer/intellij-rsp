@@ -1,6 +1,7 @@
 package com.redhat.devtools.intellij.rsp.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
@@ -58,10 +59,21 @@ public class EditServerAction extends AbstractTreeAction {
                     vf.putUserData(KEY_RSP_ID, server.getRsp().getRspType().getId());
                     vf.putUserData(KEY_SERVER_ID, server.getServerState().getServer().getId());
                     try {
-                        vf.setWritable(true);
+                        ApplicationManager.getApplication().runWriteAction(() -> {
+                            try {
+                                vf.setWritable(true);
+                            } catch (IOException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        });
                         OpenFileDescriptor desc = new OpenFileDescriptor(project, vf, 0);
-                        Editor editors = FileEditorManager.getInstance(project).openTextEditor(desc, true);
-                        // DOES THIS ACTUALLY SAVE WHEN USER SAVES?!??!?!?! TODO REALLY DO THIS?!?!
+                        FileEditorManager.getInstance(project).openTextEditor(desc, true);
+                    } catch (RuntimeException re) {
+                        if (re.getCause() instanceof IOException) {
+                            showError(re.getCause().getMessage(), "Error displaying server descriptor content.");
+                        } else {
+                            throw re;
+                        }
                     } catch (IOException ioException) {
                         showError(ioException.getMessage(), "Error displaying server descriptor content.");
                     }
