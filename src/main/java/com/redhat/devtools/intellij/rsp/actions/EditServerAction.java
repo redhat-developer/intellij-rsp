@@ -2,7 +2,6 @@ package com.redhat.devtools.intellij.rsp.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
@@ -74,8 +73,6 @@ public class EditServerAction extends AbstractTreeAction {
                         } else {
                             throw re;
                         }
-                    } catch (IOException ioException) {
-                        showError(ioException.getMessage(), "Error displaying server descriptor content.");
                     }
                 }
             } catch (InterruptedException interruptedException) {
