@@ -9,6 +9,16 @@
     ]]></description>
 
   <change-notes><![CDATA[
+  <h3>0.8.2.Final</h3>
+  <ul>
+      <li>Fixes <a href="https://github.com/redhat-developer/intellij-rsp/issues/161">#161</a>: Use direct XPath for RSP Servers tool window button</li>
+      <li>Fixes <a href="https://github.com/redhat-developer/intellij-rsp/issues/161">#161</a> Update integration tests for IntelliJ 2024.2</li>
+      <li>Fixes <a href="https://github.com/redhat-developer/intellij-rsp/issues/161">#161</a> Remove unreachable IOException catch in EditServerAction</li>
+      <li>Fixes <a href="https://github.com/redhat-developer/intellij-rsp/issues/161">#161</a> Update deprecated GitHub Actions to v4</li>
+      <li>Fixes <a href="https://github.com/redhat-developer/intellij-rsp/issues/161">#161</a> Raise minimum IDE version to 2023.1 for telemetry 1.2.2.8</li>
+      <li>Fixes <a href="https://github.com/redhat-developer/intellij-rsp/issues/161">#161</a> Wrap VirtualFile.setWritable() in runWriteAction()</li>
+      <li>Fixes <a href="https://github.com/redhat-developer/intellij-rsp/issues/161">#161</a> Update telemetry plugin from 1.1.0.52 to 1.2.2.8</li>
+</ul>
   <h3>0.8.1.Final</h3>
   <ul>
 
