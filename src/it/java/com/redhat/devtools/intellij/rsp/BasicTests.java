@@ -32,7 +32,6 @@ import org.junit.jupiter.api.Test;
 import com.redhat.devtools.intellij.commonuitest.UITestRunner;
 import com.redhat.devtools.intellij.commonuitest.fixtures.dialogs.information.TipDialog;
 import com.redhat.devtools.intellij.commonuitest.utils.runner.IntelliJVersion;
-import com.redhat.devtools.intellij.commonuitest.fixtures.mainidewindow.toolwindowspane.ToolWindowPane;
 import com.redhat.devtools.intellij.commonuitest.utils.project.CreateCloseUtils;
 
 import com.redhat.devtools.intellij.rsp.tests.CheckRspConnectorsExistsTest;
@@ -92,18 +91,15 @@ BasicTests {
     }
 
     private static void openRspServersTab(){
-        final ToolWindowPane toolWindowPane = robot.find(ToolWindowPane.class);
-        waitFor(Duration.ofSeconds(10), Duration.ofSeconds(1), "The 'RSP' stripe button is not available.", () -> isStripeButtonAvailable(toolWindowPane, "RSP Servers"));
-        toolWindowPane.stripeButton("RSP Servers", false).click();
-   }
-
-    private static boolean isStripeButtonAvailable(ToolWindowPane toolWindowPane, String label) {
-        try {
-            toolWindowPane.stripeButton(label, false);
-        } catch (WaitForConditionTimeoutException e) {
-            return false;
-        }
-        return true;
+        waitFor(Duration.ofSeconds(30), Duration.ofSeconds(1), "The 'RSP Servers' stripe button is not available.", () -> {
+            try {
+                robot.find(ComponentFixture.class, byXpath("//div[@accessiblename='RSP Servers']"), Duration.ofSeconds(1));
+                return true;
+            } catch (WaitForConditionTimeoutException e) {
+                return false;
+            }
+        });
+        robot.find(ComponentFixture.class, byXpath("//div[@accessiblename='RSP Servers']"), Duration.ofSeconds(5)).click();
     }
 
     public static void closeTipDialogIfItAppears() {
