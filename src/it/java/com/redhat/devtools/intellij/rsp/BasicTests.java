@@ -30,12 +30,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.redhat.devtools.intellij.commonuitest.UITestRunner;
-import com.redhat.devtools.intellij.commonuitest.fixtures.dialogs.FlatWelcomeFrame;
 import com.redhat.devtools.intellij.commonuitest.fixtures.dialogs.information.TipDialog;
 import com.redhat.devtools.intellij.commonuitest.utils.runner.IntelliJVersion;
-import com.redhat.devtools.intellij.commonuitest.fixtures.dialogs.project.NewProjectDialogWizard;
-import com.redhat.devtools.intellij.commonuitest.fixtures.mainidewindow.idestatusbar.IdeStatusBar;
 import com.redhat.devtools.intellij.commonuitest.fixtures.mainidewindow.toolwindowspane.ToolWindowPane;
+import com.redhat.devtools.intellij.commonuitest.utils.project.CreateCloseUtils;
 
 import com.redhat.devtools.intellij.rsp.tests.CheckRspConnectorsExistsTest;
 
@@ -55,7 +53,7 @@ BasicTests {
 
     @BeforeAll
     public static void connect() {
-        robot = UITestRunner.runIde(IntelliJVersion.COMMUNITY_V_2022_2, 8580);
+        robot = UITestRunner.runIde(IntelliJVersion.COMMUNITY_V_2024_2, 8580);
         createEmptyProject();
         openRspServersTab();
 
@@ -80,20 +78,11 @@ BasicTests {
     }
 
     private static void createEmptyProject(){
-        final FlatWelcomeFrame flatWelcomeFrame = robot.find(FlatWelcomeFrame.class);
-        flatWelcomeFrame.createNewProject();
-        final NewProjectDialogWizard newProjectDialogWizard = flatWelcomeFrame.find(NewProjectDialogWizard.class, Duration.ofSeconds(20));
-        selectNewProjectType("Empty Project");
-        newProjectDialogWizard.finish();
-//        robot.find(ComponentFixture.class, byXpath("//div[@accessiblename='Finish' and @class='JButton' and @text='Finish']"), Duration.ofSeconds(5)).click(); // workaround, if needed
-
-        final IdeStatusBar ideStatusBar = robot.find(IdeStatusBar.class, Duration.ofSeconds(5));
-        ideStatusBar.waitUntilProjectImportIsComplete();
+        CreateCloseUtils.createEmptyProject(robot, "test-project");
         ProjectStructureDialog.cancelProjectStructureDialogIfItAppears(robot);
         closeTipDialogIfItAppears();
         closeGotItPopup();
         closeOpenedEditors();
-        ideStatusBar.waitUntilAllBgTasksFinish();
     }
 
     private static boolean isRspViewTreeAvailable(ComponentFixture rspViewTree){
@@ -115,11 +104,6 @@ BasicTests {
             return false;
         }
         return true;
-    }
-
-    public static void selectNewProjectType(String projectType) {
-        ComponentFixture newProjectTypeList = robot.findAll(ComponentFixture.class, byXpath("JBList", "//div[@class='JBList']")).get(0);
-        newProjectTypeList.findText(projectType).click();
     }
 
     public static void closeTipDialogIfItAppears() {
