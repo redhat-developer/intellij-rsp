@@ -112,7 +112,7 @@ runPluginVerifier {
 }
 
 publishPlugin {
-    token = jetBrainsToken
+    token = System.getenv("PUBLISH_TOKEN") ?: jetBrainsToken
     channels = [jetBrainsChannel]
 }
 

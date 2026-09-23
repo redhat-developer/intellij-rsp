@@ -1,14 +1,28 @@
-name: Generate plugin archive for new release
+name: Release Plugin
+
+concurrency: release
+
 on:
   workflow_dispatch:
     inputs:
       version:
         description: 'The projectVersion found in gradle.properties file'
         required: true
+      publishToMarketPlace:
+        description: 'Publish to JetBrains Marketplace?'
+        required: true
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+        default: 'false'
 
 jobs:
-  build:
+  release:
+    name: Build and Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17
@@ -16,24 +30,26 @@ jobs:
         with:
           java-version: 17
           distribution: 'temurin'
+          cache: 'gradle'
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew buildPlugin
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Publish Plugin to JetBrains Marketplace
+        if: ${{ inputs.publishToMarketPlace == 'true' }}
+        env:
+          PUBLISH_TOKEN: ${{ secrets.JETBRAINS_MARKETPLACE_TOKEN }}
+        run: |
+          ./gradlew publishPlugin -Pchannel=stable
+          echo "Published ${{ inputs.version }} to the JetBrains Marketplace"
+      - name: Create Github Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.event.inputs.version }}
-          release_name: ${{ github.event.inputs.version }}
-      - name: Attach zip to release
-        uses: actions/upload-release-asset@v1
+        run: |
+          gh release create ${{ inputs.version }} \
+            --title "${{ inputs.version }}" \
+            --generate-notes
+      - name: Upload Release Asset
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: '${{ github.workspace }}/build/distributions/Server Connector by Red Hat-${{ github.event.inputs.version }}.zip'
-          asset_name: 'Server Connector by Red Hat-${{ github.event.inputs.version }}.zip'
-          asset_content_type: application/zip
+        run: gh release upload ${{ inputs.version }} ./build/distributions/*
