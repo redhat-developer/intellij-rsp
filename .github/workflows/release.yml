@@ -5,9 +5,6 @@ concurrency: release
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: 'The projectVersion found in gradle.properties file'
-        required: true
       publishToMarketPlace:
         description: 'Publish to JetBrains Marketplace?'
         required: true
@@ -31,6 +28,11 @@ jobs:
           java-version: 17
           distribution: 'temurin'
           cache: 'gradle'
+      - name: Read version from gradle.properties
+        run: |
+          VERSION=$(grep '^projectVersion=' gradle.properties | cut -d'=' -f2)
+          echo "PLUGIN_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Release version: $VERSION"
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
@@ -41,15 +43,15 @@ jobs:
           PUBLISH_TOKEN: ${{ secrets.JETBRAINS_MARKETPLACE_TOKEN }}
         run: |
           ./gradlew publishPlugin -Pchannel=stable
-          echo "Published ${{ inputs.version }} to the JetBrains Marketplace"
+          echo "Published $PLUGIN_VERSION to the JetBrains Marketplace"
       - name: Create Github Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create ${{ inputs.version }} \
-            --title "${{ inputs.version }}" \
+          gh release create $PLUGIN_VERSION \
+            --title "$PLUGIN_VERSION" \
             --generate-notes
       - name: Upload Release Asset
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ inputs.version }} ./build/distributions/*
+        run: gh release upload $PLUGIN_VERSION ./build/distributions/*
